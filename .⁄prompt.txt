@@ -1,0 +1,1517 @@
+This is m3, a project that I'm making to intake a song as an mp3, or whatever other multimedia object, extract the audio from it, and using demucs to initially create 4 stems from it, called vocals, bass, drums, and other. Then, each of those stems are going to be isolated again into their individual instruments and then will have extremely high-fidelity transcription into sheet music and tabs for guitar/bass. This is going to be an ambitious project because I anticipate that there is going to be a lot of separating of stems. There could be multiple instruments in, for example, the other.wav file because it just outputs all the other instruments like guitars and pianos and organs and synths there. The issue is that there can be multiple guitars or instruments that sound really similar but occupy different niches. There could be a lead guitar and an extremely faint rhythm guitar thats barely discernible from it. There could be two or more co-lead guitars. There could be a lot of distortion or overdrive tht makes pinpointing which guitar is which extremely difficult. Its the same in bass and vocals, because multiple diffrent vocals can be mixed together such as in geners like synthpop or dreampop. the system needs to find a way to discern the two. Same for bass because that could also be an issue. For drums, I dont really care though because the only infomration you need from that is organizing the whole song into time signatures and organizing where the notes go accordingly.
+
+I want to help split up the work. Because I anticipate this is going to be a web application, I would like to  have a rigid job scheduler to handle multiple requests in a serial order because compute is going to be limited, but once there are multiple machines or multiple blocks within one compute unit (gpu) i would like to have parallelized requests to get through operating queues much faster and eliminate latency.
+
+I would like to have multimedia support, using ffmpeg with hardware acceleration to extract the highest fidelity possible audio from the audiostreams and maybe even support links and have a yt-dlp process handle scraping that content from the web.
+
+I woul like to get rid of gpt-oss because its such a huge waste of space, being a text only model and requiring so much vram space just to do nothing because its a text-only model and creating a pipeline to output json song data from other audio models is such a pain. I want you to use the most advanced audio models there are to make teh song splitting so granular that each instrument gets its own lossless audio stream. Then each of them need to be transcribed back as accurately as possible with the most advanced audio models. Also, for all the audio models, I would like you to utilize google colab's fast internet speeds to implement parallel downloads, except in teh case where certain ubuntu libraries or maybe the python libraries need serial downloading to fulfill dependencies.
+
+There should be studio-grade pre-processing of the files and post processing because there are many audio effetcs like delay, modulation, pitch shifting that studios use to enhance their music.
+
+First help me organize this project and requirements then help me code it. Whenever you ask me about a decision, make it based on the framework logic of: Which of these options help me increase the accuracy of the music to transcription web service m3? And also to routively web search and make decision trees about the best possible way to make this work.
+
+Recommended Modern Architecture
+Phase 1: Enhanced Separation Pipeline
+
+Replace GPT-OSS with YourMT3+, which offers enhanced transformer architectures for multi-instrument transcription
+Implement MVSEP-MDX23 models which outperform Demucs HT 4 in separation quality
+Add MR-MT3 for memory retention to mitigate instrument leakage issues
+
+Input Audio → FFmpeg Preprocessing →
+├── Demucs (broad stems) →
+├── MDX-Net (fine instruments) →
+├── YAMNet/OpenL3 (instrument classification) →
+├── Lead/Rhythm separation (spectral analysis) →
+└── YourMT3+ (transcription per instrument)
+
+Complete M3 Pipeline Architecture
+Phase 1: Input Processing & Preprocessing
+Input Layer:
+
+MP3/multimedia file ingestion
+FFmpeg hardware-accelerated audio extraction (highest fidelity)
+yt-dlp integration for URL support
+Format normalization (44.1kHz/48kHz, bit depth optimization)
+
+Studio-Grade Preprocessing:
+
+Noise reduction and audio repair
+Dynamic range optimization
+Harmonic enhancement
+Clipping detection and reconstruction
+Phase alignment correction
+
+Phase 2: Multi-Pass Hierarchical Separation
+This is where your multi-pass requirement becomes critical. Based on recent research, iterative refinement mechanisms progressively enhance separation quality by recursively reusing separator outputs from previous iterations
+
+Pass 1 - Broad Separation:
+
+Demucs htdemucs (vocals, bass, drums, other)
+Quality assessment and confidence scoring
+Identify stems requiring further separation
+
+Pass 2 - Instrument Classification:
+
+YAMNet/OpenL3 analysis on "other" stem
+Generate probability distributions for instrument presence
+Create separation strategy based on detected instruments
+
+Pass 3 - Targeted Fine Separation:
+
+MDX-Net models for specific instrument types
+MVSEP-MDX23 for superior guitar/piano separation
+Conditional separation based on Pass 2 classifications
+
+Pass 4 - Lead/Rhythm Differentiation:
+
+Spectral analysis (centroid, rolloff, bandwidth)
+CREPE pitch tracking for note density analysis
+Dynamic prominence mapping
+Machine learning classifier for part assignment
+
+Pass 5+ - Iterative Refinement:
+
+Training-free multi-step refinement leveraging inherent denoising capabilities of separation models
+
+Quality metrics assessment after each pass
+Continue refinement until convergence or quality threshold met
+
+Phase 3: Multi-Model Transcription Engine
+Model Selection Logic:
+
+Guitar/Bass: YourMT3+ with string-specific conditioning
+Piano/Keys: MT3 with polyphonic optimization
+Drums: Specialized onset detection + pattern analysis
+Vocals: Pitch-aware transcription with lyrics alignment
+
+Confidence-Based Ensemble:
+
+Run multiple transcription models per stem
+Weighted averaging based on model confidence scores
+Cross-validation between models for note validation
+
+Phase 4: Post-Processing & Enhancement
+Tablature Generation (Guitar/Bass):
+
+Ergonomic fingering optimization
+Difficulty analysis and alternative fingerings
+String assignment based on playability
+
+Sheet Music Rendering:
+
+Time signature detection from drums
+Key signature inference
+Measure organization and formatting
+
+Multi-Pass Strategy for Accuracy
+The key insight from current research is that multiple passes aren't just beneficial - they're essential for your accuracy goals. Here's the decision framework:
+Pass Continuation Criteria:
+
+Instrument Leakage Detection: If stem contains >15% energy from other instruments
+Polyphony Complexity: Multiple overlapping instruments detected
+Quality Metrics: SNR, spectral clarity, separation artifacts below threshold
+Transcription Confidence: Low confidence scores from transcription models
+
+Multi-Pass Examples:
+Scenario 1: Complex Guitar Arrangement
+
+Pass 1: Demucs extracts "other" with mixed guitars/piano
+Pass 2: YAMNet detects "electric guitar" + "acoustic guitar" + "piano"
+Pass 3: MDX guitar model separates mixed guitar stem
+Pass 4: Lead/rhythm analysis on guitar stem
+Pass 5: Refine separation based on transcription feedback
+Pass 6: Final quality check and possible re-separation
+
+Scenario 2: Layered Vocals (Synthpop/Dreampop)
+
+Pass 1: Demucs vocal stem with multiple vocal layers
+Pass 2: Vocal classifier detects lead vs harmony vs effects
+Pass 3: Harmonic separation using frequency masking
+Pass 4: Temporal separation for call-and-response patterns
+Pass 5: Iterative refinement until individual vocal lines isolated
+
+Quality Assessment Framework
+Each pass needs quantitative quality metrics:
+Separation Quality:
+
+Signal-to-Distortion Ratio (SDR)
+Signal-to-Interference Ratio (SIR)
+Signal-to-Artifacts Ratio (SAR)
+Spectral similarity to reference models
+
+Transcription Accuracy:
+
+Note onset precision/recall
+Pitch accuracy (cents deviation)
+Rhythm quantization errors
+Harmonic content preservation
+
+Computational Efficiency Strategy
+Since multiple passes are computationally expensive:
+Smart Pass Selection:
+
+Only run additional passes where quality metrics indicate benefit
+Use lightweight classifiers to predict if refinement will help
+Parallel processing where stems are independent
+GPU memory management for model swapping
+
+Convergence Detection:
+
+Quality improvement threshold (stop if <2% improvement)
+Maximum pass limit (6-8 passes max)
+Real-time quality monitoring during separation
+
+m3_enhanced/
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py                     # FastAPI app with job endpoints
+│   │   ├── core/
+│   │   │   ├── __init__.py
+│   │   │   ├── config.py               # Environment configuration
+│   │   │   ├── job_scheduler.py        # Celery/Redis job management
+│   │   │   └── quality_metrics.py      # SDR/SIR/SAR calculations
+│   │   ├── models/
+│   │   │   ├── __init__.py
+│   │   │   ├── model_manager.py        # Centralized AI model loading
+│   │   │   └── model_configs.py        # Model-specific configurations
+│   │   ├── processors/
+│   │   │   ├── __init__.py
+│   │   │   ├── multipass_separator.py  # Multi-pass separation logic
+│   │   │   ├── instrument_classifier.py # YAMNet/OpenL3 classification
+│   │   │   ├── transcription_engine.py # YourMT3+/MT3/BasicPitch
+│   │   │   └── lead_rhythm_analyzer.py # Guitar part separation
+│   │   ├── preprocessing/
+│   │   │   ├── __init__.py
+│   │   │   ├── audio_enhancer.py       # Studio-grade preprocessing
+│   │   │   ├── format_converter.py     # FFmpeg integration
+│   │   │   └── noise_reducer.py        # Audio repair algorithms
+│   │   ├── postprocessing/
+│   │   │   ├── __init__.py
+│   │   │   ├── tablature_generator.py  # Guitar tab optimization
+│   │   │   ├── sheet_renderer.py       # Music notation rendering
+│   │   │   └── output_formatter.py     # ZIP packaging
+│   │   └── utils/
+│   │       ├── __init__.py
+│   │       ├── audio_utils.py          # Common audio operations
+│   │       ├── midi_utils.py           # MIDI handling
+│   │       └── file_manager.py         # File system operations
+│   ├── requirements.txt                # Updated dependencies
+│   ├── docker/
+│   │   ├── Dockerfile                  # Production container
+│   │   ├── docker-compose.yml          # Multi-service setup
+│   │   └── gpu.Dockerfile              # GPU-optimized container
+│   └── scripts/
+│       ├── download_models.py          # Model downloading script
+│       ├── colab_setup.py              # Google Colab initialization
+│       └── benchmark_models.py         # Performance testing
+├── frontend/
+│   ├── static/
+│   │   ├── index.html                  # Web interface
+│   │   ├── style.css                   # UI styling
+│   │   └── app.js                      # Client-side logic
+│   └── templates/                      # Additional UI templates
+├── models/                             # AI model storage
+│   ├── yourmt3_plus/                   # Enhanced transcription models
+│   ├── mt3/                            # Google MT3 models
+│   ├── demucs/                         # Demucs separation models
+│   ├── mvsep/                          # MVSEP-MDX23 models
+│   ├── yamnet/                         # Audio classification
+│   ├── basic_pitch/                    # Spotify transcription
+│   └── soundfonts/                     # Audio synthesis
+├── temp/                               # Temporary processing files
+├── uploads/                            # User uploaded files
+├── results/                            # Processing outputs
+├── tests/
+│   ├── __init__.py
+│   ├── test_separation.py              # Separation quality tests
+│   ├── test_transcription.py           # Transcription accuracy tests
+│   └── integration/
+│       └── test_full_pipeline.py       # End-to-end testing
+├── config/
+│   ├── redis.conf                      # Redis configuration
+│   ├── celery.conf                     # Celery worker settings
+│   └── nginx.conf                      # Reverse proxy config
+├── docs/
+│   ├── API.md                          # API documentation
+│   ├── SETUP.md                        # Installation guide
+│   └── PIPELINE.md                     # Architecture overview
+├── .env.example                        # Environment variables template
+├── docker-compose.yml                  # Development environment
+├── requirements-dev.txt                # Development dependencies
+└── README.md                           # Project overview
+
+But just worry about backend for now. Out of these backend files, you made a few:
+m3_enhanced/backend/app/core/config.py
+import os
+from pathlib import Path
+from typing import Dict, List, Optional
+from pydantic import BaseSettings, Field
+
+class M3Config(BaseSettings):
+    """Enhanced M3 Configuration for multi-pass audio processing"""
+
+    # Base Directories
+    BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent.parent
+    MODELS_DIR: Path = BASE_DIR / "models"
+    TEMP_DIR: Path = BASE_DIR / "temp"
+    UPLOADS_DIR: Path = BASE_DIR / "uploads"
+    RESULTS_DIR: Path = BASE_DIR / "results"
+
+    # Audio Processing Settings
+    AUDIO_SAMPLE_RATE: int = 48000  # Studio quality
+    AUDIO_BIT_DEPTH: int = 24
+    MAX_AUDIO_DURATION_SECONDS: int = 600  # 10 minutes max
+
+    # Multi-Pass Separation Settings
+    MAX_SEPARATION_PASSES: int = 6
+    QUALITY_THRESHOLD: float = 0.85
+    IMPROVEMENT_THRESHOLD: float = 0.02  # Stop if <2% improvement
+
+    # Model Configurations
+    DEMUCS_MODEL_NAME: str = "htdemucs"
+    MVSEP_MODEL_NAME: str = "UVR-MDX-NET-Inst_HQ_3"
+    TRANSCRIPTION_MODEL: str = "basic-pitch"  # Will upgrade to YourMT3+ when available
+
+    # Quality Metrics Thresholds
+    MIN_SDR_THRESHOLD: float = 10.0  # Signal-to-Distortion Ratio
+    MIN_SIR_THRESHOLD: float = 15.0  # Signal-to-Interference Ratio
+    MIN_SAR_THRESHOLD: float = 10.0  # Signal-to-Artifacts Ratio
+
+    # Job Management
+    CELERY_BROKER_URL: str = "redis://localhost:6379/0"
+    CELERY_RESULT_BACKEND: str = "redis://localhost:6379/0"
+    MAX_CONCURRENT_JOBS: int = 2  # GPU memory constraint
+
+    # Instrument Detection Settings
+    INSTRUMENT_CONFIDENCE_THRESHOLD: float = 0.25
+    SUPPORTED_INSTRUMENTS: List[str] = [
+        "vocals", "bass", "drums", "lead_guitar", "rhythm_guitar",
+        "acoustic_guitar", "piano", "synthesizer", "strings", "brass"
+    ]
+
+    # Guitar-specific settings for tablature
+    GUITAR_STRINGS: int = 6
+    MAX_FRET_SPAN: int = 5  # Maximum frets a hand can span
+    PREFERRED_POSITIONS: List[int] = [5, 7, 12]  # Common playing positions
+
+    # FFmpeg settings for studio-grade conversion
+    FFMPEG_AUDIO_CODEC: str = "pcm_s24le"  # 24-bit PCM
+    FFMPEG_BITRATE: str = "1152k"  # High quality
+
+    # YT-DLP settings for URL downloads
+    YT_DLP_AUDIO_FORMAT: str = "best[ext=mp3]/best"
+    YT_DLP_QUALITY: str = "bestaudio"
+
+    class Config:
+        env_file = ".env"
+        case_sensitive = True
+
+class ModelPaths:
+    """Centralized model path management"""
+
+    def __init__(self, models_dir: Path):
+        self.models_dir = models_dir
+
+        # Separation Models
+        self.demucs_dir = models_dir / "demucs"
+        self.mvsep_dir = models_dir / "mvsep"
+
+        # Transcription Models
+        self.yourmt3_dir = models_dir / "yourmt3_plus"
+        self.mt3_dir = models_dir / "mt3"
+        self.basic_pitch_dir = models_dir / "basic_pitch"
+
+        # Classification Models
+        self.yamnet_dir = models_dir / "yamnet"
+        self.openl3_dir = models_dir / "openl3"
+
+        # Synthesis
+        self.soundfonts_dir = models_dir / "soundfonts"
+
+    def get_soundfont_path(self) -> Path:
+        """Get the primary soundfont file"""
+        return self.soundfonts_dir / "FluidR3_GM.sf2"
+
+    def ensure_directories(self):
+        """Create all model directories if they don't exist"""
+        for attr_name in dir(self):
+            if attr_name.endswith('_dir'):
+                path = getattr(self, attr_name)
+                if isinstance(path, Path):
+                    path.mkdir(parents=True, exist_ok=True)
+
+# Global configuration instance
+config = M3Config()
+model_paths = ModelPaths(config.MODELS_DIR)
+
+# Ensure all directories exist
+model_paths.ensure_directories()
+config.TEMP_DIR.mkdir(parents=True, exist_ok=True)
+config.UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+config.RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+
+m3_enhanced/backend/app/core/quality_metrics.py
+import numpy as np
+import librosa
+import soundfile as sf
+from pathlib import Path
+from typing import Dict, Tuple, List, Optional
+from dataclasses import dataclass
+import mir_eval.separation
+from scipy import signal
+from pesq import pesq
+from pystoi import stoi
+
+@dataclass
+class QualityMetrics:
+    """Container for audio quality assessment results"""
+    sdr: float  # Signal-to-Distortion Ratio
+    sir: float  # Signal-to-Interference Ratio
+    sar: float  # Signal-to-Artifacts Ratio
+    pesq_score: float  # Perceptual quality
+    stoi_score: float  # Speech intelligibility
+    spectral_centroid_stability: float  # Frequency consistency
+    harmonic_distortion: float  # THD measurement
+    overall_score: float  # Weighted combination
+
+@dataclass
+class TranscriptionConfidence:
+    """Container for transcription quality assessment"""
+    note_onset_precision: float
+    pitch_accuracy: float
+    rhythm_consistency: float
+    harmonic_completeness: float
+    overall_confidence: float
+
+class QualityAssessment:
+    """
+    Advanced quality assessment for multi-pass separation decisions.
+    Replaces the simple CLAP-based approach with comprehensive metrics.
+    """
+
+    def __init__(self, sample_rate: int = 48000):
+        self.sample_rate = sample_rate
+
+    def assess_separation_quality(self,
+                                 separated_stem: Path,
+                                 original_mix: Path,
+                                 reference_mix: Optional[Path] = None) -> QualityMetrics:
+        """
+        Comprehensive quality assessment for separated audio stems.
+        This replaces the basic approach in your current pipeline.
+        """
+        # Load audio files
+        stem_audio, _ = librosa.load(separated_stem, sr=self.sample_rate)
+        original_audio, _ = librosa.load(original_mix, sr=self.sample_rate)
+
+        # Align lengths
+        min_len = min(len(stem_audio), len(original_audio))
+        stem_audio = stem_audio[:min_len]
+        original_audio = original_audio[:min_len]
+
+        # Calculate BSS metrics (Blind Source Separation)
+        sdr, sir, sar = self._calculate_bss_metrics(stem_audio, original_audio)
+
+        # Perceptual quality metrics
+        pesq_score = self._calculate_pesq(stem_audio, original_audio)
+        stoi_score = self._calculate_stoi(stem_audio, original_audio)
+
+        # Spectral analysis
+        spectral_stability = self._assess_spectral_stability(stem_audio)
+        harmonic_distortion = self._calculate_thd(stem_audio)
+
+        # Weighted overall score
+        overall_score = self._calculate_overall_score(
+            sdr, sir, sar, pesq_score, stoi_score,
+            spectral_stability, harmonic_distortion
+        )
+
+        return QualityMetrics(
+            sdr=sdr, sir=sir, sar=sar,
+            pesq_score=pesq_score, stoi_score=stoi_score,
+            spectral_centroid_stability=spectral_stability,
+            harmonic_distortion=harmonic_distortion,
+            overall_score=overall_score
+        )
+
+    def assess_transcription_confidence(self,
+                                      midi_path: Path,
+                                      original_audio: Path) -> TranscriptionConfidence:
+        """
+        Assess the quality and confidence of music transcription results.
+        Used to determine if another separation pass might improve transcription.
+        """
+        from music21 import converter, analysis, stream
+
+        # Load MIDI transcription
+        try:
+            score = converter.parse(midi_path)
+        except:
+            # Return low confidence if MIDI is malformed
+            return TranscriptionConfidence(0.1, 0.1, 0.1, 0.1, 0.1)
+
+        # Load original audio for comparison
+        audio, _ = librosa.load(original_audio, sr=self.sample_rate)
+
+        # Note onset analysis
+        onset_precision = self._assess_onset_precision(score, audio)
+
+        # Pitch accuracy assessment
+        pitch_accuracy = self._assess_pitch_accuracy(score, audio)
+
+        # Rhythm consistency
+        rhythm_consistency = self._assess_rhythm_consistency(score)
+
+        # Harmonic completeness (are we missing notes?)
+        harmonic_completeness = self._assess_harmonic_completeness(score, audio)
+
+        # Overall confidence score
+        overall_confidence = (
+            onset_precision * 0.3 +
+            pitch_accuracy * 0.3 +
+            rhythm_consistency * 0.2 +
+            harmonic_completeness * 0.2
+        )
+
+        return TranscriptionConfidence(
+            note_onset_precision=onset_precision,
+            pitch_accuracy=pitch_accuracy,
+            rhythm_consistency=rhythm_consistency,
+            harmonic_completeness=harmonic_completeness,
+            overall_confidence=overall_confidence
+        )
+
+    def _calculate_bss_metrics(self, separated: np.ndarray, original: np.ndarray) -> Tuple[float, float, float]:
+        """Calculate Signal-to-Distortion, Signal-to-Interference, Signal-to-Artifacts ratios"""
+        try:
+            # Use mir_eval for BSS metrics
+            reference = np.array([separated])
+            estimated = np.array([separated])  # Self-comparison for now
+
+            # This is simplified - in practice you'd need isolated reference tracks
+            sdr = np.mean(10 * np.log10(np.var(separated) / (np.var(separated - original) + 1e-10)))
+            sir = sdr + 3  # Approximation
+            sar = sdr + 2  # Approximation
+
+            return float(sdr), float(sir), float(sar)
+
+        except Exception as e:
+            print(f"BSS metrics calculation failed: {e}")
+            return 0.0, 0.0, 0.0
+
+    def _calculate_pesq(self, separated: np.ndarray, reference: np.ndarray) -> float:
+        """Calculate PESQ (Perceptual Evaluation of Speech Quality)"""
+        try:
+            # Resample to 16kHz for PESQ
+            separated_16k = librosa.resample(separated, orig_sr=self.sample_rate, target_sr=16000)
+            reference_16k = librosa.resample(reference, orig_sr=self.sample_rate, target_sr=16000)
+
+            return pesq(16000, reference_16k, separated_16k, 'wb')
+        except Exception as e:
+            print(f"PESQ calculation failed: {e}")
+            return 0.0
+
+    def _calculate_stoi(self, separated: np.ndarray, reference: np.ndarray) -> float:
+        """Calculate STOI (Short-Time Objective Intelligibility)"""
+        try:
+            return stoi(reference, separated, self.sample_rate, extended=False)
+        except Exception as e:
+            print(f"STOI calculation failed: {e}")
+            return 0.0
+
+    def _assess_spectral_stability(self, audio: np.ndarray) -> float:
+        """Assess how stable the spectral characteristics are over time"""
+        # Calculate spectral centroid over time
+        centroids = librosa.feature.spectral_centroid(y=audio, sr=self.sample_rate)[0]
+
+        # Calculate coefficient of variation (stability metric)
+        stability = 1.0 - (np.std(centroids) / (np.mean(centroids) + 1e-10))
+        return float(np.clip(stability, 0, 1))
+
+    def _calculate_thd(self, audio: np.ndarray) -> float:
+        """Calculate Total Harmonic Distortion"""
+        try:
+            # FFT analysis
+            fft = np.fft.fft(audio)
+            freqs = np.fft.fftfreq(len(audio), 1/self.sample_rate)
+
+            # Find fundamental frequency
+            magnitude = np.abs(fft)
+            fundamental_idx = np.argmax(magnitude[1:len(magnitude)//2]) + 1
+            fundamental_freq = abs(freqs[fundamental_idx])
+
+            if fundamental_freq < 50:  # Invalid fundamental
+                return 0.5  # Neutral score
+
+            # Calculate harmonic content
+            harmonics_power = 0
+            fundamental_power = magnitude[fundamental_idx] ** 2
+
+            for harmonic in range(2, 6):  # 2nd to 5th harmonics
+                harmonic_freq = fundamental_freq * harmonic
+                harmonic_idx = np.argmin(np.abs(freqs - harmonic_freq))
+                if harmonic_idx < len(magnitude):
+                    harmonics_power += magnitude[harmonic_idx] ** 2
+
+            thd = np.sqrt(harmonics_power) / np.sqrt(fundamental_power + 1e-10)
+            return float(np.clip(1.0 - thd, 0, 1))  # Convert to quality score (1 = low distortion)
+
+        except Exception as e:
+            print(f"THD calculation failed: {e}")
+            return 0.5
+
+    def _calculate_overall_score(self, sdr: float, sir: float, sar: float,
+                               pesq_score: float, stoi_score: float,
+                               spectral_stability: float, thd_score: float) -> float:
+        """Calculate weighted overall quality score"""
+
+        # Normalize SDR, SIR, SAR to 0-1 scale
+        sdr_norm = np.clip((sdr + 10) / 30, 0, 1)  # Assume -10 to 20 dB range
+        sir_norm = np.clip((sir + 5) / 25, 0, 1)   # Assume -5 to 20 dB range
+        sar_norm = np.clip((sar + 10) / 30, 0, 1)  # Assume -10 to 20 dB range
+
+        # Normalize PESQ (typically 1-5 scale)
+        pesq_norm = np.clip((pesq_score - 1) / 4, 0, 1)
+
+        # STOI is already 0-1
+        stoi_norm = np.clip(stoi_score, 0, 1)
+
+        # Weighted combination
+        overall = (
+            sdr_norm * 0.25 +        # Distortion is very important
+            sir_norm * 0.20 +        # Interference matters
+            sar_norm * 0.15 +        # Artifacts matter
+            pesq_norm * 0.15 +       # Perceptual quality
+            stoi_norm * 0.10 +       # Intelligibility
+            spectral_stability * 0.10 + # Consistency
+            thd_score * 0.05         # Harmonic purity
+        )
+
+        return float(np.clip(overall, 0, 1))
+
+    def _assess_onset_precision(self, score, audio: np.ndarray) -> float:
+        """Assess how well note onsets match the audio"""
+        try:
+            # Extract onsets from audio
+            audio_onsets = librosa.onset.onset_detect(
+                y=audio, sr=self.sample_rate, units='time'
+            )
+
+            # Extract onsets from MIDI
+            from music21 import note, chord
+            midi_onsets = []
+            for element in score.flat.notesAndRests:
+                if isinstance(element, (note.Note, chord.Chord)):
+                    midi_onsets.append(float(element.offset))
+
+            if not midi_onsets or not len(audio_onsets):
+                return 0.1
+
+            # Calculate precision/recall for onset matching
+            tolerance = 0.1  # 100ms tolerance
+            matches = 0
+
+            for midi_onset in midi_onsets:
+                if any(abs(audio_onset - midi_onset) < tolerance for audio_onset in audio_onsets):
+                    matches += 1
+
+            precision = matches / len(midi_onsets)
+            return float(np.clip(precision, 0, 1))
+
+        except Exception as e:
+            print(f"Onset precision assessment failed: {e}")
+            return 0.3
+
+    def _assess_pitch_accuracy(self, score, audio: np.ndarray) -> float:
+        """Assess pitch accuracy of transcription"""
+        try:
+            # Extract pitch from audio
+            pitches, magnitudes = librosa.piptrack(y=audio, sr=self.sample_rate)
+            audio_pitches = []
+
+            for t in range(pitches.shape[1]):
+                index = magnitudes[:, t].argmax()
+                pitch = pitches[index, t]
+                if pitch > 0:
+                    audio_pitches.append(pitch)
+
+            if not audio_pitches:
+                return 0.3
+
+            # Get MIDI pitches
+            from music21 import note, chord
+            midi_pitches = []
+            for element in score.flat.notes:
+                if isinstance(element, note.Note):
+                    midi_pitches.append(element.pitch.frequency)
+                elif isinstance(element, chord.Chord):
+                    for p in element.pitches:
+                        midi_pitches.append(p.frequency)
+
+            if not midi_pitches:
+                return 0.1
+
+            # Calculate pitch accuracy
+            accurate_pitches = 0
+            cents_tolerance = 50  # 50 cents tolerance
+
+            for midi_pitch in midi_pitches:
+                closest_audio_pitch = min(audio_pitches,
+                                        key=lambda x: abs(x - midi_pitch))
+                cents_diff = abs(1200 * np.log2(closest_audio_pitch / midi_pitch))
+                if cents_diff < cents_tolerance:
+                    accurate_pitches += 1
+
+            accuracy = accurate_pitches / len(midi_pitches)
+            return float(np.clip(accuracy, 0, 1))
+
+        except Exception as e:
+            print(f"Pitch accuracy assessment failed: {e}")
+            return 0.3
+
+    def _assess_rhythm_consistency(self, score) -> float:
+        """Assess rhythmic consistency and quantization quality"""
+        try:
+            from music21 import meter, note, chord
+
+            # Analyze time signature and beat structure
+            time_sigs = score.flat.getTimeSignatures()
+            if not time_sigs:
+                return 0.5
+
+            # Check for consistent note durations and beat alignment
+            note_durations = []
+            for element in score.flat.notesAndRests:
+                if isinstance(element, (note.Note, chord.Chord)):
+                    note_durations.append(float(element.duration.quarterLength))
+
+            if not note_durations:
+                return 0.1
+
+            # Calculate rhythmic regularity
+            common_durations = [4.0, 2.0, 1.0, 0.5, 0.25]  # Whole, half, quarter, eighth, sixteenth
+            quantized_count = sum(1 for dur in note_durations
+                                if any(abs(dur - common) < 0.1 for common in common_durations))
+
+            rhythm_score = quantized_count / len(note_durations)
+            return float(np.clip(rhythm_score, 0, 1))
+
+        except Exception as e:
+            print(f"Rhythm consistency assessment failed: {e}")
+            return 0.5
+
+    def _assess_harmonic_completeness(self, score, audio: np.ndarray) -> float:
+        """Assess if transcription captured all the harmonic content"""
+        try:
+            # Analyze harmonic content of audio
+            chroma_audio = librosa.feature.chroma_stft(y=audio, sr=self.sample_rate)
+            audio_chroma_mean = np.mean(chroma_audio, axis=1)
+
+            # Analyze harmonic content of MIDI
+            from music21 import note, chord, pitch
+            midi_chroma = np.zeros(12)
+
+            for element in score.flat.notes:
+                if isinstance(element, note.Note):
+                    pc = element.pitch.pitchClass
+                    midi_chroma[pc] += 1
+                elif isinstance(element, chord.Chord):
+                    for p in element.pitches:
+                        pc = p.pitchClass
+                        midi_chroma[pc] += 1
+
+            if midi_chroma.sum() == 0:
+                return 0.1
+
+            midi_chroma_norm = midi_chroma / midi_chroma.sum()
+            audio_chroma_norm = audio_chroma_mean / (audio_chroma_mean.sum() + 1e-10)
+
+            # Calculate correlation between audio and MIDI chroma
+            correlation = np.corrcoef(audio_chroma_norm, midi_chroma_norm)[0, 1]
+
+            if np.isnan(correlation):
+                return 0.3
+
+            return float(np.clip((correlation + 1) / 2, 0, 1))  # Convert from [-1,1] to [0,1]
+
+        except Exception as e:
+            print(f"Harmonic completeness assessment failed: {e}")
+            return 0.3
+
+def should_continue_separation(quality_metrics: QualityMetrics,
+                             previous_metrics: Optional[QualityMetrics],
+                             min_quality: float = 0.75,
+                             min_improvement: float = 0.02) -> bool:
+    """
+    Decision function for multi-pass continuation.
+    Replaces the simple CLAP confidence threshold in your current code.
+    """
+
+    # Stop if quality is already high enough
+    if quality_metrics.overall_score >= min_quality:
+        return False
+
+    # Stop if this is the first pass (need at least one comparison)
+    if previous_metrics is None:
+        return True
+
+    # Stop if improvement is too small
+    improvement = quality_metrics.overall_score - previous_metrics.overall_score
+    if improvement < min_improvement:
+        return False
+
+    # Continue separation
+    return True
+m3_enhanced/backend/app/models/model_configs.py
+from typing import Dict, List, Any
+from dataclasses import dataclass
+
+@dataclass
+class ModelConfig:
+    """Configuration for a specific AI model"""
+    name: str
+    estimated_memory_gb: float
+    capabilities: List[str]
+    priority: int  # Lower = higher priority
+    gpu_required: bool
+    dependencies: List[str]
+
+class ModelConfigs:
+    """Central registry of all model configurations"""
+
+    def __init__(self):
+        self.configs = {
+            # Source Separation Models
+            "demucs_htdemucs": ModelConfig(
+                name="Demucs HT",
+                estimated_memory_gb=2.5,
+                capabilities=["source_separation", "broad_separation"],
+                priority=1,
+                gpu_required=True,
+                dependencies=["demucs"]
+            ),
+
+            "demucs_htdemucs_6s": ModelConfig(
+                name="Demucs HT 6-Source",
+                estimated_memory_gb=3.0,
+                capabilities=["source_separation", "fine_separation"],
+                priority=2,
+                gpu_required=True,
+                dependencies=["demucs"]
+            ),
+
+            "mvsep_mdx23": ModelConfig(
+                name="MVSEP-MDX23",
+                estimated_memory_gb=1.8,
+                capabilities=["source_separation", "high_quality_separation"],
+                priority=2,
+                gpu_required=True,
+                dependencies=["audio-separator"]
+            ),
+
+            # Transcription Models
+            "basic_pitch": ModelConfig(
+                name="Basic Pitch",
+                estimated_memory_gb=1.2,
+                capabilities=["polyphonic_transcription", "general_instruments"],
+                priority=1,
+                gpu_required=False,
+                dependencies=["basic-pitch"]
+            ),
+
+            "yourmt3_plus": ModelConfig(
+                name="YourMT3+",
+                estimated_memory_gb=4.5,
+                capabilities=["advanced_transcription", "multi_instrument", "guitar_specific"],
+                priority=1,
+                gpu_required=True,
+                dependencies=["transformers", "torch"]
+            ),
+
+            # Classification Models
+            "yamnet": ModelConfig(
+                name="YAMNet",
+                estimated_memory_gb=0.5,
+                capabilities=["audio_classification", "instrument_detection"],
+                priority=1,
+                gpu_required=False,
+                dependencies=["tensorflow", "tensorflow-hub"]
+            ),
+
+            "openl3": ModelConfig(
+                name="OpenL3",
+                estimated_memory_gb=0.8,
+                capabilities=["audio_embeddings", "similarity_analysis"],
+                priority=3,
+                gpu_required=False,
+                dependencies=["openl3"]
+            ),
+
+            # Analysis Models
+            "clap": ModelConfig(
+                name="CLAP",
+                estimated_memory_gb=1.0,
+                capabilities=["audio_text_similarity", "instrument_classification"],
+                priority=3,
+                gpu_required=False,
+                dependencies=["laion-clap"]
+            )
+        }
+
+    def get_config(self, model_name: str) -> Dict[str, Any]:
+        """Get configuration for a specific model"""
+        config = self.configs.get(model_name)
+        if config:
+            return {
+                "name": config.name,
+                "estimated_memory_gb": config.estimated_memory_gb,
+                "capabilities": config.capabilities,
+                "priority": config.priority,
+                "gpu_required": config.gpu_required,
+                "dependencies": config.dependencies
+            }
+        return {}
+
+    def get_models_by_capability(self, capability: str) -> List[str]:
+        """Get all models that have a specific capability"""
+        return [
+            model_name for model_name, config in self.configs.items()
+            if capability in config.capabilities
+        ]
+
+    def get_separation_models(self) -> List[str]:
+        """Get all source separation models ordered by priority"""
+        models = self.get_models_by_capability("source_separation")
+        return sorted(models, key=lambda x: self.configs[x].priority)
+
+    def get_transcription_models(self) -> List[str]:
+        """Get all transcription models ordered by priority"""
+        models = [name for name, config in self.configs.items()
+                 if any(cap.endswith("transcription") for cap in config.capabilities)]
+        return sorted(models, key=lambda x: self.configs[x].priority)
+
+    def get_classification_models(self) -> List[str]:
+        """Get all classification models ordered by priority"""
+        models = [name for name, config in self.configs.items()
+                 if any(cap.endswith("classification") or cap.endswith("detection")
+                       for cap in config.capabilities)]
+        return sorted(models, key=lambda x: self.configs[x].priority)
+
+    def estimate_total_memory(self, model_names: List[str]) -> float:
+        """Estimate total memory usage for a list of models"""
+        total = 0.0
+        for model_name in model_names:
+            config = self.configs.get(model_name)
+            if config:
+                total += config.estimated_memory_gb
+        return total
+
+    def check_dependencies(self, model_name: str) -> Dict[str, bool]:
+        """Check if all dependencies for a model are satisfied"""
+        config = self.configs.get(model_name)
+        if not config:
+            return {}
+
+        dependency_status = {}
+        for dep in config.dependencies:
+            try:
+                __import__(dep.replace("-", "_"))
+                dependency_status[dep] = True
+            except ImportError:
+                dependency_status[dep] = False
+
+        return dependency_status
+
+    def get_recommended_separation_pipeline(self) -> List[str]:
+        """Get recommended sequence of separation models for multi-pass"""
+        return [
+            "demucs_htdemucs",      # Pass 1: Broad separation
+            "mvsep_mdx23",          # Pass 2+: High-quality refinement
+        ]
+
+    def get_recommended_transcription_pipeline(self) -> List[str]:
+        """Get recommended sequence of transcription models"""
+        # Check if YourMT3+ is available, otherwise fall back to Basic Pitch
+        if "yourmt3_plus" in self.configs:
+            dependencies = self.check_dependencies("yourmt3_plus")
+            if all(dependencies.values()):
+                return ["yourmt3_plus", "basic_pitch"]  # YourMT3+ primary, Basic Pitch backup
+
+        return ["basic_pitch"]  # Fallback to Basic Pitch only
+m3_enhanced/backend/app/models/model_manager.py
+import torch
+import gc
+import threading
+from pathlib import Path
+from typing import Dict, Optional, Any, List
+from contextlib import contextmanager
+import subprocess
+import sys
+
+from ..core.config import config, model_paths
+from .model_configs import ModelConfigs
+
+class ModelManager:
+    """
+    Centralized AI model management system.
+    Replaces the scattered model loading in your current implementation.
+    Handles memory management, GPU allocation, and model lifecycle.
+    """
+
+    def __init__(self):
+        self.loaded_models: Dict[str, Any] = {}
+        self.model_configs = ModelConfigs()
+        self.gpu_memory_limit = self._get_gpu_memory_limit()
+        self.lock = threading.Lock()
+
+        # Priority loading order (most important models first)
+        self.loading_priority = [
+            "demucs_htdemucs",
+            "basic_pitch",
+            "yamnet",
+            "mvsep_mdx23"
+        ]
+
+    def _get_gpu_memory_limit(self) -> float:
+        """Get available GPU memory in GB"""
+        if torch.cuda.is_available():
+            return torch.cuda.get_device_properties(0).total_memory / (1024**3)
+        return 0.0
+
+    @contextmanager
+    def model_context(self, model_name: str):
+        """Context manager for safe model usage with automatic cleanup"""
+        model = self.load_model(model_name)
+        try:
+            yield model
+        finally:
+            # Keep model loaded for reuse, but clear cache
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+
+    def load_model(self, model_name: str, force_reload: bool = False) -> Any:
+        """Load a specific model with memory management"""
+        with self.lock:
+            if model_name in self.loaded_models and not force_reload:
+                return self.loaded_models[model_name]
+
+            # Check if we need to free memory for the new model
+            self._manage_memory_for_model(model_name)
+
+            print(f"Loading model: {model_name}")
+            model = self._load_specific_model(model_name)
+
+            if model is not None:
+                self.loaded_models[model_name] = model
+                print(f"Successfully loaded {model_name}")
+            else:
+                print(f"Failed to load {model_name}")
+
+            return model
+
+    def _manage_memory_for_model(self, model_name: str):
+        """Free memory if needed before loading a new model"""
+        config = self.model_configs.get_config(model_name)
+        estimated_memory = config.get('estimated_memory_gb', 2.0)
+
+        # If we're running low on memory, unload less important models
+        if self.gpu_memory_limit > 0:
+            available_memory = self._get_available_gpu_memory()
+
+            if available_memory < estimated_memory:
+                self._free_memory_for_space(estimated_memory - available_memory)
+
+    def _get_available_gpu_memory(self) -> float:
+        """Get currently available GPU memory in GB"""
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            return (torch.cuda.get_device_properties(0).total_memory -
+                   torch.cuda.memory_allocated()) / (1024**3)
+        return float('inf')
+
+    def _free_memory_for_space(self, needed_gb: float):
+        """Free up GPU memory by unloading models"""
+        # Unload models in reverse priority order
+        for model_name in reversed(self.loading_priority):
+            if model_name in self.loaded_models:
+                print(f"Unloading {model_name} to free memory")
+                del self.loaded_models[model_name]
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+
+                if self._get_available_gpu_memory() >= needed_gb:
+                    break
+
+    def _load_specific_model(self, model_name: str) -> Optional[Any]:
+        """Load a specific model based on its type"""
+        try:
+            if model_name.startswith("demucs_"):
+                return self._load_demucs_model(model_name)
+            elif model_name == "basic_pitch":
+                return self._load_basic_pitch_model()
+            elif model_name == "yamnet":
+                return self._load_yamnet_model()
+            elif model_name.startswith("mvsep_"):
+                return self._load_mvsep_model(model_name)
+            elif model_name == "yourmt3_plus":
+                return self._load_yourmt3_model()
+            elif model_name == "openl3":
+                return self._load_openl3_model()
+            else:
+                print(f"Unknown model type: {model_name}")
+                return None
+
+        except Exception as e:
+            print(f"Failed to load {model_name}: {e}")
+            return None
+
+    def _load_demucs_model(self, model_name: str):
+        """Load Demucs separation model"""
+        from demucs.pretrained import get_model
+
+        model_type = model_name.split("_", 1)[1]  # e.g., "htdemucs" from "demucs_htdemucs"
+        return get_model(model_type)
+
+    def _load_basic_pitch_model(self):
+        """Load Basic Pitch transcription model"""
+        import basic_pitch
+        from basic_pitch.inference import predict
+
+        # Basic Pitch loads automatically when used
+        return {"predict": predict, "loaded": True}
+
+    def _load_yamnet_model(self):
+        """Load YAMNet audio classification model"""
+        try:
+            import tensorflow as tf
+            import tensorflow_hub as hub
+
+            model = hub.load('https://tfhub.dev/google/yamnet/1')
+            return model
+        except ImportError:
+            print("TensorFlow not available for YAMNet. Install with: pip install tensorflow tensorflow-hub")
+            return None
+
+    def _load_mvsep_model(self, model_name: str):
+        """Load MVSEP-MDX23 model using audio-separator"""
+        try:
+            from audio_separator.separator import Separator
+
+            model_type = model_name.split("_", 1)[1]  # e.g., "mdx23" from "mvsep_mdx23"
+            separator = Separator(
+                model_file_dir=str(model_paths.mvsep_dir),
+                output_dir=str(config.TEMP_DIR)
+            )
+
+            return separator
+        except ImportError:
+            print("audio-separator not available. Install with: pip install audio-separator")
+            return None
+
+    def _load_yourmt3_model(self):
+        """Load YourMT3+ model (when available)"""
+        # This would be implemented when YourMT3+ becomes available
+        print("YourMT3+ not yet available. Falling back to Basic Pitch.")
+        return self._load_basic_pitch_model()
+
+    def _load_openl3_model(self):
+        """Load OpenL3 audio embedding model"""
+        try:
+            import openl3
+            return openl3
+        except ImportError:
+            print("OpenL3 not available. Install with: pip install openl3")
+            return None
+
+    def preload_essential_models(self):
+        """Preload the most critical models for fast processing"""
+        essential_models = ["demucs_htdemucs", "basic_pitch", "yamnet"]
+
+        for model_name in essential_models:
+            try:
+                self.load_model(model_name)
+            except Exception as e:
+                print(f"Failed to preload {model_name}: {e}")
+
+    def get_model_info(self) -> Dict[str, Dict]:
+        """Get information about all loaded models"""
+        info = {}
+        for model_name, model in self.loaded_models.items():
+            config = self.model_configs.get_config(model_name)
+            info[model_name] = {
+                "loaded": True,
+                "memory_usage_gb": config.get('estimated_memory_gb', 'unknown'),
+                "capabilities": config.get('capabilities', [])
+            }
+        return info
+
+    def cleanup_all_models(self):
+        """Clean up all loaded models and free memory"""
+        with self.lock:
+            for model_name in list(self.loaded_models.keys()):
+                del self.loaded_models[model_name]
+
+            self.loaded_models.clear()
+            gc.collect()
+
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+
+            print("All models cleaned up and memory freed")
+
+# Global model manager instance
+model_manager = ModelManager()
+
+m3_enhanced/backend/app/processors/multipass_separator.py
+import shutil
+import subprocess
+from pathlib import Path
+from typing import Dict, List, Tuple, Optional
+from dataclasses import dataclass
+import numpy as np
+import librosa
+import soundfile as sf
+
+from ..core.config import config
+from ..core.quality_metrics import QualityAssessment, QualityMetrics, should_continue_separation
+from ..models.model_manager import model_manager
+from .instrument_classifier import InstrumentClassifier
+
+@dataclass
+class SeparationPass:
+    """Results from a single separation pass"""
+    pass_number: int
+    stems: Dict[str, Path]  # instrument_name -> file_path
+    quality_metrics: Dict[str, QualityMetrics]
+    detected_instruments: List[str]
+    processing_time: float
+
+class MultiPassSeparator:
+    """
+    Advanced multi-pass separation engine that replaces your current single-pass approach.
+    Uses iterative refinement with quality assessment to achieve maximum accuracy.
+    """
+
+    def __init__(self):
+        self.quality_assessor = QualityAssessment(sample_rate=config.AUDIO_SAMPLE_RATE)
+        self.instrument_classifier = InstrumentClassifier()
+
+    def separate_audio_multipass(self,
+                               audio_path: Path,
+                               job_id: str,
+                               callback) -> Dict[str, Path]:
+        """
+        Main multi-pass separation orchestrator.
+        This completely replaces your current run_full_pipeline logic.
+        """
+        callback("Starting advanced multi-pass separation...")
+
+        # Create working directories
+        work_dir = config.TEMP_DIR / job_id / "separation"
+        work_dir.mkdir(parents=True, exist_ok=True)
+
+        separation_passes = []
+        current_stems = {"full_mix": audio_path}
+        pass_number = 1
+
+        while pass_number <= config.MAX_SEPARATION_PASSES:
+            callback(f"Pass {pass_number}: Analyzing and separating audio...")
+
+            # Execute separation pass
+            pass_result = self._execute_separation_pass(
+                current_stems, work_dir, pass_number, callback
+            )
+            separation_passes.append(pass_result)
+
+            # Assess quality and decide whether to continue
+            should_continue = self._should_continue_separation(
+                pass_result, separation_passes, callback
+            )
+
+            if not should_continue:
+                callback(f"Separation converged after {pass_number} passes")
+                break
+
+            # Prepare for next pass - identify stems needing refinement
+            current_stems = self._prepare_next_pass_stems(pass_result, callback)
+
+            if not current_stems:
+                callback("No stems require further refinement")
+                break
+
+            pass_number += 1
+
+        # Consolidate final results
+        final_stems = self._consolidate_final_stems(separation_passes, work_dir)
+        callback(f"Multi-pass separation completed with {len(final_stems)} stems")
+
+        return final_stems
+
+    def _execute_separation_pass(self,
+                               input_stems: Dict[str, Path],
+                               work_dir: Path,
+                               pass_number: int,
+                               callback) -> SeparationPass:
+        """Execute a single separation pass on the input stems"""
+        import time
+        start_time = time.time()
+
+        pass_dir = work_dir / f"pass_{pass_number}"
+        pass_dir.mkdir(exist_ok=True)
+
+        all_stems = {}
+        all_quality_metrics = {}
+        all_detected_instruments = []
+
+        for stem_name, stem_path in input_stems.items():
+            callback(f"Pass {pass_number}: Processing {stem_name}...")
+
+            # Choose separation strategy based on pass number and stem content
+            if pass_number == 1 and stem_name == "full_mix":
+                # Pass 1: Broad separation with Demucs
+                stems, detected = self._broad_separation_demucs(stem_path, pass_dir)
+            else:
+                # Pass 2+: Targeted separation based on classification
+                stems, detected = self._targeted_separation(stem_path, stem_name, pass_dir, callback)
+
+            all_stems.update(stems)
+            all_detected_instruments.extend(detected)
+
+            # Assess quality of each separated stem
+            for new_stem_name, new_stem_path in stems.items():
+                quality = self.quality_assessor.assess_separation_quality(
+                    new_stem_path, stem_path
+                )
+                all_quality_metrics[new_stem_name] = quality
+
+        processing_time = time.time() - start_time
+
+        return SeparationPass(
+            pass_number=pass_number,
+            stems=all_stems,
+            quality_metrics=all_quality_metrics,
+            detected_instruments=list(set(all_detected_instruments)),
+            processing_time=processing_time
+        )
+
+    def _broad_separation_demucs(self, audio_path: Path, output_dir: Path) -> Tuple[Dict[str, Path], List[str]]:
+        """Pass 1: Broad separation using Demucs htdemucs"""
+        with model_manager.model_context("demucs_htdemucs"):
+            # Run Demucs separation
+            subprocess.run([
+                "python", "-m", "demucs.separate",
+                "-n", "htdemucs",
+                "-o", str(output_dir),
+                str(audio_path)
+            ], check=True, capture_output=True)
+
+            # Collect separated stems
+            stems_dir = output_dir / "htdemucs" / audio_path.stem
+            stems = {}
+            detected_instruments = []
+
+            for stem_file in stems_dir.glob("*.wav"):
+                stem_name = stem_file.stem
+                stems[stem_name] = stem_file
+                detected_instruments.append(stem_name)
+
+            return stems, detected_instruments
+
+    def _targeted_separation(self,
+                           audio_path: Path,
+                           stem_name: str,
+                           output_dir: Path,
+                           callback) -> Tuple[Dict[str, Path], List[str]]:
+        """Pass 2+: Targeted separation based on instrument classification"""
+
+        # First, classify what instruments are in this stem
+        detected_instruments = self.instrument_classifier.classify_instruments(
+            audio_path, confidence_threshold=config.INSTRUMENT_CONFIDENCE_THRESHOLD
+        )
+
+        callback(f"Detected instruments in {stem_name}: {detected_instruments}")
+
+        # If only one instrument detected, no further separation needed
+        if len(detected_instruments) <= 1:
+            return {stem_name: audio_path}, detected_instruments
+
+        # Multiple instruments detected - use targeted separation
+        return self._separate_multiple_instruments(
+            audio_path, detected_instruments, output_dir, callback
+        )
+
+    def _separate_multiple_instruments(self,
+                                     audio_path: Path,
+                                     instruments: List[str],
+                                     output_dir: Path,
+                                     callback) -> Tuple[Dict[str, Path], List[str]]:
+        """Separate audio containing multiple instruments"""
+
+        # Use MVSEP-MDX23 for high-quality targeted separation
+        try:
+            with model_manager.model_context("mvsep_mdx23") as separator:
+                if separator is None:
+                    # Fallback to Demucs 6-source
+                    return self._fallback_separation_demucs_6s(audio_path, output_dir)
+
+                # Configure separator for specific instruments
+                stems = {}
+
+                # Process each instrument type
+                for instrument in instruments:
+                    output_path = output_dir / f"{instrument}.wav"
+
+                    try:
+                        # Run audio-separator with specific model for this instrument
+                        separator.separate(str(audio_path), str(output_path))
+
+                        if output_path.exists():
+                            stems[instrument] = output_path
+
+                    except Exception as e:
+                        callback(f"Failed to separate {instrument}: {e}")
+                        continue
+
+                return stems, instruments
+
+        except Exception as e:
+            callback(f"MVSEP separation failed: {e}. Using fallback.")
+            return self._fallback_separation_demucs_6s(audio_path, output_dir)
+
+    def _fallback_separation_demucs_6s(self, audio_path: Path, output_dir: Path) -> Tuple[Dict[str, Path], List[str]]:
+        """Fallback separation using Demucs 6-source model"""
+        try:
+            with model_manager.model_context("demucs_htdemucs_6s"):
+                subprocess.run([
+                    "python", "-m", "demucs.separate",
+                    "-n", "htdemucs_6s",
+                    "-o", str(output_dir),
+                    str(audio_path)
+                ], check=True, capture_output=True)
+
+                # Collect results
+                stems_dir = output_dir / "htdemucs_6s" / audio_path.stem
+                stems = {}
+                instruments = []
+
+                for stem_file in stems_dir.glob("*.wav"):
+                    stem_name = stem_file.stem
+                    stems[stem_name] = stem_file
+                    instruments.append(stem_name)
+
+                return stems, instruments
+
+        except Exception as e:
+            print(f"Fallback separation also failed: {e}")
+            return {audio_path.stem: audio_path}, ["unknown"]
+
+    def _should_continue_separation(self,
+                                  current_pass: SeparationPass,
+                                  all_passes: List[SeparationPass],
+                                  callback) -> bool:
+        """Decide whether to continue with another separation pass"""
+
+        # Get previous pass for comparison
+        previous_pass = all_passes[-2] if len(all_passes) >= 2 else None
+
+        # Calculate average quality score for current pass
+        if not current_pass.quality_metrics:
+            return False
+
+        avg_quality = np.mean([
+            metrics.overall_score for metrics in current_pass.quality_metrics.values()
+        ])
+
+        # Calculate improvement if we have a previous pass
+        improvement = 0.0
+        if previous_pass and previous_pass.quality_metrics:
+            prev_avg_quality = np.mean([
+                metrics.overall_score for metrics in previous_pass.quality_metrics.values()
+            ])
+            improvement = avg_quality - prev_avg_quality
+
+        callback(f"Pass {current_pass.pass_number} quality: {avg_quality:.3f}, improvement: {improvement:.3f}")
+
+        # Decision logic
+        if avg_quality >= config.QUALITY_THRESHOLD:
+            callback("Quality threshold reached")
+            return False
+
+        if previous_pass and improvement < config.IMPROVEMENT_THRESHOLD:
+            callback("Improvement threshold not met")
+            return False
+
+        # Check if any stems have low quality and could benefit from refinement
+        low_quality_stems = [
+            name for name, metrics in current_pass.quality_metrics.items()
+            if metrics.overall_score < config.QUALITY_THRESHOLD * 0.8
+        ]
+
+        if not low_quality_stems:
+            callback("All stems have acceptable quality")
+            return False
+
+        callback(f"Continuing separation for stems: {low_quality_stems}")
+        return True
+
+    def _prepare_next_pass_stems(self,
+                               current_pass: SeparationPass,
+                               callback) -> Dict[str, Path]:
+        """Identify and prepare stems that need further refinement"""
+
+        candidates = {}
+
+        for stem_name, metrics in current_pass.quality_metrics.items():
+            # Include stems with low quality scores
+            if metrics.overall_score < config.QUALITY_THRESHOLD * 0.8:
+                stem_path = current_pass.stems.get(stem_name)
+                if stem_path and stem_path.exists():
+                    candidates[stem_name] = stem_path
+
+        # Also check for stems that might contain multiple instruments
+        for stem_name, stem_path in current_pass.stems.items():
+            if stem_name not in candidates:
+                instruments = self.instrument_classifier.classify_instruments(stem_path)
+                if len(instruments) > 1:
+                    callback(f"{stem_name} contains multiple instruments: {instruments}")
+                    candidates[stem_name] = stem_path
+
+        return candidates
+
+    def _consolidate_final_stems(self,
+                               all_passes: List[SeparationPass],
+                               work_dir: Path) -> Dict[str, Path]:
+        """Consolidate the best results from all separation passes"""
+
+        final_stems = {}
+        final_dir = work_dir / "final"
+        final_dir.mkdir(exist_ok=True)
+
+        # Get all unique stem names across all passes
+        all_stem_names = set()
+        for pass_result in all_passes:
+            all_stem_names.update(pass_result.stems.keys())
+
+        # For each stem, find the pass with the highest quality
+        for stem_name in all_stem_names:
+            best_pass = None
+            best_quality = -1.0
+
+            for pass_result in all_passes:
+                if stem_name in pass_result.stems and stem_name in pass_result.quality_metrics:
+                    quality = pass_result.quality_metrics[stem_name].overall_score
+                    if quality > best_quality:
+                        best_quality = quality
+                        best_pass = pass_result
+
+            if best_pass:
+                source_path = best_pass.stems[stem_name]
+                final_path = final_dir / f"{stem_name}.wav"
+
+                # Copy the best version to final directory
+                shutil.copy2(source_path, final_path)
+                final_stems[stem_name] = final_path
+
+        return final_stems

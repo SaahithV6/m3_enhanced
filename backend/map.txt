@@ -1,11 +1,11 @@
 ├── backend/
 │   ├── app/
 │   │   ├── init.py
-│   │   ├── main.py                     # FastAPI app with job endpoints
+│   │   x├── main.py                     # FastAPI app with job endpoints
 │   │   ├── core/
 │   │   │   x├── init.py
 │   │   │   x├── config.py               # Environment configuration
-│   │   │   ├── job_scheduler.py        # Celery/Redis job management
+│   │   │   x├── job_scheduler.py        # Celery/Redis job management
 │   │   │   x└── quality_metrics.py      # SDR/SIR/SAR calculations
 │   │   ├── models/
 │   │   │   x├── init.py
@@ -14,18 +14,18 @@
 │   │   ├── processors/
 │   │   │   x├── init.py
 │   │   │   x├── multipass_separator.py  # Multi-pass separation logic
-│   │   │   ├── instrument_classifier.py # YAMNet/OpenL3 classification
-│   │   │   ├── transcription_engine.py # YourMT3+/MT3/BasicPitch
-│   │   │   └── lead_rhythm_analyzer.py # Guitar part separation
+│   │   │   x├── instrument_classifier.py # YAMNet/OpenL3 classification
+│   │   │   x├── transcription_engine.py # YourMT3+/MT3/BasicPitch
+│   │   │   x└── lead_rhythm_analyzer.py # Guitar part separation
 │   │   ├── preprocessing/
 │   │   │   x├── init.py
-│   │   │   ├── audio_enhancer.py       # Studio-grade preprocessing
-│   │   │   ├── format_converter.py     # FFmpeg integration
-│   │   │   └── noise_reducer.py        # Audio repair algorithms
+│   │   │   x├── audio_enhancer.py       # Studio-grade preprocessing
+│   │   │   x├── format_converter.py     # FFmpeg integration
+│   │   │   x└── noise_reducer.py        # Audio repair algorithms
 │   │   ├── postprocessing/
 │   │   │   x├── init.py
-│   │   │   ├── tablature_generator.py  # Guitar tab optimization
-│   │   │   ├── sheet_renderer.py       # Music notation rendering
+│   │   │   x├── tablature_generator.py  # Guitar tab optimization
+│   │   │   x├── sheet_renderer.py       # Music notation rendering
 │   │   │   └── output_formatter.py     # ZIP packaging
 │   │   └── utils/
 │   │       x├── init.py
