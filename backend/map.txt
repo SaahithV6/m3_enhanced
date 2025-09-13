@@ -29,10 +29,10 @@
 │   │   │   └── output_formatter.py     # ZIP packaging
 │   │   └── utils/
 │   │       x├── init.py
-│   │       ├── audio_utils.py          # Common audio operations
-│   │       ├── midi_utils.py           # MIDI handling
-│   │       └── file_manager.py         # File system operations
-│   x├── requirements.txt                # Updated dependencies
+│   │       x├── audio_utils.py          # Common audio operations
+│   │       x├── midi_utils.py           # MIDI handling
+│   │       x└── file_manager.py         # File system operations
+│   ├── requirements.txt                # Updated dependencies
 │   ├── docker/
 │   │   ├── Dockerfile                  # Production container
 │   │   ├── docker-compose.yml          # Multi-service setup
