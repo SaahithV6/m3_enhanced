@@ -1,0 +1,60 @@
+# Server & Job Management
+fastapi
+uvicorn[standard]
+python-multipart
+celery[redis]
+redis
+pyngrok
+
+# Audio Processing & ML
+demucs==4.0.1
+audio-separator  # MVSEP-MDX23 models
+librosa>=0.10.0
+numpy<2.0.0
+scipy
+soundfile
+pydub
+
+# Studio-Grade Audio Processing
+noisereduce
+pyrubberband  # Time/pitch manipulation
+pedalboard  # Spotify's audio effects library
+
+# FFmpeg & Media Handling
+ffmpeg-python
+yt-dlp
+
+# Advanced Transcription Models
+basic-pitch
+music21
+mir-eval  # Music information retrieval evaluation
+pretty-midi
+mido
+
+# Deep Learning & Audio Classification
+torch>=2.0.0
+torchaudio>=2.0.0
+torchvision
+transformers>=4.40.0
+accelerate
+openl3
+tensorflow  # For YAMNet
+
+# Quality Assessment
+pesq  # Perceptual evaluation
+pystoi  # Short-time objective intelligibility
+museval  # Music source separation evaluation
+
+# MIDI Synthesis
+midi2audio
+fluidsynth
+pyfluidsynth
+
+# Visualization & Output
+matplotlib
+opencv-python
+reportlab  # PDF sheet music generation
+
+# Development
+pytest
+pytest-asyncio
