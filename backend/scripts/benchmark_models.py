@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 M3 Enhanced Model Benchmarking Suite
 Comprehensive performance testing and optimization analysis

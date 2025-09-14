@@ -5,6 +5,7 @@ python-multipart
 celery[redis]
 redis
 pyngrok
+aiofiles
 
 # Audio Processing & ML
 demucs==4.0.1
@@ -39,6 +40,7 @@ transformers>=4.40.0
 accelerate
 openl3
 tensorflow  # For YAMNet
+tensorflow-hub
 
 # Quality Assessment
 pesq  # Perceptual evaluation
@@ -55,6 +57,22 @@ matplotlib
 opencv-python
 reportlab  # PDF sheet music generation
 
-# Development
+# System & File Management
+psutil
+python-magic
+GPUtil
+pynvml
+
+# Configuration & Environment
+pydantic[dotenv]
+
+# Audio Analysis & Classification
+laion-clap
+
+# Development & Testing
 pytest
 pytest-asyncio
+
+# Logging & Monitoring
+logging
+threading
