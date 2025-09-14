@@ -1,0 +1,166 @@
+version: '3.8'
+
+services:
+  # Redis for job queue and caching
+  redis:
+    image: redis:7-alpine
+    container_name: m3_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 1gb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Main M3 Enhanced API
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: m3_api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - M3_MODELS_DIR=/models
+      - M3_TEMP_DIR=/temp
+      - M3_UPLOADS_DIR=/uploads
+      - M3_RESULTS_DIR=/results
+      - CUDA_VISIBLE_DEVICES=0
+    volumes:
+      - models_data:/models
+      - temp_data:/temp
+      - uploads_data:/uploads
+      - results_data:/results
+      - ./logs:/app/logs
+    depends_on:
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Celery worker for GPU processing
+  worker_gpu:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: m3_worker_gpu
+    restart: unless-stopped
+    command: celery -A app.core.job_scheduler worker --loglevel=info --concurrency=1 --queues=gpu_queue
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - M3_MODELS_DIR=/models
+      - M3_TEMP_DIR=/temp
+      - M3_UPLOADS_DIR=/uploads
+      - M3_RESULTS_DIR=/results
+      - CUDA_VISIBLE_DEVICES=0
+    volumes:
+      - models_data:/models
+      - temp_data:/temp
+      - uploads_data:/uploads
+      - results_data:/results
+      - ./logs:/app/logs
+    depends_on:
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # Celery worker for CPU processing (transcription, analysis)
+  worker_cpu:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: m3_worker_cpu
+    restart: unless-stopped
+    command: celery -A app.core.job_scheduler worker --loglevel=info --concurrency=2 --queues=transcription_queue,analysis_queue
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - M3_MODELS_DIR=/models
+      - M3_TEMP_DIR=/temp
+      - M3_UPLOADS_DIR=/uploads
+      - M3_RESULTS_DIR=/results
+      - CUDA_VISIBLE_DEVICES=""
+    volumes:
+      - models_data:/models
+      - temp_data:/temp
+      - uploads_data:/uploads
+      - results_data:/results
+      - ./logs:/app/logs
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # Celery flower for monitoring
+  flower:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: m3_flower
+    restart: unless-stopped
+    command: celery -A app.core.job_scheduler flower --port=5555
+    ports:
+      - "5555:5555"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # Nginx reverse proxy (optional, for production)
+  nginx:
+    image: nginx:alpine
+    container_name: m3_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+    profiles:
+      - production
+
+volumes:
+  redis_data:
+    driver: local
+  models_data:
+    driver: local
+  temp_data:
+    driver: local
+  uploads_data:
+    driver: local
+  results_data:
+    driver: local
+
+networks:
+  default:
+    name: m3_network
+    driver: bridge

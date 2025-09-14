@@ -26,7 +26,7 @@
 │   │   │   x├── init.py
 │   │   │   x├── tablature_generator.py  # Guitar tab optimization
 │   │   │   x├── sheet_renderer.py       # Music notation rendering
-│   │   │   └── output_formatter.py     # ZIP packaging
+│   │   │   x└── output_formatter.py     # ZIP packaging
 │   │   └── utils/
 │   │       x├── init.py
 │   │       x├── audio_utils.py          # Common audio operations
@@ -34,8 +34,8 @@
 │   │       x└── file_manager.py         # File system operations
 │   ├── requirements.txt                # Updated dependencies
 │   ├── docker/
-│   │   ├── Dockerfile                  # Production container
-│   │   ├── docker-compose.yml          # Multi-service setup
+│   │   x├── Dockerfile                  # Production container
+│   │   x├── docker-compose.yml          # Multi-service setup
 │   │   └── gpu.Dockerfile              # GPU-optimized container
 │   └── scripts/
 │       ├── download_models.py          # Model downloading script
