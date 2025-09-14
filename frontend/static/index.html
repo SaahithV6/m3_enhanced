@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M3 Enhanced - Professional Audio Separation & Transcription</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-music"></i>
+                    <span>M3 Enhanced</span>
+                </div>
+                <nav class="nav">
+                    <a href="#upload" class="nav-link active">Upload</a>
+                    <a href="#jobs" class="nav-link">Jobs</a>
+                    <a href="#results" class="nav-link">Results</a>
+                    <a href="#api" class="nav-link">API</a>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="systemStatus">
+                        <i class="fas fa-server"></i>
+                        System Status
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Upload Section -->
+            <section id="upload-section" class="section active">
+                <div class="section-header">
+                    <h1>Professional Audio Processing</h1>
+                    <p>Upload your audio file for advanced multi-pass separation and transcription</p>
+                </div>
+
+                <div class="upload-container">
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h3>Drop your audio file here</h3>
+                        <p>or <span class="upload-link">browse files</span></p>
+                        <input type="file" id="fileInput" accept=".mp3,.wav,.flac,.m4a,.aac,.ogg,.wma" hidden>
+
+                        <div class="upload-info">
+                            <div class="info-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Supports: MP3, WAV, FLAC, M4A, AAC, OGG, WMA</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Maximum duration: 10 minutes</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-database"></i>
+                                <span>File size limit: 100MB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Processing Options -->
+                    <div class="processing-options" id="processingOptions" style="display: none;">
+                        <h3>Processing Configuration</h3>
+
+                        <div class="option-group">
+                            <label class="option-label">
+                                <i class="fas fa-cogs"></i>
+                                Processing Mode
+                            </label>
+                            <select id="processingMode" class="select-input">
+                                <option value="professional">Professional (Best Quality)</option>
+                                <option value="balanced">Balanced (Good Quality, Faster)</option>
+                                <option value="fast">Fast (Basic Quality)</option>
+                            </select>
+                        </div>
+
+                        <div class="option-group">
+                            <label class="option-label">
+                                <i class="fas fa-music"></i>
+                                Target Instruments
+                            </label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="vocals" checked>
+                                    <span>Vocals</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="guitar" checked>
+                                    <span>Guitar</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="bass" checked>
+                                    <span>Bass</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="drums" checked>
+                                    <span>Drums</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="piano" checked>
+                                    <span>Piano</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="other" checked>
+                                    <span>Other</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="option-group">
+                            <label class="option-label">
+                                <i class="fas fa-file-audio"></i>
+                                Output Formats
+                            </label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="outputWav" checked>
+                                    <span>WAV (24-bit)</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="outputFlac" checked>
+                                    <span>FLAC (Lossless)</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="outputMp3">
+                                    <span>MP3 (320kbps)</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="outputMidi" checked>
+                                    <span>MIDI</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="outputTabs" checked>
+                                    <span>Guitar Tabs</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="outputSheet" checked>
+                                    <span>Sheet Music</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary btn-large" id="startProcessing">
+                            <i class="fas fa-play"></i>
+                            Start Processing
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Jobs Section -->
+            <section id="jobs-section" class="section">
+                <div class="section-header">
+                    <h1>Processing Jobs</h1>
+                    <p>Monitor your audio processing tasks in real-time</p>
+                </div>
+
+                <div class="jobs-container">
+                    <div class="jobs-filters">
+                        <button class="filter-btn active" data-filter="all">All Jobs</button>
+                        <button class="filter-btn" data-filter="running">Running</button>
+                        <button class="filter-btn" data-filter="completed">Completed</button>
+                        <button class="filter-btn" data-filter="failed">Failed</button>
+                    </div>
+
+                    <div class="jobs-list" id="jobsList">
+                        <!-- Jobs will be populated dynamically -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results-section" class="section">
+                <div class="section-header">
+                    <h1>Processing Results</h1>
+                    <p>Download and preview your processed audio files</p>
+                </div>
+
+                <div class="results-container" id="resultsContainer">
+                    <!-- Results will be populated dynamically -->
+                </div>
+            </section>
+
+            <!-- API Documentation Section -->
+            <section id="api-section" class="section">
+                <div class="section-header">
+                    <h1>API Documentation</h1>
+                    <p>Integrate M3 Enhanced into your applications</p>
+                </div>
+
+                <div class="api-docs">
+                    <div class="api-endpoint">
+                        <h3>Upload Audio File</h3>
+                        <div class="endpoint-details">
+                            <span class="method post">POST</span>
+                            <span class="url">/upload</span>
+                        </div>
+                        <pre class="code-block"><code>curl -X POST \
+  http://localhost:8000/upload \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'file=@audio.mp3'</code></pre>
+                    </div>
+
+                    <div class="api-endpoint">
+                        <h3>Check Job Status</h3>
+                        <div class="endpoint-details">
+                            <span class="method get">GET</span>
+                            <span class="url">/jobs/{job_id}/status</span>
+                        </div>
+                        <pre class="code-block"><code>curl -X GET \
+  http://localhost:8000/jobs/123e4567-e89b-12d3-a456-426614174000/status</code></pre>
+                    </div>
+
+                    <div class="api-endpoint">
+                        <h3>Download Results</h3>
+                        <div class="endpoint-details">
+                            <span class="method get">GET</span>
+                            <span class="url">/jobs/{job_id}/results</span>
+                        </div>
+                        <pre class="code-block"><code>curl -X GET \
+  http://localhost:8000/jobs/123e4567-e89b-12d3-a456-426614174000/results \
+  -o results.zip</code></pre>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Modals -->
+        <div class="modal" id="systemStatusModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>System Status</h2>
+                    <button class="modal-close" id="closeStatusModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body" id="systemStatusContent">
+                    <!-- Status content will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Processing Modal -->
+        <div class="modal" id="processingModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Processing Audio</h2>
+                </div>
+                <div class="modal-body">
+                    <div class="processing-status">
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progressBar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <div class="progress-text" id="progressText">0%</div>
+                        </div>
+
+                        <div class="processing-steps" id="processingSteps">
+                            <div class="step">
+                                <i class="fas fa-upload"></i>
+                                <span>Uploading file...</span>
+                                <div class="step-status pending"></div>
+                            </div>
+                            <div class="step">
+                                <i class="fas fa-cog"></i>
+                                <span>Preprocessing audio...</span>
+                                <div class="step-status pending"></div>
+                            </div>
+                            <div class="step">
+                                <i class="fas fa-cut"></i>
+                                <span>Separating instruments...</span>
+                                <div class="step-status pending"></div>
+                            </div>
+                            <div class="step">
+                                <i class="fas fa-music"></i>
+                                <span>Transcribing to MIDI...</span>
+                                <div class="step-status pending"></div>
+                            </div>
+                            <div class="step">
+                                <i class="fas fa-file-archive"></i>
+                                <span>Packaging results...</span>
+                                <div class="step-status pending"></div>
+                            </div>
+                        </div>
+
+                        <div class="processing-info">
+                            <div class="info-row">
+                                <span>Estimated time:</span>
+                                <span id="estimatedTime">Calculating...</span>
+                            </div>
+                            <div class="info-row">
+                                <span>Current step:</span>
+                                <span id="currentStep">Initializing...</span>
+                            </div>
+                            <div class="info-row">
+                                <span>Job ID:</span>
+                                <span id="jobId">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Container -->
+        <div class="notifications" id="notifications"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

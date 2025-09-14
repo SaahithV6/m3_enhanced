@@ -36,8 +36,8 @@
 │   ├── docker/
 │   │   x├── Dockerfile                  # Production container
 │   │   x├── docker-compose.yml          # Multi-service setup
-│   │   └── gpu.Dockerfile              # GPU-optimized container
+│   │   x└── gpu.Dockerfile              # GPU-optimized container
 │   └── scripts/
-│       ├── download_models.py          # Model downloading script
-│       ├── colab_setup.py              # Google Colab initialization
-│       └── benchmark_models.py         # Performance testing
+│       x├── download_models.py          # Model downloading script
+│       x├── colab_setup.py              # Google Colab initialization
+│       x└── benchmark_models.py         # Performance testing
