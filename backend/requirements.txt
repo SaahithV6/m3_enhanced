@@ -1,4 +1,7 @@
-# Server & Job Management
+# M3 Enhanced - requirements.txt
+# Original dependencies are preserved, with newly discovered packages added.
+
+# --- Server & Job Management ---
 fastapi
 uvicorn[standard]
 python-multipart
@@ -7,7 +10,7 @@ redis
 pyngrok
 aiofiles
 
-# Audio Processing & ML
+# --- Audio Processing & ML ---
 demucs==4.0.1
 audio-separator  # MVSEP-MDX23 models
 librosa>=0.10.0
@@ -16,23 +19,23 @@ scipy
 soundfile
 pydub
 
-# Studio-Grade Audio Processing
+# --- Studio-Grade Audio Processing ---
 noisereduce
 pyrubberband  # Time/pitch manipulation
 pedalboard  # Spotify's audio effects library
 
-# FFmpeg & Media Handling
+# --- FFmpeg & Media Handling ---
 ffmpeg-python
 yt-dlp
 
-# Advanced Transcription Models
+# --- Advanced Transcription Models ---
 basic-pitch
 music21
 mir-eval  # Music information retrieval evaluation
 pretty-midi
 mido
 
-# Deep Learning & Audio Classification
+# --- Deep Learning & Audio Classification ---
 torch>=2.0.0
 torchaudio>=2.0.0
 torchvision
@@ -42,37 +45,53 @@ openl3
 tensorflow  # For YAMNet
 tensorflow-hub
 
-# Quality Assessment
+# --- Quality Assessment ---
 pesq  # Perceptual evaluation
 pystoi  # Short-time objective intelligibility
 museval  # Music source separation evaluation
 
-# MIDI Synthesis
+# --- MIDI Synthesis ---
 midi2audio
 fluidsynth
 pyfluidsynth
 
-# Visualization & Output
+# --- Visualization & Output ---
 matplotlib
 opencv-python
 reportlab  # PDF sheet music generation
 
-# System & File Management
+# --- System & File Management ---
 psutil
 python-magic
 GPUtil
 pynvml
 
-# Configuration & Environment
+# --- Configuration & Environment ---
 pydantic[dotenv]
 
-# Audio Analysis & Classification
+# --- Audio Analysis & Classification ---
 laion-clap
 
-# Development & Testing
+# --- Development & Testing ---
 pytest
 pytest-asyncio
 
-# Logging & Monitoring
-logging
-threading
+# --- Added Packages from Code Analysis ---
+# These packages were imported in the project files but not listed above.
+
+requests             # For making HTTP requests in scripts (colab_setup.py)
+resampy              # High-quality audio resampling (used by librosa, explicitly imported)
+datasets             # Used by Hugging Face Transformers
+seaborn              # For advanced data visualization
+plotly               # For interactive plotting
+Pillow               # For image manipulation (used by music21, matplotlib, etc.)
+aiohttp              # Asynchronous HTTP client (download_models.py)
+tqdm                 # For progress bars in scripts
+scikit-learn         # For machine learning components (ICA, KMeans)
+crepe                # Monophonic pitch tracker for transcription
+numba                # JIT compiler for librosa performance
+madmom               # Advanced Music Information Retrieval library
+memory-profiler      # For benchmarking and development
+optimum[onnxruntime-gpu] # For ONNX model optimization
+onnxruntime-gpu      # GPU-accelerated ONNX runtime (install if using ONNX models on GPU)
+cupy-cuda12x         # For GPU-accelerated array operations (match your CUDA version)
