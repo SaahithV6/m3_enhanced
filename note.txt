@@ -1,0 +1,13 @@
+%%bash
+
+cd /content
+unzip m3_enhanced.zip
+
+
+cd /content/m3_enhanced
+
+# Just replace with your actual ngrok token - no Colab secrets needed!
+export NGROK_TOKEN="31u9zGx10xxBE4AU0nQo5p2kXkF_6EFLZJFdmHuH6B8TyQUwv"
+
+# Run setup
+python colab_setup.py
