@@ -1,13 +1,146 @@
+This is the output:
+Starting redis-server: redis-server.
+
+        ╔══════════════════════════════════════════════════════════════╗
+        ║                    🎵 M3 Enhanced 🎵                         ║
+        ║              Intelligent Colab Setup Script                  ║
+        ║                                                              ║
+        ║    Runtime: 🖥️ CPU        Device: cpu                  ║
+        ║    Advanced AI-Powered Music Processing Pipeline             ║
+        ║    • Audio Separation • Transcription • Analysis            ║
+        ╚══════════════════════════════════════════════════════════════╝
+
+📦 Installing system dependencies...
+🔄 Updating package lists...
+✅ Updating package lists completed
+🔄 Installing audio libraries...
+✅ Installing audio libraries completed
+🔄 Starting Redis server...
+✅ Starting Redis server completed
+🐍 Installing Python dependencies for CPU runtime...
+🔄 Upgrading pip...
+✅ Upgrading pip completed
+🔄 Installing PyTorch for CPU...
+✅ Installing PyTorch for CPU completed
+🔄 Installing TensorFlow for CPU...
+✅ Installing TensorFlow for CPU completed
+🔄 Installing transformers accelerate datasets...
+✅ Installing transformers accelerate datasets completed
+🔄 Installing librosa[display] soundfile pretty_midi music21...
+✅ Installing librosa[display] soundfile pretty_midi music21 completed
+🔄 Installing demucs basic-pitch audio-separator...
+❌ Error in Installing demucs basic-pitch audio-separator: Command 'pip install -q demucs basic-pitch audio-separator' returned non-zero exit status 1.
+🔄 Installing fastapi uvicorn[standard] python-multipart aiofiles...
+✅ Installing fastapi uvicorn[standard] python-multipart aiofiles completed
+🔄 Installing redis celery[redis]...
+✅ Installing redis celery[redis] completed
+🔄 Installing yt-dlp python-magic matplotlib seaborn plotly pillow...
+✅ Installing yt-dlp python-magic matplotlib seaborn plotly pillow completed
+🔄 Installing mir_eval pesq pystoi openl3...
+❌ Error in Installing mir_eval pesq pystoi openl3: Command 'pip install -q mir_eval pesq pystoi openl3' returned non-zero exit status 1.
+🔧 Configuring environment variables...
+🌐 Setting up ngrok tunnel...
+🔄 Installing pyngrok...
+✅ Installing pyngrok completed
+⚠️  No NGROK_TOKEN found in Colab secrets.
+Please add your ngrok token to Colab secrets as 'NGROK_TOKEN'
+Get your token from: https://dashboard.ngrok.com/get-started/your-authtoken
+Enter your ngrok auth token (or press Enter to skip): ❌ Setup failed: EOF when reading a line
+
+2025-09-15 03:09:18,025 - INFO - 🖥️  CPU runtime: 2 cores
+W: Skipping acquire of configured file 'main/source/Sources' as repository 'https://r2u.stat.illinois.edu/ubuntu jammy InRelease' does not seem to provide it (sources.list entry misspelt?)
+  error: subprocess-exited-with-error
+
+  × Getting requirements to build wheel did not run successfully.
+  │ exit code: 1
+  ╰─> See above for output.
+
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: subprocess-exited-with-error
+
+× Getting requirements to build wheel did not run successfully.
+│ exit code: 1
+╰─> See above for output.
+
+note: This error originates from a subprocess, and is likely not a problem with pip.
+  error: subprocess-exited-with-error
+
+  × python setup.py egg_info did not run successfully.
+  │ exit code: 1
+  ╰─> See above for output.
+
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+
+× Encountered error while generating package metadata.
+╰─> See above for output.
+
+note: This is an issue with the package mentioned above, not pip.
+hint: See above for details.
+Traceback (most recent call last):
+  File "/content/m3_enhanced/colab_setup.py", line 270, in setup_ngrok
+    self.ngrok_token = userdata.get('NGROK_TOKEN')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/google/colab/userdata.py", line 62, in get
+    resp = _message.blocking_request(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/google/colab/_message.py", line 173, in blocking_request
+    request_id = send_request(
+                 ^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/google/colab/_message.py", line 117, in send_request
+    instance = ipython.get_kernelapp()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/google/colab/_ipython.py", line 28, in get_kernelapp
+    return get_ipython().kernel.parent
+           ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'kernel'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/content/m3_enhanced/colab_setup.py", line 730, in <module>
+    setup_m3_enhanced()
+  File "/content/m3_enhanced/colab_setup.py", line 726, in setup_m3_enhanced
+    return setup.run_complete_setup()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/content/m3_enhanced/colab_setup.py", line 694, in run_complete_setup
+    self.setup_ngrok()
+  File "/content/m3_enhanced/colab_setup.py", line 276, in setup_ngrok
+    token = input("Enter your ngrok auth token (or press Enter to skip): ").strip()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+EOFError: EOF when reading a line
+
+---------------------------------------------------------------------------
+
+CalledProcessError                        Traceback (most recent call last)
+
+/tmp/ipython-input-3192600638.py in <cell line: 0>()
+----> 1 get_ipython().run_cell_magic('bash', '', '\ncd /content\nunzip m3_enhanced.zip\n\ncd /content/m3_enhanced\n\n\n# Run setup\npython colab_setup.py\n')
+
+4 frames
+
+<decorator-gen-103> in shebang(self, line, cell)
+
+/usr/local/lib/python3.12/dist-packages/IPython/core/magics/script.py in shebang(self, line, cell)
+    243             sys.stderr.flush()
+    244         if args.raise_error and p.returncode!=0:
+--> 245             raise CalledProcessError(p.returncode, cell, output=out, stderr=err)
+    246
+    247     def _run_script(self, p, cell, to_close):
+
+CalledProcessError: Command 'b'\ncd /content\nunzip m3_enhanced.zip\n\ncd /content/m3_enhanced\n\n\n# Run setup\npython colab_setup.py\n'' returned non-zero exit status 1.
+
+
+I ran this:
 %%bash
 
 cd /content
 unzip m3_enhanced.zip
 
-
 cd /content/m3_enhanced
 
-# Just replace with your actual ngrok token - no Colab secrets needed!
-export NGROK_TOKEN="31u9zGx10xxBE4AU0nQo5p2kXkF_6EFLZJFdmHuH6B8TyQUwv"
 
 # Run setup
 python colab_setup.py
+
+And In the secret menu, I put NGROK_TOKEN as teh name and the value and clicked teh notebook access tickmark.

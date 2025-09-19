@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 M3 Enhanced - Intelligent Google Colab Setup Script
 Automatically detects and optimizes for GPU/TPU/CPU runtimes
