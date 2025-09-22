@@ -386,8 +386,11 @@ setup_python_environment() {
     # Verify pip works
     python3 -m pip --version || error "pip not working"
 
-    # Install critical Python build dependencies
-    python3 -m pip install --upgrade Cython numpy || error "Failed to install build dependencies"
+    # Install critical Python build dependencies with FIXED numpy version
+    log "Installing critical Python build dependencies with compatible numpy..."
+    python3 -m pip install --upgrade Cython || error "Failed to install Cython"
+    # Install numpy version compatible with most packages
+    python3 -m pip install "numpy>=1.22.0,<2.0.0" || error "Failed to install compatible numpy"
 
     success "Python environment ready"
 }
@@ -416,7 +419,8 @@ install_ml_frameworks() {
         python3 -c "import torch; torch.zeros(1); print('PyTorch CPU verified')" || error "PyTorch CPU verification failed"
 
         log "Installing TensorFlow CPU version..."
-        python3 -m pip install tensorflow || error "Failed to install TensorFlow CPU"
+        # Install specific tensorflow version that works with our numpy constraints
+        python3 -m pip install "tensorflow>=2.13.0,<2.16.0" || error "Failed to install TensorFlow CPU"
 
         # Verify TensorFlow CPU
         python3 -c "import tensorflow as tf; print('TensorFlow CPU verified')" || error "TensorFlow CPU verification failed"
@@ -429,14 +433,37 @@ install_ml_frameworks() {
 install_audio_packages() {
     log "Installing audio processing packages with dependency resolution..."
 
-    # Core audio libraries first
+    # FIXED: Install compatible versions with proper dependency order
+    log "Installing scipy with numpy compatibility..."
+    python3 -m pip install "scipy>=1.9.0,<1.12.0" || error "Failed to install scipy"
+
+    log "Installing numba with numpy compatibility..."
+    python3 -m pip install "numba>=0.56.0,<0.60.0" || error "Failed to install numba"
+
+    log "Installing scikit-learn with numpy compatibility..."
+    python3 -m pip install "scikit-learn>=1.1.0,<1.4.0" || error "Failed to install scikit-learn"
+
+    # Verify scikit-learn specifically before continuing
+    log "Verifying scikit-learn installation..."
+    python3 -c "
+import sys
+try:
+    import sklearn
+    print(f'scikit-learn version: {sklearn.__version__}')
+    print('scikit-learn import successful')
+except ImportError as e:
+    print(f'scikit-learn import failed: {e}')
+    sys.exit(1)
+" || error "scikit-learn verification failed after installation"
+
+    # Core audio libraries in dependency order
     declare -a CORE_AUDIO=(
-        "librosa"
         "soundfile"
-        "resampy>=0.2.2,<0.4.3"
         "audioread"
-        "scipy"
-        "scikit-learn"
+        "joblib"
+        "decorator"
+        "resampy>=0.2.2,<0.4.3"
+        "librosa>=0.8.0,<0.11.0"
     )
 
     for package in "${CORE_AUDIO[@]}"; do
@@ -450,36 +477,36 @@ install_audio_packages() {
 
     # MIDI and music processing
     log "Installing MIDI processing packages..."
-    python3 -m pip install pretty_midi || error "Failed to install pretty_midi"
+    python3 -m pip install "pretty_midi>=0.2.9" || error "Failed to install pretty_midi"
     python3 -c "import pretty_midi; print('pretty_midi verified')" || error "pretty_midi verification failed"
 
-    python3 -m pip install music21 || error "Failed to install music21"
+    python3 -m pip install "music21>=7.0.0,<9.0.0" || error "Failed to install music21"
     python3 -c "import music21; print('music21 verified')" || error "music21 verification failed"
 
     # Audio separation - Demucs
     log "Installing Demucs..."
-    python3 -m pip install demucs || error "Failed to install demucs"
+    python3 -m pip install "demucs>=4.0.0" || error "Failed to install demucs"
     python3 -c "import demucs; print('demucs verified')" || error "demucs verification failed"
 
     # Audio quality metrics
     log "Installing audio quality packages..."
-    python3 -m pip install pesq || error "Failed to install pesq"
+    python3 -m pip install "pesq>=0.0.3" || error "Failed to install pesq"
     python3 -c "import pesq; print('pesq verified')" || error "pesq verification failed"
 
-    python3 -m pip install pystoi || error "Failed to install pystoi"
+    python3 -m pip install "pystoi>=0.3.3" || error "Failed to install pystoi"
     python3 -c "import pystoi; print('pystoi verified')" || error "pystoi verification failed"
 
     # Advanced audio separation
     log "Installing audio-separator..."
-    python3 -m pip install audio-separator || error "Failed to install audio-separator"
+    python3 -m pip install "audio-separator>=0.11.0" || error "Failed to install audio-separator"
     python3 -c "import audio_separator; print('audio-separator verified')" || error "audio-separator verification failed"
 
     # Music transcription - Basic Pitch with proper dependencies
     log "Installing Basic Pitch dependencies..."
-    python3 -m pip install mir_eval tensorflow-io || error "Failed to install Basic Pitch dependencies"
+    python3 -m pip install "mir_eval>=0.7" "tensorflow-io>=0.24.0" || error "Failed to install Basic Pitch dependencies"
 
     log "Installing Basic Pitch..."
-    python3 -m pip install basic-pitch || error "Failed to install basic-pitch"
+    python3 -m pip install "basic-pitch>=0.2.0" || error "Failed to install basic-pitch"
     python3 -c "import basic_pitch; print('basic-pitch verified')" || error "basic-pitch verification failed"
 
     success "All audio packages installed and verified"
@@ -490,18 +517,19 @@ install_ml_packages() {
     log "Installing ML/AI packages..."
 
     declare -a ML_PACKAGES=(
-        "transformers"
-        "accelerate"
-        "datasets"
-        "huggingface_hub"
-        "tokenizers"
+        "transformers>=4.20.0"
+        "accelerate>=0.20.0"
+        "datasets>=2.0.0"
+        "huggingface_hub>=0.14.0"
+        "tokenizers>=0.13.0"
     )
 
     for package in "${ML_PACKAGES[@]}"; do
         log "Installing ML package: $package"
         python3 -m pip install "$package" || error "Failed to install $package"
-        python3 -c "import ${package}; print('$package verified')" || error "$package verification failed"
-        success "Package verified: $package"
+        package_name=$(echo "$package" | cut -d'=' -f1 | cut -d'>' -f1 | cut -d'<' -f1)
+        python3 -c "import ${package_name}; print('$package_name verified')" || error "$package_name verification failed"
+        success "Package verified: $package_name"
     done
 
     success "ML packages installed and verified"
@@ -512,16 +540,16 @@ install_web_packages() {
     log "Installing web framework and utilities..."
 
     declare -a WEB_PACKAGES=(
-        "fastapi"
-        "uvicorn[standard]"
-        "python-multipart"
-        "aiofiles"
-        "redis"
-        "celery[redis]"
-        "pydantic"
-        "jinja2"
-        "python-jose[cryptography]"
-        "passlib[bcrypt]"
+        "fastapi>=0.95.0"
+        "uvicorn[standard]>=0.20.0"
+        "python-multipart>=0.0.6"
+        "aiofiles>=23.0.0"
+        "redis>=4.5.0"
+        "celery[redis]>=5.2.0"
+        "pydantic>=1.10.0"
+        "jinja2>=3.1.0"
+        "python-jose[cryptography]>=3.3.0"
+        "passlib[bcrypt]>=1.7.0"
     )
 
     for package in "${WEB_PACKAGES[@]}"; do
@@ -541,16 +569,16 @@ install_utilities() {
     log "Installing additional utilities..."
 
     declare -a UTILITY_PACKAGES=(
-        "yt-dlp"
-        "python-magic"
-        "matplotlib"
-        "seaborn"
-        "plotly"
-        "pillow"
-        "requests"
-        "tqdm"
-        "psutil"
-        "pyngrok"
+        "yt-dlp>=2023.1.0"
+        "python-magic>=0.4.27"
+        "matplotlib>=3.5.0"
+        "seaborn>=0.11.0"
+        "plotly>=5.0.0"
+        "pillow>=9.0.0"
+        "requests>=2.28.0"
+        "tqdm>=4.64.0"
+        "psutil>=5.9.0"
+        "pyngrok>=6.0.0"
     )
 
     for package in "${UTILITY_PACKAGES[@]}"; do
@@ -851,6 +879,7 @@ import demucs
 import basic_pitch
 import pesq
 import pystoi
+import sklearn
 print('Audio Libraries: PASS')
 " || error "Audio libraries test failed"
 
