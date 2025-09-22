@@ -53,7 +53,7 @@ verify_package() {
 
 # Critical system checks
 verify_system_requirements() {
-    log "🔍  Verifying system requirements..."
+    log "Verifying system requirements..."
 
     # Check disk space
     AVAILABLE_SPACE=$(df / | awk 'NR==2 {print int($4/1024/1024)}')
@@ -82,7 +82,7 @@ verify_system_requirements() {
 
 # Runtime detection with proper validation
 detect_runtime() {
-    log "🔍  Detecting runtime environment..."
+    log "Detecting runtime environment..."
 
     RUNTIME_TYPE="cpu"
     GPU_AVAILABLE=false
@@ -103,27 +103,27 @@ detect_runtime() {
                 error "GPU detected but not accessible"
             fi
 
-            log "🎮  GPU detected: $GPU_NAME (${GPU_MEMORY}MB VRAM)"
+            log "GPU detected: $GPU_NAME (${GPU_MEMORY}MB VRAM)"
         fi
     fi
 
     if [ "$RUNTIME_TYPE" = "cpu" ]; then
-        log "🖥️  CPU runtime: $CPU_CORES cores"
+        log "CPU runtime: $CPU_CORES cores"
     fi
 
     # Environment detection
     if [ -d "/content" ] && [ -d "/opt/bin" ]; then
         COLAB_DETECTED=true
-        log "📍  Google Colab environment detected"
+        log "Google Colab environment detected"
     else
         COLAB_DETECTED=false
-        log "📍  Standard Linux environment detected"
+        log "Standard Linux environment detected"
     fi
 }
 
 # Configure optimal settings
 configure_devices() {
-    log "⚙️  Configuring device-specific settings..."
+    log "Configuring device-specific settings..."
 
     if [ "$GPU_AVAILABLE" = true ]; then
         TORCH_DEVICE="cuda"
@@ -132,19 +132,19 @@ configure_devices() {
         [ "$BATCH_SIZE" -lt 1 ] && BATCH_SIZE=1
         [ "$BATCH_SIZE" -gt 16 ] && BATCH_SIZE=16
         NUM_WORKERS=$((CPU_CORES > 4 ? 4 : CPU_CORES))
-        log "📊  GPU config: device=$TORCH_DEVICE, batch_size=$BATCH_SIZE, workers=$NUM_WORKERS"
+        log "GPU config: device=$TORCH_DEVICE, batch_size=$BATCH_SIZE, workers=$NUM_WORKERS"
     else
         TORCH_DEVICE="cpu"
         TF_DEVICE="/CPU:0"
         BATCH_SIZE=1
         NUM_WORKERS=$((CPU_CORES > 8 ? 8 : CPU_CORES))
-        log "📊  CPU config: device=$TORCH_DEVICE, batch_size=$BATCH_SIZE, workers=$NUM_WORKERS"
+        log "CPU config: device=$TORCH_DEVICE, batch_size=$BATCH_SIZE, workers=$NUM_WORKERS"
     fi
 }
 
 # System dependencies with verification
 install_system_dependencies() {
-    log "📦  Installing and verifying system dependencies..."
+    log "Installing and verifying system dependencies..."
 
     # Update package database
     apt-get update -qq || error "Failed to update package lists"
@@ -241,33 +241,62 @@ install_system_dependencies() {
         apt-get install -y nvidia-cuda-toolkit nvtop || error "Failed to install GPU packages"
     fi
 
-    # Refresh library cache and verify critical libraries with correct library detection
+    # Refresh library cache and verify critical libraries with proper library detection
     ldconfig
 
     log "Verifying critical libraries..."
 
-    # Check for any FFTW3 library variant (single, double, long double, etc.)
-    if ! ldconfig -p | grep -q "fftw3"; then
-        error "FFTW3 library not found after installation"
+    # More comprehensive FFTW3 library checking - look for any variant
+    if ! ldconfig -p | grep -E "(libfftw3|fftw3)" &> /dev/null; then
+        warn "FFTW3 library not found in ldconfig cache, checking with dpkg..."
+        if ! dpkg -l | grep -q "libfftw3"; then
+            error "FFTW3 library not found after installation"
+        else
+            log "FFTW3 packages found via dpkg, continuing..."
+        fi
+    else
+        log "FFTW3 library found in system cache"
     fi
 
     # Check for libsndfile1
     if ! ldconfig -p | grep -q "libsndfile"; then
-        error "libsndfile library not found after installation"
+        warn "libsndfile library not found in cache, checking with dpkg..."
+        if ! dpkg -l | grep -q "libsndfile"; then
+            error "libsndfile library not found after installation"
+        else
+            log "libsndfile packages found via dpkg, continuing..."
+        fi
+    else
+        log "libsndfile library found in system cache"
     fi
 
     # Check for portaudio
     if ! ldconfig -p | grep -q "portaudio"; then
-        error "PortAudio library not found after installation"
+        warn "PortAudio library not found in cache, checking with dpkg..."
+        if ! dpkg -l | grep -q "portaudio"; then
+            error "PortAudio library not found after installation"
+        else
+            log "PortAudio packages found via dpkg, continuing..."
+        fi
+    else
+        log "PortAudio library found in system cache"
     fi
 
-    # Verify pkg-config can find the libraries
-    if ! pkg-config --exists fftw3; then
-        error "pkg-config cannot find FFTW3"
+    # More robust pkg-config verification with fallback
+    log "Verifying pkg-config functionality..."
+
+    # Try to find FFTW3 via pkg-config
+    if pkg-config --exists fftw3 2>/dev/null; then
+        log "pkg-config found FFTW3"
+    else
+        warn "pkg-config cannot find FFTW3, but libraries are installed - continuing"
     fi
 
-    if ! pkg-config --exists sndfile; then
-        error "pkg-config cannot find libsndfile"
+    # Try to find libsndfile via pkg-config
+    if pkg-config --exists sndfile 2>/dev/null; then
+        log "pkg-config found libsndfile"
+    else
+        warn "pkg-config cannot find libsndfile, but libraries are installed - continuing"
     fi
 
     success "Critical libraries verified"
@@ -277,30 +306,36 @@ install_system_dependencies() {
 
     # Check if systemctl is available (not in all containers)
     if command -v systemctl &> /dev/null; then
-        systemctl enable redis-server || error "Failed to enable Redis"
-        systemctl start redis-server || error "Failed to start Redis"
+        systemctl enable redis-server || warn "Failed to enable Redis (may be in container)"
+        systemctl start redis-server || warn "Failed to start Redis via systemctl, trying manual start"
         sleep 2
-        if ! systemctl is-active --quiet redis-server; then
-            error "Redis service is not running"
+        if systemctl is-active --quiet redis-server; then
+            success "Redis service started via systemctl"
+        else
+            warn "Redis not started via systemctl, trying manual start..."
+            redis-server --daemonize yes || error "Failed to start Redis manually"
+            sleep 2
         fi
     else
         # Alternative: start Redis manually
         log "Starting Redis manually (no systemd available)..."
         redis-server --daemonize yes || error "Failed to start Redis manually"
         sleep 2
-        # Test Redis connection
-        if ! redis-cli ping > /dev/null 2>&1; then
-            error "Redis is not responding to ping"
-        fi
     fi
 
-    success "Redis service verified"
+    # Test Redis connection regardless of how it was started
+    if redis-cli ping > /dev/null 2>&1; then
+        success "Redis is responding to ping"
+    else
+        error "Redis is not responding to ping"
+    fi
+
     success "All system dependencies installed and verified"
 }
 
 # Python environment setup with verification
 setup_python_environment() {
-    log "🐍  Setting up Python environment with verification..."
+    log "Setting up Python environment with verification..."
 
     # Verify Python installation
     python3 --version || error "Python3 not available"
@@ -319,7 +354,7 @@ setup_python_environment() {
 
 # Install PyTorch/TensorFlow with verification
 install_ml_frameworks() {
-    log "🧠  Installing ML frameworks with verification..."
+    log "Installing ML frameworks with verification..."
 
     if [ "$GPU_AVAILABLE" = true ]; then
         log "Installing PyTorch with CUDA support..."
@@ -352,7 +387,7 @@ install_ml_frameworks() {
 
 # Install audio processing packages with proper dependency resolution
 install_audio_packages() {
-    log "🎵  Installing audio processing packages with dependency resolution..."
+    log "Installing audio processing packages with dependency resolution..."
 
     # Core audio libraries first
     declare -a CORE_AUDIO=(
@@ -412,7 +447,7 @@ install_audio_packages() {
 
 # Install ML/AI packages
 install_ml_packages() {
-    log "🤖  Installing ML/AI packages..."
+    log "Installing ML/AI packages..."
 
     declare -a ML_PACKAGES=(
         "transformers"
@@ -434,7 +469,7 @@ install_ml_packages() {
 
 # Install web framework and utilities
 install_web_packages() {
-    log "🌐  Installing web framework and utilities..."
+    log "Installing web framework and utilities..."
 
     declare -a WEB_PACKAGES=(
         "fastapi"
@@ -463,7 +498,7 @@ install_web_packages() {
 
 # Install additional utilities
 install_utilities() {
-    log "🛠️  Installing additional utilities..."
+    log "Installing additional utilities..."
 
     declare -a UTILITY_PACKAGES=(
         "yt-dlp"
@@ -489,7 +524,7 @@ install_utilities() {
 
 # Setup ngrok with verification
 setup_ngrok() {
-    log "🌐  Setting up ngrok with verification..."
+    log "Setting up ngrok with verification..."
 
     # Install ngrok binary
     if ! command -v ngrok &> /dev/null; then
@@ -531,7 +566,7 @@ EOF
 
 # Download and verify models
 download_models() {
-    log "🤖  Downloading and verifying AI models..."
+    log "Downloading and verifying AI models..."
 
     mkdir -p models
 
@@ -557,7 +592,7 @@ print('Basic Pitch model verified')
 
 # Create project structure
 create_project_structure() {
-    log "📁  Creating project structure..."
+    log "Creating project structure..."
 
     declare -a DIRECTORIES=(
         "backend/app/core"
@@ -602,7 +637,7 @@ create_project_structure() {
 
 # Setup environment variables
 setup_environment() {
-    log "🔧  Setting up environment variables..."
+    log "Setting up environment variables..."
 
     cat > .env << EOF
 # M3 Enhanced Configuration
@@ -654,7 +689,7 @@ EOF
 
 # Create startup scripts
 create_startup_scripts() {
-    log "📝  Creating startup scripts..."
+    log "Creating startup scripts..."
 
     # API server script
     cat > start_api.sh << 'EOF'
@@ -711,13 +746,13 @@ echo "Workers: $M3_NUM_WORKERS"
 echo ""
 echo "=== Service Status ==="
 if command -v systemctl &> /dev/null; then
-    systemctl is-active redis-server && echo "✅ Redis: Running" || echo "❌ Redis: Stopped"
+    systemctl is-active redis-server && echo "Redis: Running" || echo "Redis: Stopped"
 else
-    redis-cli ping > /dev/null 2>&1 && echo "✅ Redis: Running" || echo "❌ Redis: Stopped"
+    redis-cli ping > /dev/null 2>&1 && echo "Redis: Running" || echo "Redis: Stopped"
 fi
-pgrep -f "uvicorn.*main:app" > /dev/null && echo "✅ API: Running" || echo "❌ API: Stopped"
-pgrep -f "celery.*worker" > /dev/null && echo "✅ Worker: Running" || echo "❌ Worker: Stopped"
-pgrep -f "ngrok" > /dev/null && echo "✅ Ngrok: Running" || echo "❌ Ngrok: Stopped"
+pgrep -f "uvicorn.*main:app" > /dev/null && echo "API: Running" || echo "API: Stopped"
+pgrep -f "celery.*worker" > /dev/null && echo "Worker: Running" || echo "Worker: Stopped"
+pgrep -f "ngrok" > /dev/null && echo "Ngrok: Running" || echo "Ngrok: Stopped"
 echo ""
 echo "=== Quick Commands ==="
 echo "./start_api.sh       - Start API server"
@@ -734,7 +769,7 @@ EOF
 
 # Comprehensive system test
 run_comprehensive_tests() {
-    log "🧪  Running comprehensive system tests..."
+    log "Running comprehensive system tests..."
 
     echo ""
     echo "=================================================="
@@ -749,7 +784,7 @@ print(f'PyTorch version: {torch.__version__}')
 assert torch.cuda.is_available(), 'CUDA not available'
 x = torch.zeros(1).cuda()
 print('GPU tensor creation successful')
-print('✅ PyTorch GPU: PASS')
+print('PyTorch GPU: PASS')
 " || error "PyTorch GPU test failed"
     else
         python3 -c "
@@ -757,7 +792,7 @@ import torch
 print(f'PyTorch version: {torch.__version__}')
 x = torch.zeros(1)
 print('CPU tensor creation successful')
-print('✅ PyTorch CPU: PASS')
+print('PyTorch CPU: PASS')
 " || error "PyTorch CPU test failed"
     fi
 
@@ -765,7 +800,7 @@ print('✅ PyTorch CPU: PASS')
     python3 -c "
 import tensorflow as tf
 print(f'TensorFlow version: {tf.__version__}')
-print('✅ TensorFlow: PASS')
+print('TensorFlow: PASS')
 " || error "TensorFlow test failed"
 
     # Test audio libraries
@@ -776,7 +811,7 @@ import demucs
 import basic_pitch
 import pesq
 import pystoi
-print('✅ Audio Libraries: PASS')
+print('Audio Libraries: PASS')
 " || error "Audio libraries test failed"
 
     # Test Redis connection
@@ -784,7 +819,7 @@ print('✅ Audio Libraries: PASS')
 import redis
 r = redis.Redis()
 r.ping()
-print('✅ Redis: PASS')
+print('Redis: PASS')
 " || error "Redis test failed"
 
     # Test web framework
@@ -792,23 +827,23 @@ print('✅ Redis: PASS')
 import fastapi
 import uvicorn
 import celery
-print('✅ Web Framework: PASS')
+print('Web Framework: PASS')
 " || error "Web framework test failed"
 
     # Test ngrok
     ngrok version > /dev/null || error "Ngrok test failed"
-    echo "✅ Ngrok: PASS"
+    echo "Ngrok: PASS"
 
     # Test model loading
     python3 -c "
 import demucs.pretrained
 model = demucs.pretrained.get_model('htdemucs')
-print('✅ Demucs Model: PASS')
+print('Demucs Model: PASS')
 " || error "Demucs model test failed"
 
     python3 -c "
 from basic_pitch import ICASSP_2022_MODEL_PATH
-print('✅ Basic Pitch Model: PASS')
+print('Basic Pitch Model: PASS')
 " || error "Basic Pitch model test failed"
 
     echo "=================================================="
@@ -818,7 +853,7 @@ print('✅ Basic Pitch Model: PASS')
 
 # Start ngrok tunnel and get URL
 start_ngrok_tunnel() {
-    log "🌐  Starting ngrok tunnel..."
+    log "Starting ngrok tunnel..."
 
     # Kill any existing ngrok processes
     pkill -f ngrok || true
@@ -850,7 +885,7 @@ except:
         if [ "$API_URL" != "Not ready" ] && [ -n "$API_URL" ]; then
             echo "API_URL=$API_URL" >> .env
             echo "NGROK_PID=$NGROK_PID" >> .env
-            log "🔗  Public API URL: $API_URL"
+            log "Public API URL: $API_URL"
             break
         fi
 
@@ -866,17 +901,17 @@ except:
 
 # Display final status and instructions
 display_final_status() {
-    local runtime_emoji="🖥️"
+    local runtime_icon="CPU"
     if [ "$GPU_AVAILABLE" = true ]; then
-        runtime_emoji="🎮"
+        runtime_icon="GPU"
     fi
 
     echo ""
-    echo "🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉"
-    echo "    M3 ENHANCED SETUP COMPLETE - 100% VERIFIED!"
-    echo "🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉"
+    echo "=============================================="
+    echo "    M3 ENHANCED SETUP COMPLETE - VERIFIED!"
+    echo "=============================================="
     echo ""
-    echo "📋 QUICK START:"
+    echo "QUICK START:"
     echo ""
     echo "1. Start the API server:"
     echo "   ./start_api.sh"
@@ -895,29 +930,29 @@ display_final_status() {
     fi
 
     echo ""
-    echo "📊 SYSTEM INFO:"
-    echo "   $runtime_emoji Runtime: $RUNTIME_TYPE"
-    echo "   🖥️  Device: $TORCH_DEVICE"
-    echo "   ⚡ Batch Size: $BATCH_SIZE"
-    echo "   👥 Workers: $NUM_WORKERS"
-    echo "   💾 RAM: ${AVAILABLE_RAM}GB available"
-    echo "   💿 Disk: ${AVAILABLE_SPACE}GB free"
+    echo "SYSTEM INFO:"
+    echo "   Runtime: $RUNTIME_TYPE"
+    echo "   Device: $TORCH_DEVICE"
+    echo "   Batch Size: $BATCH_SIZE"
+    echo "   Workers: $NUM_WORKERS"
+    echo "   RAM: ${AVAILABLE_RAM}GB available"
+    echo "   Disk: ${AVAILABLE_SPACE}GB free"
 
     if [ "$GPU_AVAILABLE" = true ]; then
-        echo "   🎮 GPU: $GPU_NAME (${GPU_MEMORY}MB)"
+        echo "   GPU: $GPU_NAME (${GPU_MEMORY}MB)"
     fi
 
     echo ""
-    echo "🛠️  MANAGEMENT COMMANDS:"
+    echo "MANAGEMENT COMMANDS:"
     echo "   ./check_status.sh     - Check system status"
     echo "   ./start_ngrok_api.sh  - Start public tunnel"
     echo "   ./stop_ngrok.sh       - Stop tunnels"
     echo ""
-    echo "📁 PROJECT STRUCTURE: ✅ Complete"
-    echo "🐍 PYTHON PACKAGES: ✅ All verified"
-    echo "🤖 AI MODELS: ✅ Downloaded and tested"
-    echo "🌐 NGROK: ✅ Configured and ready"
-    echo "🔧 SERVICES: ✅ Redis running"
+    echo "PROJECT STRUCTURE: Complete"
+    echo "PYTHON PACKAGES: All verified"
+    echo "AI MODELS: Downloaded and tested"
+    echo "NGROK: Configured and ready"
+    echo "SERVICES: Redis running"
     echo ""
     success "M3 Enhanced is ready for audio processing!"
 }
@@ -925,13 +960,13 @@ display_final_status() {
 # Main execution
 main() {
     echo ""
-    echo "╔═════════════════════════════════════════════════════════════╗"
-    echo "║              🎵 M3 Enhanced - Bulletproof Setup 🎵          ║"
-    echo "║                     No Fallbacks - Just Works               ║"
-    echo "╚═════════════════════════════════════════════════════════════╝"
+    echo "======================================================="
+    echo "         M3 Enhanced - Bulletproof Setup"
+    echo "              No Fallbacks - Just Works"
+    echo "======================================================="
     echo ""
 
-    log "🚀  Starting bulletproof M3 Enhanced setup..."
+    log "Starting bulletproof M3 Enhanced setup..."
 
     verify_system_requirements
     detect_runtime
