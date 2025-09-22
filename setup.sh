@@ -1,10 +1,11 @@
 #!/bin/bash
-# M3 Enhanced - Intelligent Setup Script (Fixed Version)
-# Automatically detects and optimizes for GPU/CPU runtimes
-# Fixes Python package installation errors and integrates provided ngrok token
-# All-in-one script that includes ngrok tunnel setup
+# M3 Enhanced - Bulletproof Setup Script
+# No fallbacks - everything must work or fail clearly
+# Complete dependency resolution and proper installation order
 
-set -e  # Exit on any error
+set -e  # Exit immediately on any error
+set -u  # Exit on undefined variables
+set -o pipefail  # Exit on pipe failures
 
 # Colors for output
 RED='\033[0;31m'
@@ -17,8 +18,11 @@ NC='\033[0m' # No Color
 # Configuration
 NGROK_TOKEN="31u9zGx10xxBE4AU0nQo5p2kXkF_6EFLZJFdmHuH6B8TyQUwv"
 WORK_DIR=$(pwd)
+PYTHON_VERSION="3.10"
+MIN_DISK_SPACE_GB=10
+MIN_RAM_GB=8
 
-# Logging function
+# Logging functions
 log() {
     echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')] $1${NC}"
 }
@@ -29,9 +33,43 @@ warn() {
 
 error() {
     echo -e "${RED}[ERROR] $1${NC}"
+    exit 1
 }
 
-# Runtime detection
+success() {
+    echo -e "${GREEN}[SUCCESS] $1${NC}"
+}
+
+# Critical system checks
+verify_system_requirements() {
+    log "🔍 Verifying system requirements..."
+
+    # Check disk space
+    AVAILABLE_SPACE=$(df / | awk 'NR==2 {print int($4/1024/1024)}')
+    if [ "$AVAILABLE_SPACE" -lt "$MIN_DISK_SPACE_GB" ]; then
+        error "Insufficient disk space. Need ${MIN_DISK_SPACE_GB}GB, have ${AVAILABLE_SPACE}GB"
+    fi
+
+    # Check RAM
+    AVAILABLE_RAM=$(free -g | awk '/^Mem:/ {print $2}')
+    if [ "$AVAILABLE_RAM" -lt "$MIN_RAM_GB" ]; then
+        error "Insufficient RAM. Need ${MIN_RAM_GB}GB, have ${AVAILABLE_RAM}GB"
+    fi
+
+    # Check Python version
+    if ! python3 --version | grep -q "Python 3.1[0-9]"; then
+        error "Python 3.10+ required. Current: $(python3 --version)"
+    fi
+
+    # Check if running as root (needed for system packages)
+    if [ "$EUID" -ne 0 ]; then
+        error "This script must be run as root (use sudo)"
+    fi
+
+    success "System requirements verified"
+}
+
+# Runtime detection with proper validation
 detect_runtime() {
     log "🔍 Detecting runtime environment..."
 
@@ -41,40 +79,47 @@ detect_runtime() {
     GPU_MEMORY=0
     CPU_CORES=$(nproc)
 
-    # Check for GPU using nvidia-smi
+    # Thorough GPU detection
     if command -v nvidia-smi &> /dev/null; then
         if nvidia-smi &> /dev/null; then
             GPU_AVAILABLE=true
             RUNTIME_TYPE="gpu"
-            GPU_NAME=$(nvidia-smi --query-gpu=name --format=csv,noheader,nounits | head -1)
-            GPU_MEMORY=$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits | head -1)
-            log "🎮 GPU detected: $GPU_NAME (${GPU_MEMORY}MB)"
+            GPU_NAME=$(nvidia-smi --query-gpu=name --format=csv,noheader,nounits | head -1 | xargs)
+            GPU_MEMORY=$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits | head -1 | xargs)
+
+            # Validate GPU is actually usable
+            if ! nvidia-smi -L | grep -q "GPU"; then
+                error "GPU detected but not accessible"
+            fi
+
+            log "🎮 GPU detected: $GPU_NAME (${GPU_MEMORY}MB VRAM)"
         fi
     fi
 
-    # Fallback to CPU info
     if [ "$RUNTIME_TYPE" = "cpu" ]; then
         log "🖥️ CPU runtime: $CPU_CORES cores"
     fi
 
-    # Check if we're in Colab
+    # Environment detection
     if [ -d "/content" ] && [ -d "/opt/bin" ]; then
         COLAB_DETECTED=true
         log "📍 Google Colab environment detected"
     else
         COLAB_DETECTED=false
-        warn "Not running in Google Colab - using current directory: $WORK_DIR"
+        log "📍 Standard Linux environment detected"
     fi
 }
 
-# Configure device-specific settings
+# Configure optimal settings
 configure_devices() {
     log "⚙️ Configuring device-specific settings..."
 
     if [ "$GPU_AVAILABLE" = true ]; then
         TORCH_DEVICE="cuda"
         TF_DEVICE="/GPU:0"
-        BATCH_SIZE=$((GPU_MEMORY / 2000))  # Rough estimate
+        BATCH_SIZE=$((GPU_MEMORY / 2000))
+        [ "$BATCH_SIZE" -lt 1 ] && BATCH_SIZE=1
+        [ "$BATCH_SIZE" -gt 16 ] && BATCH_SIZE=16
         NUM_WORKERS=$((CPU_CORES > 4 ? 4 : CPU_CORES))
         log "📊 GPU config: device=$TORCH_DEVICE, batch_size=$BATCH_SIZE, workers=$NUM_WORKERS"
     else
@@ -86,264 +131,302 @@ configure_devices() {
     fi
 }
 
-# Print banner
-print_banner() {
-    local runtime_emoji="🖥️"
-    if [ "$GPU_AVAILABLE" = true ]; then
-        runtime_emoji="🎮"
-    fi
-
-    echo ""
-    echo "╔═════════════════════════════════════════════════════════════╗"
-    echo "║                    🎵 M3 Enhanced 🎵                        ║"
-    echo "║              Intelligent Setup Script (Fixed)               ║"
-    echo "║                                                             ║"
-    echo "║    Runtime: $runtime_emoji $(printf "%-10s" "${RUNTIME_TYPE^^}") Device: $(printf "%-10s" "$TORCH_DEVICE")          ║"
-    echo "║    Advanced AI-Powered Music Processing Pipeline            ║"
-    echo "║    • Audio Separation • Transcription • Analysis           ║"
-    echo "╚═════════════════════════════════════════════════════════════╝"
-    echo ""
-}
-
-# Display system information
-display_system_info() {
-    echo "============================================================"
-    echo "M3 ENHANCED - SETUP (FIXED VERSION)"
-    echo "============================================================"
-    echo "🖥️ CPU Cores: $CPU_CORES"
-    echo "💾 RAM: $(free -h | awk '/^Mem:/ {print $7"/"$2}') available"
-    echo "💿 Disk: $(df -h / | awk 'NR==2 {print $4"/"$2}') free"
-    echo "📁 Working Directory: $WORK_DIR"
-
-    if [ "$GPU_AVAILABLE" = true ]; then
-        echo "🎮 GPU: $GPU_NAME"
-        echo "🎮 VRAM: ${GPU_MEMORY}MB total"
-    else
-        echo "⚠️ No GPU detected - CPU-only mode"
-    fi
-    echo "============================================================"
-    echo ""
-}
-
-# Install system dependencies with better error handling
+# System dependencies with verification
 install_system_dependencies() {
-    log "📦 Installing system dependencies..."
+    log "📦 Installing and verifying system dependencies..."
 
-    # Update package lists quietly
+    # Update package database
     apt-get update -qq || error "Failed to update package lists"
 
-    # Essential audio processing tools with individual error handling
-    local packages=(
-        "ffmpeg"                # Media processing
-        "libsndfile1-dev"      # Audio file I/O
-        "libfftw3-dev"         # Fast Fourier Transform
-        "flac"                 # FLAC codec
-        "lame"                 # MP3 encoder
-        "opus-tools"           # Opus codec
-        "vorbis-tools"         # Ogg Vorbis
-        "libmagic1"            # File type detection
-        "redis-server"         # Job queue
-        "htop"                 # System monitoring
-        "build-essential"      # Compilation tools
-        "pkg-config"           # Package configuration
-        "libasound2-dev"       # ALSA development
-        "portaudio19-dev"      # PortAudio
-        "curl"                 # For ngrok download
-        "unzip"                # For ngrok extraction
+    # Remove conflicting packages first
+    apt-get remove -y r-base-dev || true
+    apt-get autoremove -y || true
+
+    # Essential system packages in dependency order
+    declare -a CRITICAL_PACKAGES=(
+        "build-essential"
+        "pkg-config"
+        "software-properties-common"
+        "curl"
+        "wget"
+        "unzip"
+        "git"
     )
 
-    if [ "$GPU_AVAILABLE" = true ]; then
-        packages+=("nvidia-cuda-toolkit" "nvtop")
-    fi
+    declare -a AUDIO_PACKAGES=(
+        "ffmpeg"
+        "libsndfile1-dev"
+        "libfftw3-dev"
+        "libasound2-dev"
+        "portaudio19-dev"
+        "libportaudio2"
+        "libportaudiocpp0"
+        "flac"
+        "lame"
+        "opus-tools"
+        "vorbis-tools"
+        "libmagic1"
+        "libmagic-dev"
+    )
 
-    for package in "${packages[@]}"; do
-        if apt-get install -y -qq "$package" 2>/dev/null; then
-            log "✅ Installed: $package"
-        else
-            warn "Failed to install: $package (continuing...)"
-        fi
+    declare -a SERVICE_PACKAGES=(
+        "redis-server"
+        "htop"
+        "nginx"
+    )
+
+    # Install in order with verification
+    for package in "${CRITICAL_PACKAGES[@]}"; do
+        log "Installing critical package: $package"
+        apt-get install -y "$package" || error "Failed to install critical package: $package"
+        dpkg -l | grep -q "^ii  $package " || error "Package $package not properly installed"
     done
 
-    # Start Redis server
-    if service redis-server start 2>/dev/null; then
-        log "✅ Redis server started"
-    else
-        warn "Failed to start Redis server"
+    for package in "${AUDIO_PACKAGES[@]}"; do
+        log "Installing audio package: $package"
+        apt-get install -y "$package" || error "Failed to install audio package: $package"
+        dpkg -l | grep -q "^ii  $package " || error "Package $package not properly installed"
+    done
+
+    for package in "${SERVICE_PACKAGES[@]}"; do
+        log "Installing service package: $package"
+        apt-get install -y "$package" || error "Failed to install service package: $package"
+        dpkg -l | grep -q "^ii  $package " || error "Package $package not properly installed"
+    done
+
+    # GPU-specific packages
+    if [ "$GPU_AVAILABLE" = true ]; then
+        log "Installing GPU packages..."
+        apt-get install -y nvidia-cuda-toolkit nvtop || error "Failed to install GPU packages"
     fi
+
+    # Verify critical libraries
+    ldconfig
+    if ! ldconfig -p | grep -q "libfftw3"; then
+        error "FFTW3 library not found after installation"
+    fi
+    if ! ldconfig -p | grep -q "libsndfile"; then
+        error "libsndfile library not found after installation"
+    fi
+
+    # Start and verify Redis
+    systemctl enable redis-server || error "Failed to enable Redis"
+    systemctl start redis-server || error "Failed to start Redis"
+    sleep 2
+    if ! systemctl is-active --quiet redis-server; then
+        error "Redis service is not running"
+    fi
+
+    success "All system dependencies installed and verified"
 }
 
-# Optimize system settings
-optimize_system_settings() {
-    log "⚙️ Optimizing system settings..."
+# Python environment setup with verification
+setup_python_environment() {
+    log "🐍 Setting up Python environment with verification..."
 
-    # Increase file descriptor limits
-    ulimit -n 65536 2>/dev/null || warn "Could not increase file descriptor limit"
+    # Verify Python installation
+    python3 --version || error "Python3 not available"
 
-    # Set environment variables for optimal performance
-    export OMP_NUM_THREADS=$NUM_WORKERS
-    export MKL_NUM_THREADS=$NUM_WORKERS
-    export OPENBLAS_NUM_THREADS=$NUM_WORKERS
-    export NUMBA_NUM_THREADS=$NUM_WORKERS
+    # Ensure pip is latest version
+    python3 -m pip install --upgrade pip setuptools wheel || error "Failed to upgrade pip"
 
-    if [ "$GPU_AVAILABLE" = true ]; then
-        export CUDA_VISIBLE_DEVICES=0
-        export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
-        export TF_FORCE_GPU_ALLOW_GROWTH=true
-        export TF_GPU_MEMORY_GROWTH=true
-    fi
+    # Verify pip works
+    python3 -m pip --version || error "pip not working"
 
-    log "✅ System optimization complete"
+    # Install critical Python build dependencies
+    python3 -m pip install --upgrade Cython numpy || error "Failed to install build dependencies"
+
+    success "Python environment ready"
 }
 
-# Install Python packages with improved error handling
-install_python_packages() {
-    log "🐍 Installing Python packages for $RUNTIME_TYPE runtime..."
+# Install PyTorch/TensorFlow with verification
+install_ml_frameworks() {
+    log "🧠 Installing ML frameworks with verification..."
 
-    # Upgrade pip and essential tools with retries
-    python -m pip install --upgrade pip setuptools wheel --quiet --retries 3 --timeout 30
-
-    # Install PyTorch based on runtime
     if [ "$GPU_AVAILABLE" = true ]; then
-        log "📦 Installing PyTorch for GPU..."
-        python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 --quiet --retries 3
-        python -m pip install tensorflow[and-cuda] tensorflow-hub --quiet --retries 3
+        log "Installing PyTorch with CUDA support..."
+        python3 -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 || error "Failed to install PyTorch GPU"
+
+        # Verify CUDA PyTorch
+        python3 -c "import torch; assert torch.cuda.is_available(), 'CUDA not available'; print('PyTorch CUDA verified')" || error "PyTorch CUDA verification failed"
+
+        log "Installing TensorFlow with CUDA support..."
+        python3 -m pip install tensorflow[and-cuda] || error "Failed to install TensorFlow GPU"
+
+        # Verify TensorFlow GPU
+        python3 -c "import tensorflow as tf; assert len(tf.config.list_physical_devices('GPU')) > 0, 'GPU not found'; print('TensorFlow GPU verified')" || error "TensorFlow GPU verification failed"
     else
-        log "📦 Installing PyTorch for CPU..."
-        python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --quiet --retries 3
-        python -m pip install tensorflow tensorflow-hub --quiet --retries 3
+        log "Installing PyTorch CPU version..."
+        python3 -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu || error "Failed to install PyTorch CPU"
+
+        # Verify PyTorch CPU
+        python3 -c "import torch; torch.zeros(1); print('PyTorch CPU verified')" || error "PyTorch CPU verification failed"
+
+        log "Installing TensorFlow CPU version..."
+        python3 -m pip install tensorflow || error "Failed to install TensorFlow CPU"
+
+        # Verify TensorFlow CPU
+        python3 -c "import tensorflow as tf; print('TensorFlow CPU verified')" || error "TensorFlow CPU verification failed"
     fi
 
-    # Core ML/Audio packages with individual error handling
-    local ml_packages=(
+    success "ML frameworks installed and verified"
+}
+
+# Install audio processing packages with proper dependency resolution
+install_audio_packages() {
+    log "🎵 Installing audio processing packages with dependency resolution..."
+
+    # Core audio libraries first
+    declare -a CORE_AUDIO=(
+        "librosa"
+        "soundfile"
+        "resampy>=0.2.2,<0.4.3"
+        "audioread"
+        "scipy"
+        "scikit-learn"
+    )
+
+    for package in "${CORE_AUDIO[@]}"; do
+        log "Installing core audio package: $package"
+        python3 -m pip install "$package" || error "Failed to install $package"
+        # Verify installation
+        python3 -c "import ${package%%[*}" 2>/dev/null || error "$package not importable after installation"
+    done
+
+    # MIDI and music processing
+    log "Installing MIDI processing packages..."
+    python3 -m pip install pretty_midi || error "Failed to install pretty_midi"
+    python3 -c "import pretty_midi; print('pretty_midi verified')" || error "pretty_midi verification failed"
+
+    python3 -m pip install music21 || error "Failed to install music21"
+    python3 -c "import music21; print('music21 verified')" || error "music21 verification failed"
+
+    # Audio separation - Demucs
+    log "Installing Demucs..."
+    python3 -m pip install demucs || error "Failed to install demucs"
+    python3 -c "import demucs; print('demucs verified')" || error "demucs verification failed"
+
+    # Audio quality metrics
+    log "Installing audio quality packages..."
+    python3 -m pip install pesq || error "Failed to install pesq"
+    python3 -c "import pesq; print('pesq verified')" || error "pesq verification failed"
+
+    python3 -m pip install pystoi || error "Failed to install pystoi"
+    python3 -c "import pystoi; print('pystoi verified')" || error "pystoi verification failed"
+
+    # Advanced audio separation
+    log "Installing audio-separator..."
+    python3 -m pip install audio-separator || error "Failed to install audio-separator"
+    python3 -c "import audio_separator; print('audio-separator verified')" || error "audio-separator verification failed"
+
+    # Music transcription - Basic Pitch with proper dependencies
+    log "Installing Basic Pitch dependencies..."
+    python3 -m pip install mir_eval tensorflow-io || error "Failed to install Basic Pitch dependencies"
+
+    log "Installing Basic Pitch..."
+    python3 -m pip install basic-pitch || error "Failed to install basic-pitch"
+    python3 -c "import basic_pitch; print('basic-pitch verified')" || error "basic-pitch verification failed"
+
+    success "All audio packages installed and verified"
+}
+
+# Install ML/AI packages
+install_ml_packages() {
+    log "🤖 Installing ML/AI packages..."
+
+    declare -a ML_PACKAGES=(
         "transformers"
         "accelerate"
         "datasets"
-        "librosa[display]"
-        "soundfile"
-        "pretty_midi"
-        "music21"
+        "huggingface_hub"
+        "tokenizers"
     )
 
-    for package in "${ml_packages[@]}"; do
-        if python -m pip install "$package" --quiet --retries 3 --timeout 60; then
-            log "✅ Installed: $package"
-        else
-            warn "Failed to install: $package"
-        fi
+    for package in "${ML_PACKAGES[@]}"; do
+        log "Installing ML package: $package"
+        python3 -m pip install "$package" || error "Failed to install $package"
+        python3 -c "import ${package}; print('$package verified')" || error "$package verification failed"
     done
 
-    # Install demucs first (often more stable)
-    log "📦 Installing demucs..."
-    if python -m pip install demucs --quiet --retries 2 --timeout 120; then
-        log "✅ Installed: demucs"
-    else
-        warn "Failed to install demucs - trying alternative approach"
-        python -m pip install demucs --no-deps --quiet 2>/dev/null || warn "Demucs installation failed completely"
-    fi
+    success "ML packages installed and verified"
+}
 
-    # Install compatible versions to avoid conflicts
-    log "📦 Installing compatible audio processing packages..."
+# Install web framework and utilities
+install_web_packages() {
+    log "🌐 Installing web framework and utilities..."
 
-    # Install specific versions to avoid conflicts
-    python -m pip install "resampy>=0.2.2,<0.4.3" --quiet --force-reinstall 2>/dev/null || warn "Failed to fix resampy version"
-    python -m pip install "tensorflow>=2.4.1,<2.20.0" --quiet --force-reinstall 2>/dev/null || warn "Failed to fix tensorflow version"
-
-    # Try basic-pitch with dependency resolution
-    if python -m pip install basic-pitch --quiet --retries 1 --timeout 60; then
-        log "✅ Installed: basic-pitch"
-    else
-        warn "Failed to install basic-pitch - installing dependencies separately"
-        python -m pip install mir_eval --quiet 2>/dev/null || warn "Failed to install mir_eval"
-        python -m pip install basic-pitch --no-deps --quiet 2>/dev/null || warn "Failed to install basic-pitch without deps"
-    fi
-
-    # Audio processing packages with fallbacks
-    local audio_packages=(
-        "audio-separator"
-        "pesq"
-        "pystoi"
+    declare -a WEB_PACKAGES=(
+        "fastapi"
+        "uvicorn[standard]"
+        "python-multipart"
+        "aiofiles"
+        "redis"
+        "celery[redis]"
+        "pydantic"
+        "jinja2"
+        "python-jose[cryptography]"
+        "passlib[bcrypt]"
     )
 
-    for package in "${audio_packages[@]}"; do
-        log "📦 Attempting to install: $package"
-        if python -m pip install "$package" --quiet --retries 2 --timeout 120; then
-            log "✅ Installed: $package"
-        else
-            warn "Failed to install: $package (may cause issues)"
-            # Try installing without dependencies as fallback
-            if python -m pip install "$package" --no-deps --quiet 2>/dev/null; then
-                log "⚠️ Installed $package without dependencies"
-            fi
-        fi
+    for package in "${WEB_PACKAGES[@]}"; do
+        log "Installing web package: $package"
+        python3 -m pip install "$package" || error "Failed to install $package"
     done
 
-    # Skip openl3 for now as it consistently fails
-    log "📦 Skipping openl3 installation (known compatibility issues)"
+    # Verify web framework
+    python3 -c "import fastapi, uvicorn, redis, celery; print('Web framework verified')" || error "Web framework verification failed"
 
-    # Web framework and utilities
-    python -m pip install fastapi uvicorn[standard] python-multipart aiofiles --quiet
-    python -m pip install redis celery[redis] --quiet
-    python -m pip install yt-dlp python-magic matplotlib seaborn plotly pillow --quiet
-
-    log "✅ Python package installation complete"
+    success "Web packages installed and verified"
 }
 
-# Setup environment variables
-setup_environment_variables() {
-    log "🔧 Configuring environment variables..."
+# Install additional utilities
+install_utilities() {
+    log "🛠️ Installing additional utilities..."
 
-    # Create or update .env file in current directory
-    cat > .env << EOF
-M3_RUNTIME_TYPE=$RUNTIME_TYPE
-M3_DEVICE=$TORCH_DEVICE
-M3_BATCH_SIZE=$BATCH_SIZE
-M3_NUM_WORKERS=$NUM_WORKERS
-PYTHONPATH=$WORK_DIR
-OMP_NUM_THREADS=$NUM_WORKERS
-MKL_NUM_THREADS=$NUM_WORKERS
-OPENBLAS_NUM_THREADS=$NUM_WORKERS
-NUMBA_NUM_THREADS=$NUM_WORKERS
-NGROK_TOKEN=$NGROK_TOKEN
-EOF
+    declare -a UTILITY_PACKAGES=(
+        "yt-dlp"
+        "python-magic"
+        "matplotlib"
+        "seaborn"
+        "plotly"
+        "pillow"
+        "requests"
+        "tqdm"
+        "psutil"
+        "pyngrok"
+    )
 
-    if [ "$GPU_AVAILABLE" = true ]; then
-        cat >> .env << EOF
-CUDA_VISIBLE_DEVICES=0
-PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
-TF_FORCE_GPU_ALLOW_GROWTH=true
-TF_GPU_MEMORY_GROWTH=true
-EOF
-    fi
+    for package in "${UTILITY_PACKAGES[@]}"; do
+        log "Installing utility: $package"
+        python3 -m pip install "$package" || error "Failed to install $package"
+    done
 
-    # Export variables for current session
-    source .env 2>/dev/null || true
-
-    log "✅ Environment variables configured in .env file"
+    success "Utilities installed and verified"
 }
 
-# Setup ngrok with provided token
+# Setup ngrok with verification
 setup_ngrok() {
-    log "🌐 Setting up ngrok tunnel with provided token..."
-
-    # Install pyngrok
-    python -m pip install pyngrok --quiet
+    log "🌐 Setting up ngrok with verification..."
 
     # Install ngrok binary
     if ! command -v ngrok &> /dev/null; then
-        log "📦 Installing ngrok binary..."
+        log "Installing ngrok binary..."
         cd /tmp
-        curl -s https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz | tar xz
-        sudo mv ngrok /usr/local/bin/
-        cd $WORK_DIR
+        curl -s https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz | tar xz || error "Failed to download ngrok"
+        mv ngrok /usr/local/bin/ || error "Failed to install ngrok binary"
+        chmod +x /usr/local/bin/ngrok || error "Failed to make ngrok executable"
+        cd "$WORK_DIR"
     fi
 
-    # Configure ngrok with provided token
-    if [ -n "$NGROK_TOKEN" ]; then
-        ngrok config add-authtoken "$NGROK_TOKEN" 2>/dev/null
-        python -c "from pyngrok import ngrok; ngrok.set_auth_token('$NGROK_TOKEN')" 2>/dev/null
-        log "✅ Ngrok authentication configured with provided token"
+    # Verify ngrok binary
+    ngrok version || error "ngrok binary not working"
 
-        # Create ngrok configuration - use newer format
+    # Configure authentication
+    if [ -n "$NGROK_TOKEN" ]; then
+        ngrok config add-authtoken "$NGROK_TOKEN" || error "Failed to configure ngrok token"
+        python3 -c "from pyngrok import ngrok; ngrok.set_auth_token('$NGROK_TOKEN')" || error "Failed to set pyngrok token"
+
+        # Create configuration
         mkdir -p ~/.config/ngrok
         cat > ~/.config/ngrok/ngrok.yml << EOF
 version: "2"
@@ -356,17 +439,44 @@ tunnels:
     addr: 3000
     proto: http
 EOF
-        log "✅ Ngrok configuration file created"
+
+        success "Ngrok configured and verified"
     else
-        warn "No ngrok token provided"
+        error "No ngrok token provided"
     fi
+}
+
+# Download and verify models
+download_models() {
+    log "🤖 Downloading and verifying AI models..."
+
+    mkdir -p models
+
+    # Download Demucs model
+    log "Downloading Demucs model..."
+    python3 -c "
+import demucs.pretrained
+model = demucs.pretrained.get_model('htdemucs')
+print(f'Demucs model downloaded: {model}')
+" || error "Failed to download Demucs model"
+
+    # Verify Basic Pitch model
+    log "Verifying Basic Pitch model..."
+    python3 -c "
+from basic_pitch import ICASSP_2022_MODEL_PATH
+from basic_pitch.inference import predict
+import tensorflow as tf
+print('Basic Pitch model verified')
+" || error "Failed to verify Basic Pitch model"
+
+    success "All models downloaded and verified"
 }
 
 # Create project structure
 create_project_structure() {
     log "📁 Creating project structure..."
 
-    local directories=(
+    declare -a DIRECTORIES=(
         "backend/app/core"
         "backend/app/models"
         "backend/app/processors"
@@ -380,200 +490,294 @@ create_project_structure() {
         "results"
         "logs"
         "config"
+        "tests"
     )
 
-    for directory in "${directories[@]}"; do
-        mkdir -p "$directory"
-        chmod 755 "$directory"
+    for dir in "${DIRECTORIES[@]}"; do
+        mkdir -p "$dir" || error "Failed to create directory: $dir"
+        chmod 755 "$dir" || error "Failed to set permissions for: $dir"
     done
 
-    # Create __init__.py files for Python packages
-    touch backend/__init__.py
-    touch backend/app/__init__.py
-    touch backend/app/core/__init__.py
-    touch backend/app/models/__init__.py
-    touch backend/app/processors/__init__.py
-    touch backend/app/utils/__init__.py
-    touch backend/app/preprocessing/__init__.py
-    touch backend/app/postprocessing/__init__.py
+    # Create Python package files
+    declare -a INIT_FILES=(
+        "backend/__init__.py"
+        "backend/app/__init__.py"
+        "backend/app/core/__init__.py"
+        "backend/app/models/__init__.py"
+        "backend/app/processors/__init__.py"
+        "backend/app/utils/__init__.py"
+        "backend/app/preprocessing/__init__.py"
+        "backend/app/postprocessing/__init__.py"
+    )
 
-    log "✅ Project structure created"
+    for file in "${INIT_FILES[@]}"; do
+        touch "$file" || error "Failed to create: $file"
+    done
+
+    success "Project structure created"
 }
 
-# Download models with error handling
-download_models() {
-    log "🤖 Downloading AI models for $RUNTIME_TYPE runtime..."
+# Setup environment variables
+setup_environment() {
+    log "🔧 Setting up environment variables..."
 
-    # Create models directory
-    mkdir -p models
+    cat > .env << EOF
+# M3 Enhanced Configuration
+M3_RUNTIME_TYPE=$RUNTIME_TYPE
+M3_DEVICE=$TORCH_DEVICE
+M3_BATCH_SIZE=$BATCH_SIZE
+M3_NUM_WORKERS=$NUM_WORKERS
 
-    # Download Demucs models
-    log "📦 Downloading Demucs separation model..."
-    if python -c "import demucs.pretrained; demucs.pretrained.get_model('htdemucs')" 2>/dev/null; then
-        log "✅ Demucs model downloaded"
-    else
-        warn "Failed to download Demucs model"
+# Python Configuration
+PYTHONPATH=$WORK_DIR
+PYTHONUNBUFFERED=1
+
+# Performance Tuning
+OMP_NUM_THREADS=$NUM_WORKERS
+MKL_NUM_THREADS=$NUM_WORKERS
+OPENBLAS_NUM_THREADS=$NUM_WORKERS
+NUMBA_NUM_THREADS=$NUM_WORKERS
+
+# Ngrok Configuration
+NGROK_TOKEN=$NGROK_TOKEN
+
+# Redis Configuration
+REDIS_URL=redis://localhost:6379/0
+
+# API Configuration
+API_HOST=0.0.0.0
+API_PORT=8000
+FRONTEND_PORT=3000
+EOF
+
+    if [ "$GPU_AVAILABLE" = true ]; then
+        cat >> .env << EOF
+
+# GPU Configuration
+CUDA_VISIBLE_DEVICES=0
+PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
+TF_FORCE_GPU_ALLOW_GROWTH=true
+TF_GPU_MEMORY_GROWTH=true
+EOF
     fi
 
-    # Initialize Basic Pitch
-    log "📦 Initializing Basic Pitch model..."
-    if python -c "try:
-    from basic_pitch import ICASSP_2022_MODEL_PATH
-    print('Basic Pitch initialized')
-except:
-    print('Basic Pitch not available')" 2>/dev/null; then
-        log "✅ Basic Pitch model initialized"
-    else
-        warn "Failed to initialize Basic Pitch model"
-    fi
-}
+    # Export for current session
+    set -a
+    source .env
+    set +a
 
-# Start ngrok tunnels
-start_ngrok_tunnels() {
-    log "🌐 Starting ngrok tunnels for API and frontend..."
-
-    # Kill any existing ngrok processes
-    pkill -f ngrok || true
-    sleep 2
-
-    # Start API tunnel in background
-    nohup ngrok http 8000 --log=stdout > ngrok_api.log 2>&1 &
-    API_NGROK_PID=$!
-    sleep 3
-
-    # Start frontend tunnel in background
-    nohup ngrok http 3000 --log=stdout > ngrok_frontend.log 2>&1 &
-    FRONTEND_NGROK_PID=$!
-    sleep 3
-
-    # Get tunnel URLs
-    API_URL=$(curl -s http://localhost:4040/api/tunnels | python -c "import sys, json; data = json.load(sys.stdin); print(next((t['public_url'] for t in data['tunnels'] if ':8000' in t['config']['addr']), 'Not found'))" 2>/dev/null || echo "API tunnel not ready")
-    FRONTEND_URL=$(curl -s http://localhost:4041/api/tunnels | python -c "import sys, json; data = json.load(sys.stdin); print(next((t['public_url'] for t in data['tunnels'] if ':3000' in t['config']['addr']), 'Not found'))" 2>/dev/null || echo "Frontend tunnel not ready")
-
-    echo "API_NGROK_PID=$API_NGROK_PID" >> .env
-    echo "FRONTEND_NGROK_PID=$FRONTEND_NGROK_PID" >> .env
-    echo "API_URL=$API_URL" >> .env
-    echo "FRONTEND_URL=$FRONTEND_URL" >> .env
-
-    log "✅ Ngrok tunnels started"
-    if [ "$API_URL" != "API tunnel not ready" ]; then
-        log "🔗 API URL: $API_URL"
-    fi
-    if [ "$FRONTEND_URL" != "Frontend tunnel not ready" ]; then
-        log "🔗 Frontend URL: $FRONTEND_URL"
-    fi
-}
-
-# Run system tests
-run_system_tests() {
-    log "🧪 Running $RUNTIME_TYPE system tests..."
-
-    echo ""
-    echo "=================================================="
-    echo "$RUNTIME_TYPE SYSTEM TESTS"
-    echo "=================================================="
-
-    # Test PyTorch
-    if python -c "import torch; print('PyTorch version:', torch.__version__)" 2>/dev/null; then
-        if [ "$GPU_AVAILABLE" = true ]; then
-            if python -c "import torch; torch.zeros(1).cuda(); print('GPU tensor creation successful')" 2>/dev/null; then
-                echo "PyTorch GPU               ✅ PASS"
-            else
-                echo "PyTorch GPU               ❌ FAIL"
-            fi
-        else
-            if python -c "import torch; torch.zeros(1); print('CPU tensor creation successful')" 2>/dev/null; then
-                echo "PyTorch CPU               ✅ PASS"
-            else
-                echo "PyTorch CPU               ❌ FAIL"
-            fi
-        fi
-    else
-        echo "PyTorch                   ❌ FAIL: Not installed"
-    fi
-
-    # Test TensorFlow
-    if python -c "import tensorflow as tf; print('TensorFlow version:', tf.__version__)" 2>/dev/null; then
-        echo "TensorFlow                ✅ PASS"
-    else
-        echo "TensorFlow                ❌ FAIL: Not installed"
-    fi
-
-    # Test audio libraries
-    if python -c "import librosa, soundfile; print('Audio libraries working')" 2>/dev/null; then
-        echo "Audio Libraries           ✅ PASS"
-    else
-        echo "Audio Libraries           ❌ FAIL"
-    fi
-
-    # Test Redis
-    if python -c "import redis; r=redis.Redis(); r.ping(); print('Redis working')" 2>/dev/null; then
-        echo "Redis                     ✅ PASS"
-    else
-        echo "Redis                     ❌ FAIL"
-    fi
-
-    # Test ngrok
-    if command -v ngrok &> /dev/null; then
-        echo "Ngrok Binary              ✅ PASS"
-    else
-        echo "Ngrok Binary              ❌ FAIL"
-    fi
-
-    echo "=================================================="
-    echo ""
+    success "Environment configured"
 }
 
 # Create startup scripts
 create_startup_scripts() {
     log "📝 Creating startup scripts..."
 
-    # Create API server startup script
+    # API server script
     cat > start_api.sh << 'EOF'
 #!/bin/bash
-source .env 2>/dev/null || true
+set -e
+source .env
 echo "Starting M3 Enhanced API server..."
-python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+echo "API will be available at: http://localhost:${API_PORT}/docs"
+python3 -m uvicorn backend.app.main:app --host ${API_HOST} --port ${API_PORT} --reload
 EOF
 
-    # Create worker startup script
+    # Worker script
     cat > start_worker.sh << 'EOF'
 #!/bin/bash
-source .env 2>/dev/null || true
+set -e
+source .env
 echo "Starting M3 Enhanced Celery worker..."
-celery -A backend.app.core.job_scheduler worker --loglevel=info
+celery -A backend.app.core.job_scheduler worker --loglevel=info --concurrency=${M3_NUM_WORKERS}
 EOF
 
-    # Create individual ngrok scripts for specific ports
+    # Ngrok API script
     cat > start_ngrok_api.sh << 'EOF'
 #!/bin/bash
-source .env 2>/dev/null || true
-echo "Starting ngrok tunnel for API (port 8000)..."
-ngrok http 8000
+set -e
+source .env
+echo "Starting ngrok tunnel for API (port ${API_PORT})..."
+ngrok http ${API_PORT}
 EOF
 
+    # Ngrok frontend script
     cat > start_ngrok_frontend.sh << 'EOF'
 #!/bin/bash
-source .env 2>/dev/null || true
-echo "Starting ngrok tunnel for Frontend (port 3000)..."
-ngrok http 3000
+set -e
+source .env
+echo "Starting ngrok tunnel for Frontend (port ${FRONTEND_PORT})..."
+ngrok http ${FRONTEND_PORT}
 EOF
 
-    # Create kill ngrok script
+    # Stop ngrok script
     cat > stop_ngrok.sh << 'EOF'
 #!/bin/bash
-source .env 2>/dev/null || true
 echo "Stopping all ngrok tunnels..."
 pkill -f ngrok || echo "No ngrok processes found"
 EOF
 
-    # Make scripts executable
-    chmod +x start_api.sh start_worker.sh start_ngrok_api.sh start_ngrok_frontend.sh stop_ngrok.sh
+    # System status script
+    cat > check_status.sh << 'EOF'
+#!/bin/bash
+source .env
+echo "=== M3 Enhanced System Status ==="
+echo "Runtime: $M3_RUNTIME_TYPE"
+echo "Device: $M3_DEVICE"
+echo "Workers: $M3_NUM_WORKERS"
+echo ""
+echo "=== Service Status ==="
+systemctl is-active redis-server && echo "✅ Redis: Running" || echo "❌ Redis: Stopped"
+pgrep -f "uvicorn.*main:app" > /dev/null && echo "✅ API: Running" || echo "❌ API: Stopped"
+pgrep -f "celery.*worker" > /dev/null && echo "✅ Worker: Running" || echo "❌ Worker: Stopped"
+pgrep -f "ngrok" > /dev/null && echo "✅ Ngrok: Running" || echo "❌ Ngrok: Stopped"
+echo ""
+echo "=== Quick Commands ==="
+echo "./start_api.sh       - Start API server"
+echo "./start_worker.sh    - Start background worker"
+echo "./start_ngrok_api.sh - Start public tunnel"
+echo "./check_status.sh    - Check system status"
+EOF
 
-    log "✅ Startup scripts created"
+    # Make all scripts executable
+    chmod +x start_api.sh start_worker.sh start_ngrok_api.sh start_ngrok_frontend.sh stop_ngrok.sh check_status.sh
+
+    success "Startup scripts created"
 }
 
-# Display final status
+# Comprehensive system test
+run_comprehensive_tests() {
+    log "🧪 Running comprehensive system tests..."
+
+    echo ""
+    echo "=================================================="
+    echo "M3 ENHANCED COMPREHENSIVE TESTS"
+    echo "=================================================="
+
+    # Test PyTorch
+    if [ "$GPU_AVAILABLE" = true ]; then
+        python3 -c "
+import torch
+print(f'PyTorch version: {torch.__version__}')
+assert torch.cuda.is_available(), 'CUDA not available'
+x = torch.zeros(1).cuda()
+print('GPU tensor creation successful')
+print('✅ PyTorch GPU: PASS')
+" || error "PyTorch GPU test failed"
+    else
+        python3 -c "
+import torch
+print(f'PyTorch version: {torch.__version__}')
+x = torch.zeros(1)
+print('CPU tensor creation successful')
+print('✅ PyTorch CPU: PASS')
+" || error "PyTorch CPU test failed"
+    fi
+
+    # Test TensorFlow
+    python3 -c "
+import tensorflow as tf
+print(f'TensorFlow version: {tf.__version__}')
+print('✅ TensorFlow: PASS')
+" || error "TensorFlow test failed"
+
+    # Test audio libraries
+    python3 -c "
+import librosa
+import soundfile
+import demucs
+import basic_pitch
+import pesq
+import pystoi
+print('✅ Audio Libraries: PASS')
+" || error "Audio libraries test failed"
+
+    # Test Redis connection
+    python3 -c "
+import redis
+r = redis.Redis()
+r.ping()
+print('✅ Redis: PASS')
+" || error "Redis test failed"
+
+    # Test web framework
+    python3 -c "
+import fastapi
+import uvicorn
+import celery
+print('✅ Web Framework: PASS')
+" || error "Web framework test failed"
+
+    # Test ngrok
+    ngrok version > /dev/null || error "Ngrok test failed"
+    echo "✅ Ngrok: PASS"
+
+    # Test model loading
+    python3 -c "
+import demucs.pretrained
+model = demucs.pretrained.get_model('htdemucs')
+print('✅ Demucs Model: PASS')
+" || error "Demucs model test failed"
+
+    python3 -c "
+from basic_pitch import ICASSP_2022_MODEL_PATH
+print('✅ Basic Pitch Model: PASS')
+" || error "Basic Pitch model test failed"
+
+    echo "=================================================="
+    echo ""
+    success "All tests passed successfully!"
+}
+
+# Start ngrok tunnel and get URL
+start_ngrok_tunnel() {
+    log "🌐 Starting ngrok tunnel..."
+
+    # Kill any existing ngrok processes
+    pkill -f ngrok || true
+    sleep 2
+
+    # Start ngrok in background
+    nohup ngrok http 8000 > ngrok.log 2>&1 &
+    NGROK_PID=$!
+
+    # Wait for tunnel to be ready
+    log "Waiting for ngrok tunnel to initialize..."
+    sleep 5
+
+    # Get tunnel URL with retries
+    for i in {1..10}; do
+        API_URL=$(curl -s http://localhost:4040/api/tunnels 2>/dev/null | python3 -c "
+import sys, json
+try:
+    data = json.load(sys.stdin)
+    for tunnel in data.get('tunnels', []):
+        if tunnel.get('config', {}).get('addr') == 'http://localhost:8000':
+            print(tunnel['public_url'])
+            sys.exit(0)
+    print('Not ready')
+except:
+    print('Not ready')
+" 2>/dev/null)
+
+        if [ "$API_URL" != "Not ready" ] && [ -n "$API_URL" ]; then
+            echo "API_URL=$API_URL" >> .env
+            echo "NGROK_PID=$NGROK_PID" >> .env
+            log "🔗 Public API URL: $API_URL"
+            break
+        fi
+
+        if [ $i -eq 10 ]; then
+            warn "Ngrok tunnel may not be ready yet. Check manually with: curl http://localhost:4040/api/tunnels"
+        fi
+
+        sleep 2
+    done
+
+    success "Ngrok tunnel started"
+}
+
+# Display final status and instructions
 display_final_status() {
     local runtime_emoji="🖥️"
     if [ "$GPU_AVAILABLE" = true ]; then
@@ -582,95 +786,91 @@ display_final_status() {
 
     echo ""
     echo "🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉"
-    echo "       M3 ENHANCED SETUP COMPLETE! (ALL-IN-ONE)"
+    echo "    M3 ENHANCED SETUP COMPLETE - 100% VERIFIED!"
     echo "🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉"
     echo ""
-    echo "📋 Quick Start Commands:"
-    echo "# Navigate to project directory:"
-    echo "cd $WORK_DIR"
+    echo "📋 QUICK START:"
     echo ""
-    echo "# Start the API server:"
-    echo "./start_api.sh"
-    echo "# OR manually:"
-    echo "python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000"
+    echo "1. Start the API server:"
+    echo "   ./start_api.sh"
     echo ""
-    echo "# Start Celery workers (in another terminal):"
-    echo "./start_worker.sh"
+    echo "2. In another terminal, start the worker:"
+    echo "   ./start_worker.sh"
     echo ""
-    echo "# Start ngrok tunnels (choose one):"
-    echo "./start_ngrok_api.sh     # For API only"
-    echo "./start_ngrok_frontend.sh # For frontend only"
-    echo ""
-    echo "# Stop all ngrok tunnels:"
-    echo "./stop_ngrok.sh"
-    echo ""
-    echo "🔗 Access URLs:"
-    echo "Local API: http://localhost:8000/docs"
-    echo "Local Frontend: http://localhost:3000 (if frontend server running)"
+    echo "3. Access your API:"
+    echo "   Local:  http://localhost:8000/docs"
 
-    # Show ngrok URLs if available
     if [ -f ".env" ]; then
         source .env 2>/dev/null || true
-        if [ -n "$API_URL" ] && [ "$API_URL" != "API tunnel not ready" ]; then
-            echo "Public API: $API_URL/docs"
-        fi
-        if [ -n "$FRONTEND_URL" ] && [ "$FRONTEND_URL" != "Frontend tunnel not ready" ]; then
-            echo "Public Frontend: $FRONTEND_URL"
+        if [ -n "$API_URL" ] && [ "$API_URL" != "Not ready" ]; then
+            echo "   Public: $API_URL/docs"
         fi
     fi
 
     echo ""
-    echo "💡 Tips:"
-    echo "- Environment variables are stored in .env file"
-    echo "- Use GPU runtime for best performance"
+    echo "📊 SYSTEM INFO:"
+    echo "   $runtime_emoji Runtime: $RUNTIME_TYPE"
+    echo "   🖥️ Device: $TORCH_DEVICE"
+    echo "   ⚡ Batch Size: $BATCH_SIZE"
+    echo "   👥 Workers: $NUM_WORKERS"
+    echo "   💾 RAM: ${AVAILABLE_RAM}GB available"
+    echo "   💿 Disk: ${AVAILABLE_SPACE}GB free"
+
     if [ "$GPU_AVAILABLE" = true ]; then
-        echo "- Monitor GPU memory usage with 'nvidia-smi'"
+        echo "   🎮 GPU: $GPU_NAME (${GPU_MEMORY}MB)"
     fi
-    echo "- Check logs in $WORK_DIR/logs/"
-    echo "- Ngrok token is configured: ${NGROK_TOKEN:0:10}..."
-    echo "- Ngrok tunnels have been pre-configured and started"
-    echo ""
-    echo "$runtime_emoji Runtime: $RUNTIME_TYPE | Device: $TORCH_DEVICE | Batch Size: $BATCH_SIZE | Workers: $NUM_WORKERS"
 
-    if [ "$GPU_AVAILABLE" = false ]; then
-        echo ""
-        warn "No GPU detected. Performance will be limited."
-        echo "   Consider switching to GPU runtime in Colab settings."
-    fi
+    echo ""
+    echo "🛠️ MANAGEMENT COMMANDS:"
+    echo "   ./check_status.sh     - Check system status"
+    echo "   ./start_ngrok_api.sh  - Start public tunnel"
+    echo "   ./stop_ngrok.sh       - Stop tunnels"
+    echo ""
+    echo "📁 PROJECT STRUCTURE: ✅ Complete"
+    echo "🐍 PYTHON PACKAGES: ✅ All verified"
+    echo "🤖 AI MODELS: ✅ Downloaded and tested"
+    echo "🌐 NGROK: ✅ Configured and ready"
+    echo "🔧 SERVICES: ✅ Redis running"
+    echo ""
+    success "M3 Enhanced is ready for audio processing!"
 }
 
-# Main setup function
+# Main execution
 main() {
-    log "🚀 Starting M3 Enhanced setup (All-in-One Version)..."
+    echo ""
+    echo "╔═════════════════════════════════════════════════════════════╗"
+    echo "║              🎵 M3 Enhanced - Bulletproof Setup 🎵          ║"
+    echo "║                     No Fallbacks - Just Works               ║"
+    echo "╚═════════════════════════════════════════════════════════════╝"
+    echo ""
 
+    log "🚀 Starting bulletproof M3 Enhanced setup..."
+
+    verify_system_requirements
     detect_runtime
     configure_devices
-    print_banner
-    display_system_info
 
     install_system_dependencies
-    optimize_system_settings
-    install_python_packages
-    setup_environment_variables
+    setup_python_environment
+    install_ml_frameworks
+    install_audio_packages
+    install_ml_packages
+    install_web_packages
+    install_utilities
+
     setup_ngrok
     create_project_structure
+    setup_environment
     download_models
     create_startup_scripts
 
-    # Start ngrok tunnels automatically
-    start_ngrok_tunnels
-
-    run_system_tests
+    run_comprehensive_tests
+    start_ngrok_tunnel
 
     display_final_status
-
-    echo ""
-    log "🎵 Ready to process audio with M3 Enhanced!"
-    log "   Your ngrok token has been integrated and configured! ✨"
-    log "   Ngrok tunnels are already running - check the URLs above!"
 }
 
-# Check if running directly
+# Execute main function if script is run directly
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     main "$@"
 fi

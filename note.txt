@@ -1,18 +1,5 @@
  just send teh code in this session as a file. setup.sh errored out and needs to be fixed. analyze it, and see if theres anything wrong.
 
- However, I notice there were some warnings and issues during the execution:
-
-Package installation warnings - Some packages like basic-pitch failed to install properly
-Dependency conflicts - There were some pip dependency resolver conflicts
-Repository warning - The r2u.stat.illinois.edu repository had some issues
-Line 211: There's a bug where it tries to install PyTorch with CUDA even for CPU runtime
-Line 248: TensorFlow version constraint might be too restrictive
-Some packages failed to install but the script handled it gracefully
-theres that but it said: Use ./start_ngrok.sh to create public tunnels for your servers.
-
-I want it all in one script
-
-
 /content# cd /home
 /home# unzip m3_enhanced.zip
 Archive:  m3_enhanced.zip
@@ -99,9 +86,17 @@ Archive:  m3_enhanced.zip
    creating: m3_enhanced/.git/objects/
    creating: m3_enhanced/.git/objects/94/
  extracting: m3_enhanced/.git/objects/94/c769140cf4f9cda42659e1b0cc87f0a4167b82
+   creating: m3_enhanced/.git/objects/2b/
+ extracting: m3_enhanced/.git/objects/2b/25231c05ad213e955bffe53036338a892e0eaa
    creating: m3_enhanced/.git/objects/info/
+   creating: m3_enhanced/.git/objects/da/
+ extracting: m3_enhanced/.git/objects/da/9312a328b75ac7782496813b3ffc2e3ca3da3a
    creating: m3_enhanced/.git/objects/d9/
  extracting: m3_enhanced/.git/objects/d9/a18a072e07ab4d513a5b08467c6e6ba0af2ad9
+   creating: m3_enhanced/.git/objects/76/
+ extracting: m3_enhanced/.git/objects/76/bc7595218b6324491fd919a869b7e52f8704b5
+   creating: m3_enhanced/.git/objects/fe/
+ extracting: m3_enhanced/.git/objects/fe/7dfd056c8c1f8d9a7c4cfff91d4d6ef7d74e32
    creating: m3_enhanced/.git/objects/1c/
  extracting: m3_enhanced/.git/objects/1c/3f8ff9d4142ac4b8b7744a3ad91e5ec596c836
    creating: m3_enhanced/.git/objects/f7/
@@ -114,11 +109,11 @@ Archive:  m3_enhanced.zip
    creating: m3_enhanced/.git/branches/
    creating: m3_enhanced/.git/refs/
    creating: m3_enhanced/.git/refs/heads/
- extracting: m3_enhanced/.git/refs/heads/main
+  inflating: m3_enhanced/.git/refs/heads/main
    creating: m3_enhanced/.git/refs/tags/
    creating: m3_enhanced/.git/refs/remotes/
    creating: m3_enhanced/.git/refs/remotes/origin/
- extracting: m3_enhanced/.git/refs/remotes/origin/main
+  inflating: m3_enhanced/.git/refs/remotes/origin/main
  extracting: m3_enhanced/.git/refs/remotes/origin/HEAD
   inflating: m3_enhanced/setup.sh
   inflating: m3_enhanced/note.txt
@@ -146,19 +141,15 @@ Archive:  m3_enhanced.zip
   inflating: m3_enhanced/tests/test_full_pipeline.py
   inflating: m3_enhanced/tests/test_transcription.py
   inflating: m3_enhanced/.gitattributes
-/home# chmod +x setup.sh
-chmod: cannot access 'setup.sh': No such file or directory
-/home# ./setup.sh
--bash: ./setup.sh: No such file or directory
 /home# cd m3_enhanced
 /home/m3_enhanced# chmod +x setup.sh
 /home/m3_enhanced# ./setup.sh
-[2025-09-22 04:40:25] 🚀  Starting M3 Enhanced setup (Fixed Version)...
-[2025-09-22 04:40:25] 🔍  Detecting runtime environment...
-[2025-09-22 04:40:25] 🖥️ CPU runtime: 2 cores
+[2025-09-22 05:15:24] 🚀  Starting M3 Enhanced setup (All-in-One Version)...
+[2025-09-22 05:15:24] 🔍  Detecting runtime environment...
+[2025-09-22 05:15:24] 🖥️ CPU runtime: 2 cores
 [WARNING] Not running in Google Colab - using current directory: /home/m3_enhanced
-[2025-09-22 04:40:25] ⚙️ Configuring device-specific settings...
-[2025-09-22 04:40:25] 📊  CPU config: device=cpu, batch_size=1, workers=2
+[2025-09-22 05:15:24] ⚙️ Configuring device-specific settings...
+[2025-09-22 05:15:24] 📊  CPU config: device=cpu, batch_size=1, workers=2
 
 ╔═════════════════════════════════════════════════════════════╗
 ║                    🎵 M3 Enhanced 🎵                        ║
@@ -179,10 +170,10 @@ M3 ENHANCED - SETUP (FIXED VERSION)
 ⚠️ No GPU detected - CPU-only mode
 ============================================================
 
-[2025-09-22 04:40:25] 📦  Installing system dependencies...
+[2025-09-22 05:15:24] 📦  Installing system dependencies...
 W: Skipping acquire of configured file 'main/source/Sources' as repository 'https://r2u.stat.illinois.edu/ubuntu jammy InRelease' does not seem to provide it (sources.list entry misspelt?)
-[2025-09-22 04:40:31] ✅  Installed: ffmpeg
-[2025-09-22 04:40:33] ✅  Installed: libsndfile1-dev
+[2025-09-22 05:15:33] ✅  Installed: ffmpeg
+[2025-09-22 05:15:36] ✅  Installed: libsndfile1-dev
 Selecting previously unselected package libfftw3-double3:amd64.
 (Reading database ... 126435 files and directories currently installed.)
 Preparing to unpack .../0-libfftw3-double3_3.3.8-2ubuntu8_amd64.deb ...
@@ -238,21 +229,21 @@ Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
 
 /sbin/ldconfig.real: /usr/local/lib/libur_loader.so.0 is not a symbolic link
 
-[2025-09-22 04:40:42] ✅  Installed: libfftw3-dev
+[2025-09-22 05:15:48] ✅  Installed: libfftw3-dev
 Selecting previously unselected package flac.
 (Reading database ... 126538 files and directories currently installed.)
 Preparing to unpack .../flac_1.3.3-2ubuntu0.2_amd64.deb ...
 Unpacking flac (1.3.3-2ubuntu0.2) ...
 Setting up flac (1.3.3-2ubuntu0.2) ...
 Processing triggers for man-db (2.10.2-1) ...
-[2025-09-22 04:40:47] ✅  Installed: flac
+[2025-09-22 05:15:55] ✅  Installed: flac
 Selecting previously unselected package lame.
 (Reading database ... 126546 files and directories currently installed.)
 Preparing to unpack .../lame_3.100-3build2_amd64.deb ...
 Unpacking lame (3.100-3build2) ...
 Setting up lame (3.100-3build2) ...
 Processing triggers for man-db (2.10.2-1) ...
-[2025-09-22 04:40:52] ✅  Installed: lame
+[2025-09-22 05:16:00] ✅  Installed: lame
 Selecting previously unselected package libpcap0.8:amd64.
 (Reading database ... 126551 files and directories currently installed.)
 Preparing to unpack .../libpcap0.8_1.10.1-4ubuntu1.22.04.1_amd64.deb ...
@@ -292,7 +283,7 @@ Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
 /sbin/ldconfig.real: /usr/local/lib/libur_loader.so.0 is not a symbolic link
 
 Processing triggers for man-db (2.10.2-1) ...
-[2025-09-22 04:40:57] ✅  Installed: opus-tools
+[2025-09-22 05:16:06] ✅  Installed: opus-tools
 Selecting previously unselected package libao-common.
 (Reading database ... 126571 files and directories currently installed.)
 Preparing to unpack .../libao-common_1.2.2+20180113-1.1ubuntu3_all.deb ...
@@ -337,8 +328,8 @@ Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
 
 /sbin/ldconfig.real: /usr/local/lib/libur_loader.so.0 is not a symbolic link
 
-[2025-09-22 04:41:01] ✅  Installed: vorbis-tools
-[2025-09-22 04:41:04] ✅  Installed: libmagic1
+[2025-09-22 05:16:12] ✅  Installed: vorbis-tools
+[2025-09-22 05:16:16] ✅  Installed: libmagic1
 Selecting previously unselected package libjemalloc2:amd64.
 (Reading database ... 126629 files and directories currently installed.)
 Preparing to unpack .../0-libjemalloc2_5.2.1-4ubuntu1_amd64.deb ...
@@ -402,7 +393,7 @@ Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
 
 /sbin/ldconfig.real: /usr/local/lib/libur_loader.so.0 is not a symbolic link
 
-[2025-09-22 04:41:10] ✅  Installed: redis-server
+[2025-09-22 05:16:22] ✅  Installed: redis-server
 Selecting previously unselected package libnl-genl-3-200:amd64.
 (Reading database ... 126711 files and directories currently installed.)
 Preparing to unpack .../libnl-genl-3-200_3.5.0-0.1_amd64.deb ...
@@ -444,8 +435,8 @@ Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
 
 /sbin/ldconfig.real: /usr/local/lib/libur_loader.so.0 is not a symbolic link
 
-[2025-09-22 04:41:14] ✅  Installed: htop
-[2025-09-22 04:41:16] ✅  Installed: build-essential
+[2025-09-22 05:16:29] ✅  Installed: htop
+[2025-09-22 05:16:32] ✅  Installed: build-essential
 (Reading database ... 126726 files and directories currently installed.)
 Removing r-base-dev (4.5.1-1.2204.0) ...
 dpkg: pkgconf: dependency problems, but removing anyway as you requested:
@@ -482,8 +473,8 @@ Preparing to unpack .../pkg-config_0.29.2-1ubuntu3_amd64.deb ...
 Unpacking pkg-config (0.29.2-1ubuntu3) ...
 Setting up pkg-config (0.29.2-1ubuntu3) ...
 Processing triggers for man-db (2.10.2-1) ...
-[2025-09-22 04:41:21] ✅  Installed: pkg-config
-[2025-09-22 04:41:23] ✅  Installed: libasound2-dev
+[2025-09-22 05:16:38] ✅  Installed: pkg-config
+[2025-09-22 05:16:42] ✅  Installed: libasound2-dev
 Selecting previously unselected package libportaudio2:amd64.
 (Reading database ... 126717 files and directories currently installed.)
 Preparing to unpack .../libportaudio2_19.6.0-1.1_amd64.deb ...
@@ -526,30 +517,30 @@ Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
 
 /sbin/ldconfig.real: /usr/local/lib/libur_loader.so.0 is not a symbolic link
 
-[2025-09-22 04:41:28] ✅  Installed: portaudio19-dev
-[2025-09-22 04:41:31] ✅  Installed: curl
-[2025-09-22 04:41:33] ✅  Installed: unzip
+[2025-09-22 05:16:48] ✅  Installed: portaudio19-dev
+[2025-09-22 05:16:51] ✅  Installed: curl
+[2025-09-22 05:16:54] ✅  Installed: unzip
 Starting redis-server: redis-server.
-[2025-09-22 04:41:33] ✅  Redis server started
-[2025-09-22 04:41:33] ⚙️ Optimizing system settings...
-[2025-09-22 04:41:33] ✅  System optimization complete
-[2025-09-22 04:41:33] 🐍  Installing Python packages for cpu runtime...
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 23.5 MB/s eta 0:00:00
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 75.4 MB/s eta 0:00:00
+[2025-09-22 05:16:54] ✅  Redis server started
+[2025-09-22 05:16:54] ⚙️ Optimizing system settings...
+[2025-09-22 05:16:54] ✅  System optimization complete
+[2025-09-22 05:16:54] 🐍  Installing Python packages for cpu runtime...
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 16.9 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 47.7 MB/s eta 0:00:00
 ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
 ipython 7.34.0 requires jedi>=0.16, which is not installed.
-[2025-09-22 04:41:46] 📦  Installing PyTorch for CPU...
-[2025-09-22 04:41:54] ✅  Installed: transformers
-[2025-09-22 04:41:57] ✅  Installed: accelerate
-[2025-09-22 04:41:59] ✅  Installed: datasets
-[2025-09-22 04:42:01] ✅  Installed: librosa[display]
-[2025-09-22 04:42:04] ✅  Installed: soundfile
+[2025-09-22 05:17:10] 📦  Installing PyTorch for CPU...
+[2025-09-22 05:17:22] ✅  Installed: transformers
+[2025-09-22 05:17:25] ✅  Installed: accelerate
+[2025-09-22 05:17:27] ✅  Installed: datasets
+[2025-09-22 05:17:29] ✅  Installed: librosa[display]
+[2025-09-22 05:17:32] ✅  Installed: soundfile
   Preparing metadata (setup.py) ... done
   DEPRECATION: Building 'pretty_midi' using the legacy setup.py bdist_wheel mechanism, which will be removed in a future version. pip 25.3 will enforce this behaviour change. A possible replacement is to use the standardized build interface by setting the `--use-pep517` option, (possibly combined with `--no-build-isolation`), or adding a `pyproject.toml` file to the source tree of 'pretty_midi'. Discussion can be found at https://github.com/pypa/pip/issues/6334
   Building wheel for pretty_midi (setup.py) ... done
-[2025-09-22 04:42:10] ✅  Installed: pretty_midi
-[2025-09-22 04:42:12] ✅  Installed: music21
-[2025-09-22 04:42:12] 📦  Installing demucs...
+[2025-09-22 05:17:40] ✅  Installed: pretty_midi
+[2025-09-22 05:17:43] ✅  Installed: music21
+[2025-09-22 05:17:43] 📦  Installing demucs...
   Preparing metadata (setup.py) ... done
   Installing build dependencies ... done
   Getting requirements to build wheel ... done
@@ -560,9 +551,8 @@ ipython 7.34.0 requires jedi>=0.16, which is not installed.
   DEPRECATION: Building 'julius' using the legacy setup.py bdist_wheel mechanism, which will be removed in a future version. pip 25.3 will enforce this behaviour change. A possible replacement is to use the standardized build interface by setting the `--use-pep517` option, (possibly combined with `--no-build-isolation`), or adding a `pyproject.toml` file to the source tree of 'julius'. Discussion can be found at https://github.com/pypa/pip/issues/6334
   Building wheel for julius (setup.py) ... done
   Building wheel for dora-search (pyproject.toml) ... done
-[2025-09-22 04:42:27] ✅  Installed: demucs
-[2025-09-22 04:42:27] 📦  Installing compatible audio processing packages...
-[WARNING] Failed to fix tensorflow version
+[2025-09-22 05:18:05] ✅  Installed: demucs
+[2025-09-22 05:18:05] 📦  Installing compatible audio processing packages...
   Installing build dependencies ... done
   Getting requirements to build wheel ... done
   Preparing metadata (pyproject.toml) ... done
@@ -583,39 +573,42 @@ error: subprocess-exited-with-error
 
 note: This error originates from a subprocess, and is likely not a problem with pip.
 [WARNING] Failed to install basic-pitch - installing dependencies separately
-[2025-09-22 04:43:10] 📦  Attempting to install: audio-separator
+[2025-09-22 05:20:53] 📦  Attempting to install: audio-separator
   Installing build dependencies ... done
   Getting requirements to build wheel ... done
   Preparing metadata (pyproject.toml) ... done
   Building wheel for diffq (pyproject.toml) ... done
-[2025-09-22 04:43:34] ✅  Installed: audio-separator
-[2025-09-22 04:43:34] 📦  Attempting to install: pesq
+[2025-09-22 05:21:29] ✅  Installed: audio-separator
+[2025-09-22 05:21:29] 📦  Attempting to install: pesq
   Preparing metadata (setup.py) ... done
   DEPRECATION: Building 'pesq' using the legacy setup.py bdist_wheel mechanism, which will be removed in a future version. pip 25.3 will enforce this behaviour change. A possible replacement is to use the standardized build interface by setting the `--use-pep517` option, (possibly combined with `--no-build-isolation`), or adding a `pyproject.toml` file to the source tree of 'pesq'. Discussion can be found at https://github.com/pypa/pip/issues/6334
   Building wheel for pesq (setup.py) ... done
-[2025-09-22 04:43:48] ✅  Installed: pesq
-[2025-09-22 04:43:48] 📦  Attempting to install: pystoi
-[2025-09-22 04:43:50] ✅  Installed: pystoi
-[2025-09-22 04:43:50] 📦  Skipping openl3 installation (known compatibility issues)
-[2025-09-22 04:44:05] ✅  Python package installation complete
-[2025-09-22 04:44:05] 🔧  Configuring environment variables...
-[2025-09-22 04:44:05] ✅  Environment variables configured in .env file
-[2025-09-22 04:44:05] 🌐  Setting up ngrok tunnel with provided token...
-                                                                                                                                    Authtoken saved to configuration file: /root/.config/ngrok/ngrok.yml
-[2025-09-22 04:44:10] ✅  Ngrok authentication configured with provided token
-[2025-09-22 04:44:10] ✅  Ngrok configuration file created
-[2025-09-22 04:44:10] 📁  Creating project structure...
-[2025-09-22 04:44:11] ✅  Project structure created
-[2025-09-22 04:44:11] 🤖  Downloading AI models for cpu runtime...
-[2025-09-22 04:44:11] 📦  Downloading Demucs separation model...
+[2025-09-22 05:21:48] ✅  Installed: pesq
+[2025-09-22 05:21:48] 📦  Attempting to install: pystoi
+[2025-09-22 05:21:52] ✅  Installed: pystoi
+[2025-09-22 05:21:52] 📦  Skipping openl3 installation (known compatibility issues)
+[2025-09-22 05:22:15] ✅  Python package installation complete
+[2025-09-22 05:22:15] 🔧  Configuring environment variables...
+[2025-09-22 05:22:15] ✅  Environment variables configured in .env file
+[2025-09-22 05:22:15] 🌐  Setting up ngrok tunnel with provided token...
+Authtoken saved to configuration file: /root/.config/ngrok/ngrok.yml
+[2025-09-22 05:22:20] ✅  Ngrok authentication configured with provided token
+[2025-09-22 05:22:20] ✅  Ngrok configuration file created
+[2025-09-22 05:22:20] 📁  Creating project structure...
+[2025-09-22 05:22:20] ✅  Project structure created
+[2025-09-22 05:22:20] 🤖  Downloading AI models for cpu runtime...
+[2025-09-22 05:22:20] 📦  Downloading Demucs separation model...
 Downloading: "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/955717e8-8726e21a.th" to /root/.cache/torch/hub/checkpoints/955717e8-8726e21a.th
-[2025-09-22 04:44:18] ✅  Demucs model downloaded
-[2025-09-22 04:44:18] 📦  Initializing Basic Pitch model...
+[2025-09-22 05:22:30] ✅  Demucs model downloaded
+[2025-09-22 05:22:30] 📦  Initializing Basic Pitch model...
 Basic Pitch initialized
-[2025-09-22 04:44:23] ✅  Basic Pitch model initialized
-[2025-09-22 04:44:23] 📝  Creating startup scripts...
-[2025-09-22 04:44:23] ✅  Startup scripts created
-[2025-09-22 04:44:23] 🧪  Running cpu system tests...
+[2025-09-22 05:22:40] ✅  Basic Pitch model initialized
+[2025-09-22 05:22:40] 📝  Creating startup scripts...
+[2025-09-22 05:22:40] ✅  Startup scripts created
+[2025-09-22 05:22:40] 🌐  Starting ngrok tunnels for API and frontend...
+[2025-09-22 05:22:48] ✅  Ngrok tunnels started
+[2025-09-22 05:22:48] 🔗  API URL: https://3e75175c69f4.ngrok-free.app
+[2025-09-22 05:22:48] 🧪  Running cpu system tests...
 
 ==================================================
 cpu SYSTEM TESTS
@@ -623,7 +616,7 @@ cpu SYSTEM TESTS
 PyTorch version: 2.8.0+cu126
 CPU tensor creation successful
 PyTorch CPU               ✅  PASS
-TensorFlow version: 2.19.0
+TensorFlow version: 2.19.1
 TensorFlow                ✅  PASS
 Audio libraries working
 Audio Libraries           ✅  PASS
@@ -634,7 +627,7 @@ Ngrok Binary              ✅  PASS
 
 
 🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉
-       M3 ENHANCED SETUP COMPLETE! (FIXED)
+       M3 ENHANCED SETUP COMPLETE! (ALL-IN-ONE)
 🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉
 
 📋  Quick Start Commands:
@@ -649,25 +642,30 @@ python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
 # Start Celery workers (in another terminal):
 ./start_worker.sh
 
-# Start ngrok tunnel (in another terminal):
-./start_ngrok.sh
+# Start ngrok tunnels (choose one):
+./start_ngrok_api.sh     # For API only
+./start_ngrok_frontend.sh # For frontend only
+
+# Stop all ngrok tunnels:
+./stop_ngrok.sh
 
 🔗  Access URLs:
 Local API: http://localhost:8000/docs
 Local Frontend: http://localhost:3000 (if frontend server running)
+Public API: https://3e75175c69f4.ngrok-free.app/docs
 
 💡  Tips:
 - Environment variables are stored in .env file
 - Use GPU runtime for best performance
 - Check logs in /home/m3_enhanced/logs/
 - Ngrok token is configured: 31u9zGx10x...
+- Ngrok tunnels have been pre-configured and started
 
 🖥️ Runtime: cpu | Device: cpu | Batch Size: 1 | Workers: 2
 
 [WARNING] No GPU detected. Performance will be limited.
    Consider switching to GPU runtime in Colab settings.
 
-[2025-09-22 04:44:32] 🎵  Ready to process audio with M3 Enhanced!
-[2025-09-22 04:44:32]    Your ngrok token has been integrated and configured! ✨
-[2025-09-22 04:44:32]    Use ./start_ngrok.sh to create public tunnels for your servers.
-/home/m3_enhanced#
+[2025-09-22 05:22:59] 🎵  Ready to process audio with M3 Enhanced!
+[2025-09-22 05:22:59]    Your ngrok token has been integrated and configured! ✨
+[2025-09-22 05:22:59]    Ngrok tunnels are already running - check the URLs above!
