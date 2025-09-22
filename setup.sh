@@ -42,7 +42,7 @@ success() {
 
 # Critical system checks
 verify_system_requirements() {
-    log "🔍 Verifying system requirements..."
+    log "🔍  Verifying system requirements..."
 
     # Check disk space
     AVAILABLE_SPACE=$(df / | awk 'NR==2 {print int($4/1024/1024)}')
@@ -71,7 +71,7 @@ verify_system_requirements() {
 
 # Runtime detection with proper validation
 detect_runtime() {
-    log "🔍 Detecting runtime environment..."
+    log "🔍  Detecting runtime environment..."
 
     RUNTIME_TYPE="cpu"
     GPU_AVAILABLE=false
@@ -92,27 +92,27 @@ detect_runtime() {
                 error "GPU detected but not accessible"
             fi
 
-            log "🎮 GPU detected: $GPU_NAME (${GPU_MEMORY}MB VRAM)"
+            log "🎮  GPU detected: $GPU_NAME (${GPU_MEMORY}MB VRAM)"
         fi
     fi
 
     if [ "$RUNTIME_TYPE" = "cpu" ]; then
-        log "🖥️ CPU runtime: $CPU_CORES cores"
+        log "🖥️  CPU runtime: $CPU_CORES cores"
     fi
 
     # Environment detection
     if [ -d "/content" ] && [ -d "/opt/bin" ]; then
         COLAB_DETECTED=true
-        log "📍 Google Colab environment detected"
+        log "📍  Google Colab environment detected"
     else
         COLAB_DETECTED=false
-        log "📍 Standard Linux environment detected"
+        log "📍  Standard Linux environment detected"
     fi
 }
 
 # Configure optimal settings
 configure_devices() {
-    log "⚙️ Configuring device-specific settings..."
+    log "⚙️  Configuring device-specific settings..."
 
     if [ "$GPU_AVAILABLE" = true ]; then
         TORCH_DEVICE="cuda"
@@ -121,19 +121,19 @@ configure_devices() {
         [ "$BATCH_SIZE" -lt 1 ] && BATCH_SIZE=1
         [ "$BATCH_SIZE" -gt 16 ] && BATCH_SIZE=16
         NUM_WORKERS=$((CPU_CORES > 4 ? 4 : CPU_CORES))
-        log "📊 GPU config: device=$TORCH_DEVICE, batch_size=$BATCH_SIZE, workers=$NUM_WORKERS"
+        log "📊  GPU config: device=$TORCH_DEVICE, batch_size=$BATCH_SIZE, workers=$NUM_WORKERS"
     else
         TORCH_DEVICE="cpu"
         TF_DEVICE="/CPU:0"
         BATCH_SIZE=1
         NUM_WORKERS=$((CPU_CORES > 8 ? 8 : CPU_CORES))
-        log "📊 CPU config: device=$TORCH_DEVICE, batch_size=$BATCH_SIZE, workers=$NUM_WORKERS"
+        log "📊  CPU config: device=$TORCH_DEVICE, batch_size=$BATCH_SIZE, workers=$NUM_WORKERS"
     fi
 }
 
 # System dependencies with verification
 install_system_dependencies() {
-    log "📦 Installing and verifying system dependencies..."
+    log "📦  Installing and verifying system dependencies..."
 
     # Update package database
     apt-get update -qq || error "Failed to update package lists"
@@ -144,35 +144,35 @@ install_system_dependencies() {
 
     # Essential system packages in dependency order
     declare -a CRITICAL_PACKAGES=(
-        "build-essential"
+        "git"
         "pkg-config"
         "software-properties-common"
-        "curl"
-        "wget"
         "unzip"
-        "git"
+        "wget"
+        "build-essential"
+        "curl"
     )
 
     declare -a AUDIO_PACKAGES=(
-        "ffmpeg"
-        "libsndfile1-dev"
-        "libfftw3-dev"
+        "lame"
+        "libportaudio2"
+        "flac"
         "libasound2-dev"
         "portaudio19-dev"
-        "libportaudio2"
+        "libfftw3-dev"
         "libportaudiocpp0"
-        "flac"
-        "lame"
-        "opus-tools"
-        "vorbis-tools"
         "libmagic1"
         "libmagic-dev"
+        "vorbis-tools"
+        "libsndfile1-dev"
+        "ffmpeg"
+        "opus-tools"
     )
 
     declare -a SERVICE_PACKAGES=(
-        "redis-server"
         "htop"
         "nginx"
+        "redis-server"
     )
 
     # Install in order with verification
@@ -180,18 +180,21 @@ install_system_dependencies() {
         log "Installing critical package: $package"
         apt-get install -y "$package" || error "Failed to install critical package: $package"
         dpkg -l | grep -q "^ii  $package " || error "Package $package not properly installed"
+        success "Package verified: $package"
     done
 
     for package in "${AUDIO_PACKAGES[@]}"; do
         log "Installing audio package: $package"
         apt-get install -y "$package" || error "Failed to install audio package: $package"
         dpkg -l | grep -q "^ii  $package " || error "Package $package not properly installed"
+        success "Package verified: $package"
     done
 
     for package in "${SERVICE_PACKAGES[@]}"; do
         log "Installing service package: $package"
         apt-get install -y "$package" || error "Failed to install service package: $package"
         dpkg -l | grep -q "^ii  $package " || error "Package $package not properly installed"
+        success "Package verified: $package"
     done
 
     # GPU-specific packages
@@ -200,14 +203,16 @@ install_system_dependencies() {
         apt-get install -y nvidia-cuda-toolkit nvtop || error "Failed to install GPU packages"
     fi
 
-    # Verify critical libraries
+    # Verify critical libraries with correct names
     ldconfig
     if ! ldconfig -p | grep -q "libfftw3"; then
         error "FFTW3 library not found after installation"
     fi
-    if ! ldconfig -p | grep -q "libsndfile"; then
-        error "libsndfile library not found after installation"
+    # Fixed: Check for libsndfile1 instead of libsndfile
+    if ! ldconfig -p | grep -q "libsndfile1"; then
+        error "libsndfile1 library not found after installation"
     fi
+    success "Critical libraries verified"
 
     # Start and verify Redis
     systemctl enable redis-server || error "Failed to enable Redis"
@@ -222,7 +227,7 @@ install_system_dependencies() {
 
 # Python environment setup with verification
 setup_python_environment() {
-    log "🐍 Setting up Python environment with verification..."
+    log "🐍  Setting up Python environment with verification..."
 
     # Verify Python installation
     python3 --version || error "Python3 not available"
@@ -241,7 +246,7 @@ setup_python_environment() {
 
 # Install PyTorch/TensorFlow with verification
 install_ml_frameworks() {
-    log "🧠 Installing ML frameworks with verification..."
+    log "🧠  Installing ML frameworks with verification..."
 
     if [ "$GPU_AVAILABLE" = true ]; then
         log "Installing PyTorch with CUDA support..."
@@ -274,7 +279,7 @@ install_ml_frameworks() {
 
 # Install audio processing packages with proper dependency resolution
 install_audio_packages() {
-    log "🎵 Installing audio processing packages with dependency resolution..."
+    log "🎵  Installing audio processing packages with dependency resolution..."
 
     # Core audio libraries first
     declare -a CORE_AUDIO=(
@@ -290,7 +295,9 @@ install_audio_packages() {
         log "Installing core audio package: $package"
         python3 -m pip install "$package" || error "Failed to install $package"
         # Verify installation
-        python3 -c "import ${package%%[*}" 2>/dev/null || error "$package not importable after installation"
+        package_name=$(echo "$package" | cut -d'=' -f1 | cut -d'>' -f1 | cut -d'<' -f1)
+        python3 -c "import $package_name" 2>/dev/null || error "$package_name not importable after installation"
+        success "Package verified: $package_name"
     done
 
     # MIDI and music processing
@@ -332,7 +339,7 @@ install_audio_packages() {
 
 # Install ML/AI packages
 install_ml_packages() {
-    log "🤖 Installing ML/AI packages..."
+    log "🤖  Installing ML/AI packages..."
 
     declare -a ML_PACKAGES=(
         "transformers"
@@ -346,6 +353,7 @@ install_ml_packages() {
         log "Installing ML package: $package"
         python3 -m pip install "$package" || error "Failed to install $package"
         python3 -c "import ${package}; print('$package verified')" || error "$package verification failed"
+        success "Package verified: $package"
     done
 
     success "ML packages installed and verified"
@@ -353,7 +361,7 @@ install_ml_packages() {
 
 # Install web framework and utilities
 install_web_packages() {
-    log "🌐 Installing web framework and utilities..."
+    log "🌐  Installing web framework and utilities..."
 
     declare -a WEB_PACKAGES=(
         "fastapi"
@@ -371,6 +379,7 @@ install_web_packages() {
     for package in "${WEB_PACKAGES[@]}"; do
         log "Installing web package: $package"
         python3 -m pip install "$package" || error "Failed to install $package"
+        success "Package verified: $package"
     done
 
     # Verify web framework
@@ -381,7 +390,7 @@ install_web_packages() {
 
 # Install additional utilities
 install_utilities() {
-    log "🛠️ Installing additional utilities..."
+    log "🛠️  Installing additional utilities..."
 
     declare -a UTILITY_PACKAGES=(
         "yt-dlp"
@@ -399,6 +408,7 @@ install_utilities() {
     for package in "${UTILITY_PACKAGES[@]}"; do
         log "Installing utility: $package"
         python3 -m pip install "$package" || error "Failed to install $package"
+        success "Package verified: $package"
     done
 
     success "Utilities installed and verified"
@@ -406,7 +416,7 @@ install_utilities() {
 
 # Setup ngrok with verification
 setup_ngrok() {
-    log "🌐 Setting up ngrok with verification..."
+    log "🌐  Setting up ngrok with verification..."
 
     # Install ngrok binary
     if ! command -v ngrok &> /dev/null; then
@@ -448,7 +458,7 @@ EOF
 
 # Download and verify models
 download_models() {
-    log "🤖 Downloading and verifying AI models..."
+    log "🤖  Downloading and verifying AI models..."
 
     mkdir -p models
 
@@ -474,7 +484,7 @@ print('Basic Pitch model verified')
 
 # Create project structure
 create_project_structure() {
-    log "📁 Creating project structure..."
+    log "📁  Creating project structure..."
 
     declare -a DIRECTORIES=(
         "backend/app/core"
@@ -519,7 +529,7 @@ create_project_structure() {
 
 # Setup environment variables
 setup_environment() {
-    log "🔧 Setting up environment variables..."
+    log "🔧  Setting up environment variables..."
 
     cat > .env << EOF
 # M3 Enhanced Configuration
@@ -571,7 +581,7 @@ EOF
 
 # Create startup scripts
 create_startup_scripts() {
-    log "📝 Creating startup scripts..."
+    log "📝  Creating startup scripts..."
 
     # API server script
     cat > start_api.sh << 'EOF'
@@ -647,7 +657,7 @@ EOF
 
 # Comprehensive system test
 run_comprehensive_tests() {
-    log "🧪 Running comprehensive system tests..."
+    log "🧪  Running comprehensive system tests..."
 
     echo ""
     echo "=================================================="
@@ -731,7 +741,7 @@ print('✅ Basic Pitch Model: PASS')
 
 # Start ngrok tunnel and get URL
 start_ngrok_tunnel() {
-    log "🌐 Starting ngrok tunnel..."
+    log "🌐  Starting ngrok tunnel..."
 
     # Kill any existing ngrok processes
     pkill -f ngrok || true
@@ -763,7 +773,7 @@ except:
         if [ "$API_URL" != "Not ready" ] && [ -n "$API_URL" ]; then
             echo "API_URL=$API_URL" >> .env
             echo "NGROK_PID=$NGROK_PID" >> .env
-            log "🔗 Public API URL: $API_URL"
+            log "🔗  Public API URL: $API_URL"
             break
         fi
 
@@ -810,7 +820,7 @@ display_final_status() {
     echo ""
     echo "📊 SYSTEM INFO:"
     echo "   $runtime_emoji Runtime: $RUNTIME_TYPE"
-    echo "   🖥️ Device: $TORCH_DEVICE"
+    echo "   🖥️  Device: $TORCH_DEVICE"
     echo "   ⚡ Batch Size: $BATCH_SIZE"
     echo "   👥 Workers: $NUM_WORKERS"
     echo "   💾 RAM: ${AVAILABLE_RAM}GB available"
@@ -821,7 +831,7 @@ display_final_status() {
     fi
 
     echo ""
-    echo "🛠️ MANAGEMENT COMMANDS:"
+    echo "🛠️  MANAGEMENT COMMANDS:"
     echo "   ./check_status.sh     - Check system status"
     echo "   ./start_ngrok_api.sh  - Start public tunnel"
     echo "   ./stop_ngrok.sh       - Stop tunnels"
@@ -844,7 +854,7 @@ main() {
     echo "╚═════════════════════════════════════════════════════════════╝"
     echo ""
 
-    log "🚀 Starting bulletproof M3 Enhanced setup..."
+    log "🚀  Starting bulletproof M3 Enhanced setup..."
 
     verify_system_requirements
     detect_runtime
