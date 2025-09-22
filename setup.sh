@@ -241,31 +241,60 @@ install_system_dependencies() {
         apt-get install -y nvidia-cuda-toolkit nvtop || error "Failed to install GPU packages"
     fi
 
-    # Verify critical libraries with correct names
+    # Refresh library cache and verify critical libraries with correct library detection
     ldconfig
 
     log "Verifying critical libraries..."
-    if ! ldconfig -p | grep -q "libfftw3"; then
+
+    # Check for any FFTW3 library variant (single, double, long double, etc.)
+    if ! ldconfig -p | grep -q "fftw3"; then
         error "FFTW3 library not found after installation"
     fi
 
-    # Check for libsndfile1 instead of libsndfile
-    if ! ldconfig -p | grep -q "libsndfile1"; then
-        error "libsndfile1 library not found after installation"
+    # Check for libsndfile1
+    if ! ldconfig -p | grep -q "libsndfile"; then
+        error "libsndfile library not found after installation"
+    fi
+
+    # Check for portaudio
+    if ! ldconfig -p | grep -q "portaudio"; then
+        error "PortAudio library not found after installation"
+    fi
+
+    # Verify pkg-config can find the libraries
+    if ! pkg-config --exists fftw3; then
+        error "pkg-config cannot find FFTW3"
+    fi
+
+    if ! pkg-config --exists sndfile; then
+        error "pkg-config cannot find libsndfile"
     fi
 
     success "Critical libraries verified"
 
-    # Start and verify Redis
+    # Start and verify Redis with proper systemd handling
     log "Starting and verifying Redis service..."
-    systemctl enable redis-server || error "Failed to enable Redis"
-    systemctl start redis-server || error "Failed to start Redis"
-    sleep 2
-    if ! systemctl is-active --quiet redis-server; then
-        error "Redis service is not running"
-    fi
-    success "Redis service verified"
 
+    # Check if systemctl is available (not in all containers)
+    if command -v systemctl &> /dev/null; then
+        systemctl enable redis-server || error "Failed to enable Redis"
+        systemctl start redis-server || error "Failed to start Redis"
+        sleep 2
+        if ! systemctl is-active --quiet redis-server; then
+            error "Redis service is not running"
+        fi
+    else
+        # Alternative: start Redis manually
+        log "Starting Redis manually (no systemd available)..."
+        redis-server --daemonize yes || error "Failed to start Redis manually"
+        sleep 2
+        # Test Redis connection
+        if ! redis-cli ping > /dev/null 2>&1; then
+            error "Redis is not responding to ping"
+        fi
+    fi
+
+    success "Redis service verified"
     success "All system dependencies installed and verified"
 }
 
@@ -681,7 +710,11 @@ echo "Device: $M3_DEVICE"
 echo "Workers: $M3_NUM_WORKERS"
 echo ""
 echo "=== Service Status ==="
-systemctl is-active redis-server && echo "✅ Redis: Running" || echo "❌ Redis: Stopped"
+if command -v systemctl &> /dev/null; then
+    systemctl is-active redis-server && echo "✅ Redis: Running" || echo "❌ Redis: Stopped"
+else
+    redis-cli ping > /dev/null 2>&1 && echo "✅ Redis: Running" || echo "❌ Redis: Stopped"
+fi
 pgrep -f "uvicorn.*main:app" > /dev/null && echo "✅ API: Running" || echo "❌ API: Stopped"
 pgrep -f "celery.*worker" > /dev/null && echo "✅ Worker: Running" || echo "❌ Worker: Stopped"
 pgrep -f "ngrok" > /dev/null && echo "✅ Ngrok: Running" || echo "❌ Ngrok: Stopped"
