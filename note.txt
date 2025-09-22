@@ -1,181 +1,9 @@
-Errors with setup.sh cause this to crash. figure out whats wrong and fix it. I want a completely ironed out approach to this and need it to just work. I dont want any workarounds or anything where teh script continues after vital system components dont work. Its a slog but I just need setup.sh fixed to make everything work. If necessary you can fix up the other stuff. Also send your code as a file in this session, dont edit or do anything. Also I dont want any emojis in this document.
+Errors with setup.sh cause this to crash. figure out whats wrong and fix it. I want a completely ironed out approach to this and need it to just work. I dont want any workarounds or anything where teh script continues after vital system components dont work. Its a slog but I just need setup.sh fixed to make everything work. If necessary you can fix up the other stuff. Also send your code as a file in this session, dont edit or do anything. Also I dont want any emojis in this document. Also I would like you to pipe all of this output and create a new file called results.txt that gets all of the verbose output in the terminal because colab clips some stuff
 
-   creating: m3_enhanced/backend/app/utils/
-  inflating: m3_enhanced/backend/app/utils/audio_utils.py
- extracting: m3_enhanced/backend/app/utils/init.py
-  inflating: m3_enhanced/backend/app/utils/midi_utils.py
-  inflating: m3_enhanced/backend/app/utils/file_manager.py
-   creating: m3_enhanced/backend/app/models/
-  inflating: m3_enhanced/backend/app/models/model_manager.py
- extracting: m3_enhanced/backend/app/models/init.py
-  inflating: m3_enhanced/backend/app/models/model_configs.py
-   creating: m3_enhanced/backend/app/processors/
-  inflating: m3_enhanced/backend/app/processors/multipass_separator.py
-  inflating: m3_enhanced/backend/app/processors/transcription_engine.py
- extracting: m3_enhanced/backend/app/processors/init.py
-  inflating: m3_enhanced/backend/app/processors/instrument_classifier.py
-  inflating: m3_enhanced/backend/app/processors/lead_rhythm_analyzer.py
-   creating: m3_enhanced/backend/scripts/
-  inflating: m3_enhanced/backend/scripts/colab_setup.py
-  inflating: m3_enhanced/backend/scripts/download_models.py
-  inflating: m3_enhanced/backend/scripts/benchmark_models.py
-  inflating: m3_enhanced/README.md
-  inflating: m3_enhanced/docker-compose.yml
-   creating: m3_enhanced/.git/
-  inflating: m3_enhanced/.git/index
-  inflating: m3_enhanced/.git/description
-   creating: m3_enhanced/.git/info/
-  inflating: m3_enhanced/.git/info/exclude
-  inflating: m3_enhanced/.git/packed-refs
- extracting: m3_enhanced/.git/COMMIT_EDITMSG
-   creating: m3_enhanced/.git/hooks/
-  inflating: m3_enhanced/.git/hooks/pre-receive.sample
-  inflating: m3_enhanced/.git/hooks/post-update.sample
-  inflating: m3_enhanced/.git/hooks/sendemail-validate.sample
-  inflating: m3_enhanced/.git/hooks/pre-rebase.sample
-  inflating: m3_enhanced/.git/hooks/prepare-commit-msg.sample
-  inflating: m3_enhanced/.git/hooks/fsmonitor-watchman.sample
-  inflating: m3_enhanced/.git/hooks/pre-commit.sample
-  inflating: m3_enhanced/.git/hooks/commit-msg.sample
-  inflating: m3_enhanced/.git/hooks/push-to-checkout.sample
-  inflating: m3_enhanced/.git/hooks/update.sample
-  inflating: m3_enhanced/.git/hooks/applypatch-msg.sample
-  inflating: m3_enhanced/.git/hooks/pre-merge-commit.sample
-  inflating: m3_enhanced/.git/hooks/pre-push.sample
-  inflating: m3_enhanced/.git/hooks/pre-applypatch.sample
-  inflating: m3_enhanced/.git/config
-  inflating: m3_enhanced/.git/FETCH_HEAD
-   creating: m3_enhanced/.git/logs/
-  inflating: m3_enhanced/.git/logs/HEAD
-   creating: m3_enhanced/.git/logs/refs/
-   creating: m3_enhanced/.git/logs/refs/heads/
-  inflating: m3_enhanced/.git/logs/refs/heads/main
-   creating: m3_enhanced/.git/logs/refs/remotes/
-   creating: m3_enhanced/.git/logs/refs/remotes/origin/
-  inflating: m3_enhanced/.git/logs/refs/remotes/origin/main
-  inflating: m3_enhanced/.git/logs/refs/remotes/origin/HEAD
-   creating: m3_enhanced/.git/objects/
-   creating: m3_enhanced/.git/objects/0b/
- extracting: m3_enhanced/.git/objects/0b/3f8e88a080cd347563f56578e38a1768e22d10
- extracting: m3_enhanced/.git/objects/0b/b061509092cdc80ca63424c90607c768593269
-   creating: m3_enhanced/.git/objects/a3/
- extracting: m3_enhanced/.git/objects/a3/bc3682b4131636d3a243a736865aaef70022c6
-   creating: m3_enhanced/.git/objects/82/
- extracting: m3_enhanced/.git/objects/82/5b8919d0b16acbe9f51510724a4beb659c17bf
-   creating: m3_enhanced/.git/objects/bd/
- extracting: m3_enhanced/.git/objects/bd/2d3565e22aff2424b47325c374663d2820003c
-  inflating: m3_enhanced/.git/objects/bd/578f80f6e0df0ba1bc88ef62547294ff06ad52
-   creating: m3_enhanced/.git/objects/1e/
-  inflating: m3_enhanced/.git/objects/1e/6ad12c4f2659e6e90ab5ca7a251c2b1473d751
- extracting: m3_enhanced/.git/objects/1e/0c9e7ed1df0ae2696b05c3ac455db00eb22450
-   creating: m3_enhanced/.git/objects/fc/
- extracting: m3_enhanced/.git/objects/fc/ed8156873dc6add9626d89baa3412ce331b69a
-   creating: m3_enhanced/.git/objects/3c/
- extracting: m3_enhanced/.git/objects/3c/a76801334762c352b874a2cd941d2a07a66653
-   creating: m3_enhanced/.git/objects/94/
- extracting: m3_enhanced/.git/objects/94/c769140cf4f9cda42659e1b0cc87f0a4167b82
-   creating: m3_enhanced/.git/objects/2b/
- extracting: m3_enhanced/.git/objects/2b/25231c05ad213e955bffe53036338a892e0eaa
-   creating: m3_enhanced/.git/objects/info/
-   creating: m3_enhanced/.git/objects/87/
- extracting: m3_enhanced/.git/objects/87/7b50cc9ddf878365fd50b0c230960ba9a7be09
-  inflating: m3_enhanced/.git/objects/87/65f1a0188f4966421af6f39f4aade039257cac
-   creating: m3_enhanced/.git/objects/da/
- extracting: m3_enhanced/.git/objects/da/9312a328b75ac7782496813b3ffc2e3ca3da3a
-   creating: m3_enhanced/.git/objects/d9/
- extracting: m3_enhanced/.git/objects/d9/8b659b68a8ab5dfb6a6b738aeb6a50c1afde99
- extracting: m3_enhanced/.git/objects/d9/a18a072e07ab4d513a5b08467c6e6ba0af2ad9
-   creating: m3_enhanced/.git/objects/20/
- extracting: m3_enhanced/.git/objects/20/8a310376e8693adc64c2f319be464fc8235043
-  inflating: m3_enhanced/.git/objects/20/8e1c91e8a9080a6acb01a5c9b75212013ce2ee
-   creating: m3_enhanced/.git/objects/67/
- extracting: m3_enhanced/.git/objects/67/26e5e770ab444020d95b23323ffb711ae79061
-   creating: m3_enhanced/.git/objects/76/
- extracting: m3_enhanced/.git/objects/76/bc7595218b6324491fd919a869b7e52f8704b5
-   creating: m3_enhanced/.git/objects/fe/
- extracting: m3_enhanced/.git/objects/fe/7dfd056c8c1f8d9a7c4cfff91d4d6ef7d74e32
-   creating: m3_enhanced/.git/objects/1c/
- extracting: m3_enhanced/.git/objects/1c/3f8ff9d4142ac4b8b7744a3ad91e5ec596c836
-   creating: m3_enhanced/.git/objects/f7/
- extracting: m3_enhanced/.git/objects/f7/67c8dec050102ac75d9ce645c0036e1e1629be
-   creating: m3_enhanced/.git/objects/5d/
- extracting: m3_enhanced/.git/objects/5d/aa53ea4d9548d7852288c483db464dbd5a697d
-   creating: m3_enhanced/.git/objects/pack/
-  inflating: m3_enhanced/.git/objects/pack/pack-33989990dae7dfc97fe4e6b41896ccba6e066966.rev
-  inflating: m3_enhanced/.git/objects/pack/pack-33989990dae7dfc97fe4e6b41896ccba6e066966.idx
-  inflating: m3_enhanced/.git/objects/pack/pack-33989990dae7dfc97fe4e6b41896ccba6e066966.pack
-   creating: m3_enhanced/.git/objects/7d/
-  inflating: m3_enhanced/.git/objects/7d/226dae78f96e4e839bff8d0a293db822a01ae5
-   creating: m3_enhanced/.git/objects/b3/
- extracting: m3_enhanced/.git/objects/b3/45f443d379280e323538e31b1acb85075016ca
-   creating: m3_enhanced/.git/objects/19/
- extracting: m3_enhanced/.git/objects/19/83747a0a565925970cb4fe7128b226936f2806
-   creating: m3_enhanced/.git/objects/be/
- extracting: m3_enhanced/.git/objects/be/4cc9841ae6cdecf6f465077613340b1cb55349
- extracting: m3_enhanced/.git/HEAD
-   creating: m3_enhanced/.git/branches/
-   creating: m3_enhanced/.git/refs/
-   creating: m3_enhanced/.git/refs/heads/
- extracting: m3_enhanced/.git/refs/heads/main
-   creating: m3_enhanced/.git/refs/tags/
-   creating: m3_enhanced/.git/refs/remotes/
-   creating: m3_enhanced/.git/refs/remotes/origin/
- extracting: m3_enhanced/.git/refs/remotes/origin/main
- extracting: m3_enhanced/.git/refs/remotes/origin/HEAD
-  inflating: m3_enhanced/setup.sh
-  inflating: m3_enhanced/note.txt
-   creating: m3_enhanced/config/
-  inflating: m3_enhanced/config/nginx.conf
-  inflating: m3_enhanced/config/celery.conf
-  inflating: m3_enhanced/config/redis.conf
-  inflating: m3_enhanced/colab_setup.py
-   creating: m3_enhanced/frontend/
-   creating: m3_enhanced/frontend/static/
-  inflating: m3_enhanced/frontend/static/style.css
-  inflating: m3_enhanced/frontend/static/index.html
-  inflating: m3_enhanced/frontend/static/app.js
-  inflating: m3_enhanced/filesystem_structure.txt
-  inflating: m3_enhanced/requirements-dev.txt
-  inflating: m3_enhanced/.env.example
-  inflating: m3_enhanced/.⁄prompt.txt
-   creating: m3_enhanced/docs/
-  inflating: m3_enhanced/docs/API.md
-  inflating: m3_enhanced/docs/SETUP.md
-  inflating: m3_enhanced/docs/PIPELINE.md
-   creating: m3_enhanced/tests/
-  inflating: m3_enhanced/tests/test_separation.py
- extracting: m3_enhanced/tests/init.py
-  inflating: m3_enhanced/tests/test_full_pipeline.py
-  inflating: m3_enhanced/tests/test_transcription.py
-  inflating: m3_enhanced/.gitattributes
-/home# cd m3_enhanced
-/home/m3_enhanced# chmod +x setup.sh
-/home/m3_enhanced# ./setup.sh
-
-=======================================================
-         M3 Enhanced - Bulletproof Setup
-              No Fallbacks - Just Works
-=======================================================
-
-[2025-09-22 06:42:14] Starting bulletproof M3 Enhanced setup...
-[2025-09-22 06:42:14] Verifying system requirements...
-[SUCCESS] System requirements verified
-[2025-09-22 06:42:14] Detecting runtime environment...
-[2025-09-22 06:42:14] CPU runtime: 2 cores
-[2025-09-22 06:42:14] Standard Linux environment detected
-[2025-09-22 06:42:14] Configuring device-specific settings...
-[2025-09-22 06:42:14] CPU config: device=cpu, batch_size=1, workers=2
-[2025-09-22 06:42:14] Installing and verifying system dependencies...
-W: Skipping acquire of configured file 'main/source/Sources' as repository 'https://r2u.stat.illinois.edu/ubuntu jammy InRelease' does not seem to provide it (sources.list entry misspelt?)
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
-The following packages were automatically installed and are no longer required:
-  libbz2-dev libreadline-dev
 Use 'apt autoremove' to remove them.
 The following packages will be REMOVED:
   r-base-dev
-0 upgraded, 0 newly installed, 1 to remove and 44 not upgraded.
+0 upgraded, 0 newly installed, 1 to remove and 41 not upgraded.
 After this operation, 15.4 kB disk space will be freed.
 (Reading database ... 126435 files and directories currently installed.)
 Removing r-base-dev (4.5.1-1.2204.0) ...
@@ -184,19 +12,19 @@ Building dependency tree... Done
 Reading state information... Done
 The following packages will be REMOVED:
   libbz2-dev libreadline-dev
-0 upgraded, 0 newly installed, 2 to remove and 44 not upgraded.
+0 upgraded, 0 newly installed, 2 to remove and 41 not upgraded.
 After this operation, 900 kB disk space will be freed.
 (Reading database ... 126432 files and directories currently installed.)
 Removing libbz2-dev:amd64 (1.0.8-5build1) ...
 Removing libreadline-dev:amd64 (8.1.2-1) ...
-[2025-09-22 06:42:30] Installing critical package: git
+[2025-09-22 19:03:01] Installing critical package: git
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
 git is already the newest version (1:2.34.1-1ubuntu1.15).
-0 upgraded, 0 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
 [SUCCESS] Package verified: git
-[2025-09-22 06:42:33] Installing critical package: pkg-config
+[2025-09-22 19:03:05] Installing critical package: pkg-config
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -207,11 +35,11 @@ The following packages will be REMOVED:
   pkgconf
 The following NEW packages will be installed:
   pkg-config
-0 upgraded, 1 newly installed, 1 to remove and 44 not upgraded.
+0 upgraded, 1 newly installed, 1 to remove and 41 not upgraded.
 Need to get 48.2 kB of archives.
 After this operation, 5,120 B of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy/main amd64 pkg-config amd64 0.29.2-1ubuntu3 [48.2 kB]
-Fetched 48.2 kB in 0s (101 kB/s)
+Fetched 48.2 kB in 0s (126 kB/s)
 dpkg: pkgconf: dependency problems, but removing anyway as you requested:
  libsndfile1-dev:amd64 depends on pkg-config; however:
   Package pkg-config is not installed.
@@ -248,7 +76,7 @@ Unpacking pkg-config (0.29.2-1ubuntu3) ...
 Setting up pkg-config (0.29.2-1ubuntu3) ...
 Processing triggers for man-db (2.10.2-1) ...
 [SUCCESS] Package verified: pkg-config
-[2025-09-22 06:42:42] Installing critical package: software-properties-common
+[2025-09-22 19:03:12] Installing critical package: software-properties-common
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -256,9 +84,9 @@ software-properties-common is already the newest version (0.99.22.9).
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
-0 upgraded, 0 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
 [SUCCESS] Package verified: software-properties-common
-[2025-09-22 06:42:45] Installing critical package: unzip
+[2025-09-22 19:03:16] Installing critical package: unzip
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -266,9 +94,9 @@ unzip is already the newest version (6.0-26ubuntu3.2).
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
-0 upgraded, 0 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
 [SUCCESS] Package verified: unzip
-[2025-09-22 06:42:50] Installing critical package: wget
+[2025-09-22 19:03:20] Installing critical package: wget
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -276,9 +104,9 @@ wget is already the newest version (1.21.2-2ubuntu1.1).
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
-0 upgraded, 0 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
 [SUCCESS] Package verified: wget
-[2025-09-22 06:42:53] Installing critical package: build-essential
+[2025-09-22 19:03:24] Installing critical package: build-essential
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -286,9 +114,9 @@ build-essential is already the newest version (12.9ubuntu3).
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
-0 upgraded, 0 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
 [SUCCESS] Package verified: build-essential
-[2025-09-22 06:42:56] Installing critical package: curl
+[2025-09-22 19:03:27] Installing critical package: curl
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -296,9 +124,9 @@ curl is already the newest version (7.81.0-1ubuntu1.20).
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
-0 upgraded, 0 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
 [SUCCESS] Package verified: curl
-[2025-09-22 06:43:00] Installing audio package: lame
+[2025-09-22 19:03:31] Installing audio package: lame
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -309,11 +137,11 @@ Suggested packages:
   lame-doc
 The following NEW packages will be installed:
   lame
-0 upgraded, 1 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 1 newly installed, 0 to remove and 41 not upgraded.
 Need to get 51.3 kB of archives.
 After this operation, 129 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy/universe amd64 lame amd64 3.100-3build2 [51.3 kB]
-Fetched 51.3 kB in 0s (130 kB/s)
+Fetched 51.3 kB in 0s (125 kB/s)
 Selecting previously unselected package lame.
 (Reading database ... 126407 files and directories currently installed.)
 Preparing to unpack .../lame_3.100-3build2_amd64.deb ...
@@ -321,7 +149,7 @@ Unpacking lame (3.100-3build2) ...
 Setting up lame (3.100-3build2) ...
 Processing triggers for man-db (2.10.2-1) ...
 [SUCCESS] Package verified: lame
-[2025-09-22 06:43:07] Installing audio package: libportaudio2
+[2025-09-22 19:03:37] Installing audio package: libportaudio2
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -330,47 +158,47 @@ The following package was automatically installed and is no longer required:
 Use 'apt autoremove' to remove it.
 The following NEW packages will be installed:
   libportaudio2
-0 upgraded, 1 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 1 newly installed, 0 to remove and 41 not upgraded.
 Need to get 65.3 kB of archives.
 After this operation, 223 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libportaudio2 amd64 19.6.0-1.1 [65.3 kB]
-Fetched 65.3 kB in 0s (146 kB/s)
+Fetched 65.3 kB in 0s (156 kB/s)
 Selecting previously unselected package libportaudio2:amd64.
 (Reading database ... 126412 files and directories currently installed.)
 Preparing to unpack .../libportaudio2_19.6.0-1.1_amd64.deb ...
 Unpacking libportaudio2:amd64 (19.6.0-1.1) ...
 Setting up libportaudio2:amd64 (19.6.0-1.1) ...
 Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
-/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link
-
 /sbin/ldconfig.real: /usr/local/lib/libhwloc.so.15 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbmalloc.so.2 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libumf.so.0 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_5.so.3 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtcm.so.1 is not a symbolic link
 
-/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link
-
 /sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero_v2.so.0 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libur_loader.so.0 is not a symbolic link
 
+/sbin/ldconfig.real: /usr/local/lib/libumf.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
+
 [SUCCESS] Package verified: libportaudio2
-[2025-09-22 06:43:18] Installing audio package: flac
+[2025-09-22 19:03:48] Installing audio package: flac
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -379,11 +207,11 @@ The following package was automatically installed and is no longer required:
 Use 'apt autoremove' to remove it.
 The following NEW packages will be installed:
   flac
-0 upgraded, 1 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 1 newly installed, 0 to remove and 41 not upgraded.
 Need to get 130 kB of archives.
 After this operation, 359 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 flac amd64 1.3.3-2ubuntu0.2 [130 kB]
-Fetched 130 kB in 1s (250 kB/s)
+Fetched 130 kB in 1s (256 kB/s)
 Selecting previously unselected package flac.
 (Reading database ... 126418 files and directories currently installed.)
 Preparing to unpack .../flac_1.3.3-2ubuntu0.2_amd64.deb ...
@@ -391,7 +219,7 @@ Unpacking flac (1.3.3-2ubuntu0.2) ...
 Setting up flac (1.3.3-2ubuntu0.2) ...
 Processing triggers for man-db (2.10.2-1) ...
 [SUCCESS] Package verified: flac
-[2025-09-22 06:43:25] Installing audio package: libasound2-dev
+[2025-09-22 19:03:55] Installing audio package: libasound2-dev
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -399,9 +227,9 @@ libasound2-dev is already the newest version (1.2.6.1-1ubuntu1).
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
-0 upgraded, 0 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
 [SUCCESS] Package verified: libasound2-dev
-[2025-09-22 06:43:29] Installing audio package: portaudio19-dev
+[2025-09-22 19:03:58] Installing audio package: portaudio19-dev
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -414,12 +242,12 @@ Suggested packages:
   portaudio19-doc
 The following NEW packages will be installed:
   libportaudiocpp0 portaudio19-dev
-0 upgraded, 2 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 2 newly installed, 0 to remove and 41 not upgraded.
 Need to get 122 kB of archives.
 After this operation, 703 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libportaudiocpp0 amd64 19.6.0-1.1 [16.1 kB]
 Get:2 http://archive.ubuntu.com/ubuntu jammy/universe amd64 portaudio19-dev amd64 19.6.0-1.1 [106 kB]
-Fetched 122 kB in 1s (200 kB/s)
+Fetched 122 kB in 1s (206 kB/s)
 Selecting previously unselected package libportaudiocpp0:amd64.
 (Reading database ... 126426 files and directories currently installed.)
 Preparing to unpack .../libportaudiocpp0_19.6.0-1.1_amd64.deb ...
@@ -430,36 +258,36 @@ Unpacking portaudio19-dev:amd64 (19.6.0-1.1) ...
 Setting up libportaudiocpp0:amd64 (19.6.0-1.1) ...
 Setting up portaudio19-dev:amd64 (19.6.0-1.1) ...
 Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
-/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link
-
 /sbin/ldconfig.real: /usr/local/lib/libhwloc.so.15 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbmalloc.so.2 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libumf.so.0 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_5.so.3 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtcm.so.1 is not a symbolic link
 
-/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link
-
 /sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero_v2.so.0 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libur_loader.so.0 is not a symbolic link
 
+/sbin/ldconfig.real: /usr/local/lib/libumf.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
+
 [SUCCESS] Package verified: portaudio19-dev
-[2025-09-22 06:43:36] Installing audio package: libfftw3-dev
+[2025-09-22 19:04:05] Installing audio package: libfftw3-dev
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -467,13 +295,14 @@ The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
 The following additional packages will be installed:
-  libfftw3-bin libfftw3-double3 libfftw3-long3 libfftw3-quad3 libfftw3-single3
+  libfftw3-bin libfftw3-double3 libfftw3-long3 libfftw3-quad3
+  libfftw3-single3
 Suggested packages:
   libfftw3-doc
 The following NEW packages will be installed:
-  libfftw3-bin libfftw3-dev libfftw3-double3 libfftw3-long3 libfftw3-quad3
-  libfftw3-single3
-0 upgraded, 6 newly installed, 0 to remove and 44 not upgraded.
+  libfftw3-bin libfftw3-dev libfftw3-double3 libfftw3-long3
+  libfftw3-quad3 libfftw3-single3
+0 upgraded, 6 newly installed, 0 to remove and 41 not upgraded.
 Need to get 4,654 kB of archives.
 After this operation, 24.7 MB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy/main amd64 libfftw3-double3 amd64 3.3.8-2ubuntu8 [770 kB]
@@ -482,7 +311,7 @@ Get:3 http://archive.ubuntu.com/ubuntu jammy/main amd64 libfftw3-quad3 amd64 3.3
 Get:4 http://archive.ubuntu.com/ubuntu jammy/main amd64 libfftw3-single3 amd64 3.3.8-2ubuntu8 [800 kB]
 Get:5 http://archive.ubuntu.com/ubuntu jammy/main amd64 libfftw3-bin amd64 3.3.8-2ubuntu8 [35.5 kB]
 Get:6 http://archive.ubuntu.com/ubuntu jammy/main amd64 libfftw3-dev amd64 3.3.8-2ubuntu8 [2,101 kB]
-Fetched 4,654 kB in 1s (3,445 kB/s)
+Fetched 4,654 kB in 1s (4,190 kB/s)
 Selecting previously unselected package libfftw3-double3:amd64.
 (Reading database ... 126464 files and directories currently installed.)
 Preparing to unpack .../0-libfftw3-double3_3.3.8-2ubuntu8_amd64.deb ...
@@ -510,36 +339,36 @@ Setting up libfftw3-bin (3.3.8-2ubuntu8) ...
 Setting up libfftw3-dev:amd64 (3.3.8-2ubuntu8) ...
 Processing triggers for man-db (2.10.2-1) ...
 Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
-/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link
-
 /sbin/ldconfig.real: /usr/local/lib/libhwloc.so.15 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbmalloc.so.2 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libumf.so.0 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_5.so.3 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtcm.so.1 is not a symbolic link
 
-/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link
-
 /sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero_v2.so.0 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libur_loader.so.0 is not a symbolic link
 
+/sbin/ldconfig.real: /usr/local/lib/libumf.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
+
 [SUCCESS] Package verified: libfftw3-dev
-[2025-09-22 06:43:46] Installing audio package: libportaudiocpp0
+[2025-09-22 19:04:14] Installing audio package: libportaudiocpp0
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -548,9 +377,9 @@ libportaudiocpp0 set to manually installed.
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
-0 upgraded, 0 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
 [SUCCESS] Package verified: libportaudiocpp0
-[2025-09-22 06:43:49] Installing audio package: libmagic1
+[2025-09-22 19:04:17] Installing audio package: libmagic1
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -559,9 +388,9 @@ libmagic1 set to manually installed.
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
-0 upgraded, 0 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
 [SUCCESS] Package verified: libmagic1
-[2025-09-22 06:43:54] Installing audio package: libmagic-dev
+[2025-09-22 19:04:21] Installing audio package: libmagic-dev
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -570,11 +399,11 @@ The following package was automatically installed and is no longer required:
 Use 'apt autoremove' to remove it.
 The following NEW packages will be installed:
   libmagic-dev
-0 upgraded, 1 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 1 newly installed, 0 to remove and 41 not upgraded.
 Need to get 105 kB of archives.
 After this operation, 389 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libmagic-dev amd64 1:5.41-3ubuntu0.1 [105 kB]
-Fetched 105 kB in 1s (199 kB/s)
+Fetched 105 kB in 0s (217 kB/s)
 Selecting previously unselected package libmagic-dev:amd64.
 (Reading database ... 126567 files and directories currently installed.)
 Preparing to unpack .../libmagic-dev_1%3a5.41-3ubuntu0.1_amd64.deb ...
@@ -582,7 +411,7 @@ Unpacking libmagic-dev:amd64 (1:5.41-3ubuntu0.1) ...
 Setting up libmagic-dev:amd64 (1:5.41-3ubuntu0.1) ...
 Processing triggers for man-db (2.10.2-1) ...
 [SUCCESS] Package verified: libmagic-dev
-[2025-09-22 06:44:01] Installing audio package: vorbis-tools
+[2025-09-22 19:04:27] Installing audio package: vorbis-tools
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -595,13 +424,13 @@ Suggested packages:
   libaudio2 libsndio6.1
 The following NEW packages will be installed:
   libao-common libao4 vorbis-tools
-0 upgraded, 3 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 3 newly installed, 0 to remove and 41 not upgraded.
 Need to get 236 kB of archives.
 After this operation, 1,018 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy/main amd64 libao-common all 1.2.2+20180113-1.1ubuntu3 [6,568 B]
 Get:2 http://archive.ubuntu.com/ubuntu jammy/main amd64 libao4 amd64 1.2.2+20180113-1.1ubuntu3 [35.2 kB]
 Get:3 http://archive.ubuntu.com/ubuntu jammy/universe amd64 vorbis-tools amd64 1.4.2-1 [195 kB]
-Fetched 236 kB in 1s (362 kB/s)
+Fetched 236 kB in 1s (374 kB/s)
 Selecting previously unselected package libao-common.
 (Reading database ... 126577 files and directories currently installed.)
 Preparing to unpack .../libao-common_1.2.2+20180113-1.1ubuntu3_all.deb ...
@@ -618,36 +447,36 @@ Setting up vorbis-tools (1.4.2-1) ...
 Processing triggers for man-db (2.10.2-1) ...
 Processing triggers for mailcap (3.70+nmu1ubuntu1) ...
 Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
-/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link
-
 /sbin/ldconfig.real: /usr/local/lib/libhwloc.so.15 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbmalloc.so.2 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libumf.so.0 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_5.so.3 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtcm.so.1 is not a symbolic link
 
-/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link
-
 /sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero_v2.so.0 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libur_loader.so.0 is not a symbolic link
 
+/sbin/ldconfig.real: /usr/local/lib/libumf.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
+
 [SUCCESS] Package verified: vorbis-tools
-[2025-09-22 06:44:09] Installing audio package: libsndfile1-dev
+[2025-09-22 19:04:35] Installing audio package: libsndfile1-dev
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -655,9 +484,9 @@ libsndfile1-dev is already the newest version (1.0.31-2ubuntu0.2).
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
-0 upgraded, 0 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
 [SUCCESS] Package verified: libsndfile1-dev
-[2025-09-22 06:44:12] Installing audio package: ffmpeg
+[2025-09-22 19:04:38] Installing audio package: ffmpeg
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -665,9 +494,9 @@ ffmpeg is already the newest version (7:4.4.2-0ubuntu0.22.04.1).
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
-0 upgraded, 0 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
 [SUCCESS] Package verified: ffmpeg
-[2025-09-22 06:44:15] Installing audio package: opus-tools
+[2025-09-22 19:04:41] Installing audio package: opus-tools
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -678,12 +507,12 @@ The following additional packages will be installed:
   libpcap0.8
 The following NEW packages will be installed:
   libpcap0.8 opus-tools
-0 upgraded, 2 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 2 newly installed, 0 to remove and 41 not upgraded.
 Need to get 225 kB of archives.
 After this operation, 622 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libpcap0.8 amd64 1.10.1-4ubuntu1.22.04.1 [145 kB]
 Get:2 http://archive.ubuntu.com/ubuntu jammy/universe amd64 opus-tools amd64 0.1.10-1.1 [79.7 kB]
-Fetched 225 kB in 1s (331 kB/s)
+Fetched 225 kB in 0s (1,300 kB/s)
 Selecting previously unselected package libpcap0.8:amd64.
 (Reading database ... 126635 files and directories currently installed.)
 Preparing to unpack .../libpcap0.8_1.10.1-4ubuntu1.22.04.1_amd64.deb ...
@@ -694,37 +523,37 @@ Unpacking opus-tools (0.1.10-1.1) ...
 Setting up libpcap0.8:amd64 (1.10.1-4ubuntu1.22.04.1) ...
 Setting up opus-tools (0.1.10-1.1) ...
 Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
-/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link
-
 /sbin/ldconfig.real: /usr/local/lib/libhwloc.so.15 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbmalloc.so.2 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libumf.so.0 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_5.so.3 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtcm.so.1 is not a symbolic link
 
-/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link
-
 /sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero_v2.so.0 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libur_loader.so.0 is not a symbolic link
 
+/sbin/ldconfig.real: /usr/local/lib/libumf.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
+
 Processing triggers for man-db (2.10.2-1) ...
 [SUCCESS] Package verified: opus-tools
-[2025-09-22 06:44:24] Installing service package: htop
+[2025-09-22 19:04:48] Installing service package: htop
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -737,12 +566,12 @@ Suggested packages:
   lm-sensors strace
 The following NEW packages will be installed:
   htop libnl-genl-3-200
-0 upgraded, 2 newly installed, 0 to remove and 44 not upgraded.
+0 upgraded, 2 newly installed, 0 to remove and 41 not upgraded.
 Need to get 140 kB of archives.
 After this operation, 404 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy/main amd64 libnl-genl-3-200 amd64 3.5.0-0.1 [12.4 kB]
 Get:2 http://archive.ubuntu.com/ubuntu jammy/main amd64 htop amd64 3.0.5-7build2 [128 kB]
-Fetched 140 kB in 0s (798 kB/s)
+Fetched 140 kB in 1s (263 kB/s)
 Selecting previously unselected package libnl-genl-3-200:amd64.
 (Reading database ... 126655 files and directories currently installed.)
 Preparing to unpack .../libnl-genl-3-200_3.5.0-0.1_amd64.deb ...
@@ -756,36 +585,36 @@ Processing triggers for man-db (2.10.2-1) ...
 Processing triggers for mailcap (3.70+nmu1ubuntu1) ...
 Processing triggers for hicolor-icon-theme (0.17-2) ...
 Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
-/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link
-
 /sbin/ldconfig.real: /usr/local/lib/libhwloc.so.15 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbmalloc.so.2 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libumf.so.0 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_5.so.3 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtcm.so.1 is not a symbolic link
 
-/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link
-
 /sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero_v2.so.0 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libur_loader.so.0 is not a symbolic link
 
+/sbin/ldconfig.real: /usr/local/lib/libumf.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
+
 [SUCCESS] Package verified: htop
-[2025-09-22 06:44:31] Installing service package: nginx
+[2025-09-22 19:04:55] Installing service package: nginx
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -794,15 +623,17 @@ The following package was automatically installed and is no longer required:
 Use 'apt autoremove' to remove it.
 The following additional packages will be installed:
   libnginx-mod-http-geoip2 libnginx-mod-http-image-filter
-  libnginx-mod-http-xslt-filter libnginx-mod-mail libnginx-mod-stream
-  libnginx-mod-stream-geoip2 nginx-common nginx-core
+  libnginx-mod-http-xslt-filter libnginx-mod-mail
+  libnginx-mod-stream libnginx-mod-stream-geoip2 nginx-common
+  nginx-core
 Suggested packages:
   fcgiwrap nginx-doc ssl-cert
 The following NEW packages will be installed:
   libnginx-mod-http-geoip2 libnginx-mod-http-image-filter
-  libnginx-mod-http-xslt-filter libnginx-mod-mail libnginx-mod-stream
-  libnginx-mod-stream-geoip2 nginx nginx-common nginx-core
-0 upgraded, 9 newly installed, 0 to remove and 44 not upgraded.
+  libnginx-mod-http-xslt-filter libnginx-mod-mail
+  libnginx-mod-stream libnginx-mod-stream-geoip2 nginx
+  nginx-common nginx-core
+0 upgraded, 9 newly installed, 0 to remove and 41 not upgraded.
 Need to get 698 kB of archives.
 After this operation, 2,391 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 nginx-common all 1.18.0-6ubuntu14.7 [40.1 kB]
@@ -814,7 +645,7 @@ Get:6 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libnginx-mod-str
 Get:7 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libnginx-mod-stream-geoip2 amd64 1.18.0-6ubuntu14.7 [10.1 kB]
 Get:8 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 nginx-core amd64 1.18.0-6ubuntu14.7 [483 kB]
 Get:9 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 nginx amd64 1.18.0-6ubuntu14.7 [3,878 B]
-Fetched 698 kB in 0s (2,945 kB/s)
+Fetched 698 kB in 1s (841 kB/s)
 Preconfiguring packages ...
 Selecting previously unselected package nginx-common.
 (Reading database ... 126670 files and directories currently installed.)
@@ -858,7 +689,7 @@ invoke-rc.d: policy-rc.d denied execution of start.
 Setting up nginx (1.18.0-6ubuntu14.7) ...
 Processing triggers for man-db (2.10.2-1) ...
 [SUCCESS] Package verified: nginx
-[2025-09-22 06:44:40] Installing service package: redis-server
+[2025-09-22 19:05:04] Installing service package: redis-server
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
@@ -866,12 +697,14 @@ The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
 The following additional packages will be installed:
-  libjemalloc2 liblua5.1-0 liblzf1 lua-bitop lua-cjson redis-tools
+  libjemalloc2 liblua5.1-0 liblzf1 lua-bitop lua-cjson
+  redis-tools
 Suggested packages:
   ruby-redis
 The following NEW packages will be installed:
-  libjemalloc2 liblua5.1-0 liblzf1 lua-bitop lua-cjson redis-server redis-tools
-0 upgraded, 7 newly installed, 0 to remove and 44 not upgraded.
+  libjemalloc2 liblua5.1-0 liblzf1 lua-bitop lua-cjson
+  redis-server redis-tools
+0 upgraded, 7 newly installed, 0 to remove and 41 not upgraded.
 Need to get 1,273 kB of archives.
 After this operation, 5,725 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libjemalloc2 amd64 5.2.1-4ubuntu1 [240 kB]
@@ -881,7 +714,7 @@ Get:4 http://archive.ubuntu.com/ubuntu jammy/universe amd64 lua-bitop amd64 1.0.
 Get:5 http://archive.ubuntu.com/ubuntu jammy/universe amd64 lua-cjson amd64 2.1.0+dfsg-2.1 [17.4 kB]
 Get:6 http://archive.ubuntu.com/ubuntu jammy/universe amd64 redis-tools amd64 5:6.0.16-1ubuntu1 [856 kB]
 Get:7 http://archive.ubuntu.com/ubuntu jammy/universe amd64 redis-server amd64 5:6.0.16-1ubuntu1 [45.9 kB]
-Fetched 1,273 kB in 0s (5,077 kB/s)
+Fetched 1,273 kB in 1s (1,364 kB/s)
 Selecting previously unselected package libjemalloc2:amd64.
 (Reading database ... 126762 files and directories currently installed.)
 Preparing to unpack .../0-libjemalloc2_5.2.1-4ubuntu1_amd64.deb ...
@@ -917,65 +750,66 @@ Created symlink /etc/systemd/system/redis.service → /lib/systemd/system/redis-
 Created symlink /etc/systemd/system/multi-user.target.wants/redis-server.service → /lib/systemd/system/redis-server.service.
 Processing triggers for man-db (2.10.2-1) ...
 Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
-/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link
-
 /sbin/ldconfig.real: /usr/local/lib/libhwloc.so.15 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbmalloc.so.2 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libumf.so.0 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_5.so.3 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtcm.so.1 is not a symbolic link
 
-/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link
-
 /sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero_v2.so.0 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libur_loader.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libumf.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
 
 [SUCCESS] Package verified: redis-server
-/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link
-
 /sbin/ldconfig.real: /usr/local/lib/libhwloc.so.15 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbmalloc.so.2 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libumf.so.0 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link
-
-/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_5.so.3 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtcm.so.1 is not a symbolic link
 
-/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link
-
 /sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero_v2.so.0 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libur_loader.so.0 is not a symbolic link
 
-[2025-09-22 06:44:49] Verifying critical libraries...
-[2025-09-22 06:44:49] FFTW3 library found in system cache
-[WARNING] libsndfile library not found in cache, checking with dpkg...
-[ERROR] libsndfile library not found after installation
+/sbin/ldconfig.real: /usr/local/lib/libumf.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtcm_debug.so.1 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libur_adapter_opencl.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libur_adapter_level_zero.so.0 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link
+
+/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
+
+[2025-09-22 19:05:13] Verifying critical libraries...
+[2025-09-22 19:05:13] fftw3 found via pkg-config
+[2025-09-22 19:05:13] sndfile found via pkg-config
+[ERROR] PortAudio library verification failed completely
 /home/m3_enhanced#
+[0] 0:bash*                         "bd17f73e28cf" 19:16 22-Sep-25

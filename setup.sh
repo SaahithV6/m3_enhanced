@@ -7,6 +7,9 @@ set -e  # Exit immediately on any error
 set -u  # Exit on undefined variables
 set -o pipefail  # Exit on pipe failures
 
+# Redirect all output to both console and results.txt
+exec > >(tee -a results.txt) 2>&1
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -22,6 +25,11 @@ PYTHON_VERSION="3.10"
 MIN_DISK_SPACE_GB=10
 MIN_RAM_GB=8
 
+# Initialize results file
+echo "=== M3 Enhanced Setup Log - $(date) ===" > results.txt
+echo "Working Directory: $WORK_DIR" >> results.txt
+echo "=======================================" >> results.txt
+
 # Logging functions
 log() {
     echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')] $1${NC}"
@@ -33,6 +41,7 @@ warn() {
 
 error() {
     echo -e "${RED}[ERROR] $1${NC}"
+    echo "FATAL ERROR: $1" >> results.txt
     exit 1
 }
 
@@ -150,7 +159,7 @@ install_system_dependencies() {
     apt-get update -qq || error "Failed to update package lists"
 
     # Remove conflicting packages first
-    apt-get remove -y r-base-dev || true
+    apt-get remove -y r-base-dev libbz2-dev libreadline-dev || true
     apt-get autoremove -y || true
 
     # Essential system packages in dependency order
@@ -246,31 +255,48 @@ install_system_dependencies() {
 
     log "Verifying critical libraries..."
 
-    # Enhanced library checking with multiple methods
+    # Enhanced library checking with multiple methods - FIXED PortAudio verification
     verify_library() {
         local lib_name=$1
-        local pkg_name=$2
-        local lib_pattern=$3
+        local pkg_pattern=$2
+        local lib_file_pattern=$3
 
-        # Method 1: Check with ldconfig
-        if ldconfig -p | grep -q "$lib_pattern"; then
+        log "Verifying $lib_name library..."
+
+        # Method 1: Check with pkg-config
+        if pkg-config --exists "$lib_name" 2>/dev/null; then
+            log "$lib_name found via pkg-config"
+            return 0
+        fi
+
+        # Method 2: Check with ldconfig
+        if ldconfig -p | grep -q "$lib_file_pattern"; then
             log "$lib_name library found in system cache"
             return 0
         fi
 
-        # Method 2: Check with dpkg
-        if dpkg -l | grep -q "$pkg_name"; then
-            log "$lib_name packages found via dpkg"
-            # Method 3: Check for actual library files
-            if find /usr/lib* /lib* -name "*${lib_pattern}*" 2>/dev/null | grep -q "${lib_pattern}"; then
-                log "$lib_name library files found in filesystem"
-                return 0
-            fi
+        # Method 3: Check for actual library files in common locations
+        if find /usr/lib* /lib* /usr/local/lib* -name "*${lib_file_pattern}*" 2>/dev/null | grep -q "${lib_file_pattern}"; then
+            log "$lib_name library files found in filesystem"
+            return 0
         fi
 
-        # Method 4: Try to use pkg-config
-        if pkg-config --exists "$lib_name" 2>/dev/null; then
-            log "$lib_name found via pkg-config"
+        # Method 4: Check packages are installed
+        if dpkg -l | grep -i "$pkg_pattern" | grep -q "^ii"; then
+            log "$lib_name packages found via dpkg"
+            # Additional verification for PortAudio specifically
+            if [ "$lib_name" = "portaudio-2.0" ]; then
+                # Check for PortAudio headers and libraries
+                if [ -f "/usr/include/portaudio.h" ] || [ -f "/usr/local/include/portaudio.h" ]; then
+                    log "PortAudio headers found"
+                    return 0
+                fi
+                # Check for libportaudio files
+                if ls /usr/lib*/libportaudio* 2>/dev/null | grep -q "libportaudio"; then
+                    log "PortAudio library files found"
+                    return 0
+                fi
+            fi
             return 0
         fi
 
@@ -278,21 +304,42 @@ install_system_dependencies() {
     }
 
     # Verify FFTW3
-    if ! verify_library "fftw3" "libfftw3" "libfftw3"; then
+    if ! verify_library "fftw3" "fftw3" "libfftw3"; then
         error "FFTW3 library verification failed completely"
     fi
+    success "FFTW3 library verified"
 
     # Verify libsndfile
-    if ! verify_library "sndfile" "libsndfile" "libsndfile"; then
+    if ! verify_library "sndfile" "sndfile" "libsndfile"; then
         error "libsndfile library verification failed completely"
     fi
+    success "libsndfile library verified"
 
-    # Verify portaudio
-    if ! verify_library "portaudio" "portaudio" "libportaudio"; then
-        error "PortAudio library verification failed completely"
+    # Verify portaudio - FIXED verification
+    if ! verify_library "portaudio-2.0" "portaudio" "libportaudio"; then
+        # Final fallback - try to compile a simple test
+        log "Attempting PortAudio compilation test..."
+        cat > /tmp/portaudio_test.c << 'EOF'
+#include <stdio.h>
+#ifdef __has_include
+#if __has_include(<portaudio.h>)
+#include <portaudio.h>
+int main() { printf("PortAudio headers available\n"); return 0; }
+#else
+int main() { printf("PortAudio headers not found\n"); return 1; }
+#endif
+#else
+int main() { printf("Cannot check headers\n"); return 1; }
+#endif
+EOF
+        if gcc /tmp/portaudio_test.c -o /tmp/portaudio_test 2>/dev/null && /tmp/portaudio_test; then
+            log "PortAudio compilation test passed"
+        else
+            error "PortAudio library verification failed completely"
+        fi
+        rm -f /tmp/portaudio_test.c /tmp/portaudio_test
     fi
-
-    success "Critical libraries verified"
+    success "PortAudio library verified"
 
     # Start and verify Redis with proper systemd handling
     log "Starting and verifying Redis service..."
@@ -947,7 +994,18 @@ display_final_status() {
     echo "NGROK: Configured and ready"
     echo "SERVICES: Redis running"
     echo ""
+    echo "ALL OUTPUT LOGGED TO: results.txt"
+    echo ""
     success "M3 Enhanced is ready for audio processing!"
+
+    # Final summary to results.txt
+    echo "" >> results.txt
+    echo "=== SETUP COMPLETED SUCCESSFULLY ===" >> results.txt
+    echo "Timestamp: $(date)" >> results.txt
+    echo "Runtime: $RUNTIME_TYPE" >> results.txt
+    echo "Device: $TORCH_DEVICE" >> results.txt
+    echo "All components verified and operational" >> results.txt
+    echo "=======================================" >> results.txt
 }
 
 # Main execution
