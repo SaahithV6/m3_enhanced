@@ -40,6 +40,17 @@ success() {
     echo -e "${GREEN}[SUCCESS] $1${NC}"
 }
 
+# Function to verify package installation
+verify_package() {
+    local package=$1
+    # Use dpkg-query for more reliable package verification
+    if dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q "install ok installed"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Critical system checks
 verify_system_requirements() {
     log "🔍  Verifying system requirements..."
@@ -178,22 +189,49 @@ install_system_dependencies() {
     # Install in order with verification
     for package in "${CRITICAL_PACKAGES[@]}"; do
         log "Installing critical package: $package"
-        apt-get install -y "$package" || error "Failed to install critical package: $package"
-        dpkg -l | grep -q "^ii  $package " || error "Package $package not properly installed"
+
+        # Install the package
+        if ! apt-get install -y "$package"; then
+            error "Failed to install critical package: $package"
+        fi
+
+        # Verify installation
+        if ! verify_package "$package"; then
+            error "Package $package not properly installed"
+        fi
+
         success "Package verified: $package"
     done
 
     for package in "${AUDIO_PACKAGES[@]}"; do
         log "Installing audio package: $package"
-        apt-get install -y "$package" || error "Failed to install audio package: $package"
-        dpkg -l | grep -q "^ii  $package " || error "Package $package not properly installed"
+
+        # Install the package
+        if ! apt-get install -y "$package"; then
+            error "Failed to install audio package: $package"
+        fi
+
+        # Verify installation
+        if ! verify_package "$package"; then
+            error "Package $package not properly installed"
+        fi
+
         success "Package verified: $package"
     done
 
     for package in "${SERVICE_PACKAGES[@]}"; do
         log "Installing service package: $package"
-        apt-get install -y "$package" || error "Failed to install service package: $package"
-        dpkg -l | grep -q "^ii  $package " || error "Package $package not properly installed"
+
+        # Install the package
+        if ! apt-get install -y "$package"; then
+            error "Failed to install service package: $package"
+        fi
+
+        # Verify installation
+        if ! verify_package "$package"; then
+            error "Package $package not properly installed"
+        fi
+
         success "Package verified: $package"
     done
 
@@ -205,22 +243,28 @@ install_system_dependencies() {
 
     # Verify critical libraries with correct names
     ldconfig
+
+    log "Verifying critical libraries..."
     if ! ldconfig -p | grep -q "libfftw3"; then
         error "FFTW3 library not found after installation"
     fi
-    # Fixed: Check for libsndfile1 instead of libsndfile
+
+    # Check for libsndfile1 instead of libsndfile
     if ! ldconfig -p | grep -q "libsndfile1"; then
         error "libsndfile1 library not found after installation"
     fi
+
     success "Critical libraries verified"
 
     # Start and verify Redis
+    log "Starting and verifying Redis service..."
     systemctl enable redis-server || error "Failed to enable Redis"
     systemctl start redis-server || error "Failed to start Redis"
     sleep 2
     if ! systemctl is-active --quiet redis-server; then
         error "Redis service is not running"
     fi
+    success "Redis service verified"
 
     success "All system dependencies installed and verified"
 }
