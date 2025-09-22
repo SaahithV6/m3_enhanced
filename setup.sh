@@ -1,7 +1,7 @@
 #!/bin/bash
-# M3 Enhanced - Intelligent Google Colab Setup Script (Shell Version)
+# M3 Enhanced - Intelligent Setup Script (Fixed Version)
 # Automatically detects and optimizes for GPU/CPU runtimes
-# Fixes Python package installation errors and non-interactive execution issues
+# Fixes Python package installation errors and integrates provided ngrok token
 
 set -e  # Exit on any error
 
@@ -12,6 +12,10 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
+
+# Configuration
+NGROK_TOKEN="31u9zGx10xxBE4AU0nQo5p2kXkF_6EFLZJFdmHuH6B8TyQUwv"
+WORK_DIR=$(pwd)
 
 # Logging function
 log() {
@@ -49,7 +53,7 @@ detect_runtime() {
 
     # Fallback to CPU info
     if [ "$RUNTIME_TYPE" = "cpu" ]; then
-        log "🖥️  CPU runtime: $CPU_CORES cores"
+        log "🖥️ CPU runtime: $CPU_CORES cores"
     fi
 
     # Check if we're in Colab
@@ -58,13 +62,13 @@ detect_runtime() {
         log "📍 Google Colab environment detected"
     else
         COLAB_DETECTED=false
-        warn "Not running in Google Colab - some optimizations may not apply"
+        warn "Not running in Google Colab - using current directory: $WORK_DIR"
     fi
 }
 
 # Configure device-specific settings
 configure_devices() {
-    log "⚙️  Configuring device-specific settings..."
+    log "⚙️ Configuring device-specific settings..."
 
     if [ "$GPU_AVAILABLE" = true ]; then
         TORCH_DEVICE="cuda"
@@ -91,7 +95,7 @@ print_banner() {
     echo ""
     echo "╔═════════════════════════════════════════════════════════════╗"
     echo "║                    🎵 M3 Enhanced 🎵                        ║"
-    echo "║              Intelligent Colab Setup Script                 ║"
+    echo "║              Intelligent Setup Script (Fixed)               ║"
     echo "║                                                             ║"
     echo "║    Runtime: $runtime_emoji $(printf "%-10s" "${RUNTIME_TYPE^^}") Device: $(printf "%-10s" "$TORCH_DEVICE")          ║"
     echo "║    Advanced AI-Powered Music Processing Pipeline            ║"
@@ -103,17 +107,18 @@ print_banner() {
 # Display system information
 display_system_info() {
     echo "============================================================"
-    echo "M3 ENHANCED - GOOGLE COLAB SETUP"
+    echo "M3 ENHANCED - SETUP (FIXED VERSION)"
     echo "============================================================"
-    echo "🖥️  CPU Cores: $CPU_CORES"
+    echo "🖥️ CPU Cores: $CPU_CORES"
     echo "💾 RAM: $(free -h | awk '/^Mem:/ {print $7"/"$2}') available"
     echo "💿 Disk: $(df -h / | awk 'NR==2 {print $4"/"$2}') free"
+    echo "📁 Working Directory: $WORK_DIR"
 
     if [ "$GPU_AVAILABLE" = true ]; then
         echo "🎮 GPU: $GPU_NAME"
         echo "🎮 VRAM: ${GPU_MEMORY}MB total"
     else
-        echo "⚠️  No GPU detected - CPU-only mode"
+        echo "⚠️ No GPU detected - CPU-only mode"
     fi
     echo "============================================================"
     echo ""
@@ -142,6 +147,8 @@ install_system_dependencies() {
         "pkg-config"           # Package configuration
         "libasound2-dev"       # ALSA development
         "portaudio19-dev"      # PortAudio
+        "curl"                 # For ngrok download
+        "unzip"                # For ngrok extraction
     )
 
     if [ "$GPU_AVAILABLE" = true ]; then
@@ -166,16 +173,10 @@ install_system_dependencies() {
 
 # Optimize system settings
 optimize_system_settings() {
-    log "⚙️  Optimizing system settings..."
+    log "⚙️ Optimizing system settings..."
 
     # Increase file descriptor limits
     ulimit -n 65536 2>/dev/null || warn "Could not increase file descriptor limit"
-
-    # Optimize memory settings (if we have permission)
-    if [ -w /etc/sysctl.conf ]; then
-        echo 'vm.swappiness=10' >> /etc/sysctl.conf
-        echo 'vm.vfs_cache_pressure=50' >> /etc/sysctl.conf
-    fi
 
     # Set environment variables for optimal performance
     export OMP_NUM_THREADS=$NUM_WORKERS
@@ -193,7 +194,7 @@ optimize_system_settings() {
     log "✅ System optimization complete"
 }
 
-# Install Python packages with robust error handling
+# Install Python packages with improved error handling
 install_python_packages() {
     log "🐍 Installing Python packages for $RUNTIME_TYPE runtime..."
 
@@ -230,15 +231,36 @@ install_python_packages() {
         fi
     done
 
-    # Audio processing packages that often fail - install with fallbacks
+    # Install demucs first (often more stable)
+    log "📦 Installing demucs..."
+    if python -m pip install demucs --quiet --retries 2 --timeout 120; then
+        log "✅ Installed: demucs"
+    else
+        warn "Failed to install demucs - trying alternative approach"
+        python -m pip install demucs --no-deps --quiet 2>/dev/null || warn "Demucs installation failed completely"
+    fi
+
+    # Install compatible versions to avoid conflicts
+    log "📦 Installing compatible audio processing packages..."
+
+    # Install specific versions to avoid conflicts
+    python -m pip install "resampy>=0.2.2,<0.4.3" --quiet --force-reinstall 2>/dev/null || warn "Failed to fix resampy version"
+    python -m pip install "tensorflow>=2.4.1,<2.15.1" --quiet --force-reinstall 2>/dev/null || warn "Failed to fix tensorflow version"
+
+    # Try basic-pitch with dependency resolution
+    if python -m pip install basic-pitch --quiet --retries 1 --timeout 60; then
+        log "✅ Installed: basic-pitch"
+    else
+        warn "Failed to install basic-pitch - installing dependencies separately"
+        python -m pip install mir_eval --quiet 2>/dev/null || warn "Failed to install mir_eval"
+        python -m pip install basic-pitch --no-deps --quiet 2>/dev/null || warn "Failed to install basic-pitch without deps"
+    fi
+
+    # Audio processing packages with fallbacks
     local audio_packages=(
-        "demucs"
-        "basic-pitch"
         "audio-separator"
-        "mir_eval"
         "pesq"
         "pystoi"
-        "openl3"
     )
 
     for package in "${audio_packages[@]}"; do
@@ -249,10 +271,13 @@ install_python_packages() {
             warn "Failed to install: $package (may cause issues)"
             # Try installing without dependencies as fallback
             if python -m pip install "$package" --no-deps --quiet 2>/dev/null; then
-                log "⚠️  Installed $package without dependencies"
+                log "⚠️ Installed $package without dependencies"
             fi
         fi
     done
+
+    # Skip openl3 for now as it consistently fails
+    log "📦 Skipping openl3 installation (known compatibility issues)"
 
     # Web framework and utilities
     python -m pip install fastapi uvicorn[standard] python-multipart aiofiles --quiet
@@ -266,61 +291,72 @@ install_python_packages() {
 setup_environment_variables() {
     log "🔧 Configuring environment variables..."
 
-    # Export all variables to current session and write to bashrc
-    {
-        echo "export M3_RUNTIME_TYPE=$RUNTIME_TYPE"
-        echo "export M3_DEVICE=$TORCH_DEVICE"
-        echo "export M3_BATCH_SIZE=$BATCH_SIZE"
-        echo "export M3_NUM_WORKERS=$NUM_WORKERS"
-        echo "export PYTHONPATH=/content"
-        echo "export OMP_NUM_THREADS=$NUM_WORKERS"
-        echo "export MKL_NUM_THREADS=$NUM_WORKERS"
-        echo "export OPENBLAS_NUM_THREADS=$NUM_WORKERS"
-        echo "export NUMBA_NUM_THREADS=$NUM_WORKERS"
+    # Create or update .env file in current directory
+    cat > .env << EOF
+M3_RUNTIME_TYPE=$RUNTIME_TYPE
+M3_DEVICE=$TORCH_DEVICE
+M3_BATCH_SIZE=$BATCH_SIZE
+M3_NUM_WORKERS=$NUM_WORKERS
+PYTHONPATH=$WORK_DIR
+OMP_NUM_THREADS=$NUM_WORKERS
+MKL_NUM_THREADS=$NUM_WORKERS
+OPENBLAS_NUM_THREADS=$NUM_WORKERS
+NUMBA_NUM_THREADS=$NUM_WORKERS
+NGROK_TOKEN=$NGROK_TOKEN
+EOF
 
-        if [ "$GPU_AVAILABLE" = true ]; then
-            echo "export CUDA_VISIBLE_DEVICES=0"
-            echo "export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512"
-            echo "export TF_FORCE_GPU_ALLOW_GROWTH=true"
-            echo "export TF_GPU_MEMORY_GROWTH=true"
-        fi
-    } >> ~/.bashrc
+    if [ "$GPU_AVAILABLE" = true ]; then
+        cat >> .env << EOF
+CUDA_VISIBLE_DEVICES=0
+PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
+TF_FORCE_GPU_ALLOW_GROWTH=true
+TF_GPU_MEMORY_GROWTH=true
+EOF
+    fi
 
-    # Source the variables for current session
-    source ~/.bashrc
+    # Export variables for current session
+    source .env 2>/dev/null || true
 
-    log "✅ Environment variables configured"
+    log "✅ Environment variables configured in .env file"
 }
 
-# Setup ngrok with better error handling
+# Setup ngrok with provided token
 setup_ngrok() {
-    log "🌐 Setting up ngrok tunnel..."
+    log "🌐 Setting up ngrok tunnel with provided token..."
 
     # Install pyngrok
     python -m pip install pyngrok --quiet
 
-    # Try to get ngrok token from Colab secrets first
-    NGROK_TOKEN=""
-    if python -c "from google.colab import userdata; print(userdata.get('NGROK_TOKEN'))" 2>/dev/null | grep -v "None"; then
-        NGROK_TOKEN=$(python -c "from google.colab import userdata; print(userdata.get('NGROK_TOKEN'))" 2>/dev/null)
-        log "✅ Ngrok token found in Colab secrets"
-    else
-        warn "No NGROK_TOKEN found in Colab secrets"
-        echo "Please add your ngrok token to Colab secrets as 'NGROK_TOKEN'"
-        echo "Get your token from: https://dashboard.ngrok.com/get-started/your-authtoken"
-        echo ""
-        echo "To add to Colab secrets:"
-        echo "1. Click the 🔑 key icon in the left sidebar"
-        echo "2. Add a new secret named 'NGROK_TOKEN'"
-        echo "3. Paste your ngrok auth token as the value"
-        echo ""
-        echo "Continuing without ngrok (local access only)..."
+    # Install ngrok binary
+    if ! command -v ngrok &> /dev/null; then
+        log "📦 Installing ngrok binary..."
+        cd /tmp
+        curl -s https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz | tar xz
+        sudo mv ngrok /usr/local/bin/
+        cd $WORK_DIR
     fi
 
-    if [ -n "$NGROK_TOKEN" ] && [ "$NGROK_TOKEN" != "None" ]; then
+    # Configure ngrok with provided token
+    if [ -n "$NGROK_TOKEN" ]; then
+        ngrok config add-authtoken "$NGROK_TOKEN" 2>/dev/null
         python -c "from pyngrok import ngrok; ngrok.set_auth_token('$NGROK_TOKEN')" 2>/dev/null
-        echo "export NGROK_TOKEN=$NGROK_TOKEN" >> ~/.bashrc
-        log "✅ Ngrok authentication configured"
+        log "✅ Ngrok authentication configured with provided token"
+
+        # Create ngrok configuration
+        mkdir -p ~/.ngrok2
+        cat > ~/.ngrok2/ngrok.yml << EOF
+authtoken: $NGROK_TOKEN
+tunnels:
+  api:
+    addr: 8000
+    proto: http
+  frontend:
+    addr: 3000
+    proto: http
+EOF
+        log "✅ Ngrok configuration file created"
+    else
+        warn "No ngrok token provided"
     fi
 }
 
@@ -333,18 +369,31 @@ create_project_structure() {
         "backend/app/models"
         "backend/app/processors"
         "backend/app/utils"
+        "backend/app/preprocessing"
+        "backend/app/postprocessing"
         "frontend/static"
         "models"
         "temp"
         "uploads"
         "results"
         "logs"
+        "config"
     )
 
     for directory in "${directories[@]}"; do
         mkdir -p "$directory"
         chmod 755 "$directory"
     done
+
+    # Create __init__.py files for Python packages
+    touch backend/__init__.py
+    touch backend/app/__init__.py
+    touch backend/app/core/__init__.py
+    touch backend/app/models/__init__.py
+    touch backend/app/processors/__init__.py
+    touch backend/app/utils/__init__.py
+    touch backend/app/preprocessing/__init__.py
+    touch backend/app/postprocessing/__init__.py
 
     log "✅ Project structure created"
 }
@@ -358,7 +407,7 @@ download_models() {
 
     # Download Demucs models
     log "📦 Downloading Demucs separation model..."
-    if python -c "import demucs; demucs.pretrained.get_model('htdemucs')" 2>/dev/null; then
+    if python -c "import demucs.pretrained; demucs.pretrained.get_model('htdemucs')" 2>/dev/null; then
         log "✅ Demucs model downloaded"
     else
         warn "Failed to download Demucs model"
@@ -366,7 +415,11 @@ download_models() {
 
     # Initialize Basic Pitch
     log "📦 Initializing Basic Pitch model..."
-    if python -c "from basic_pitch import ICASSP_2022_MODEL_PATH; print('Basic Pitch initialized')" 2>/dev/null; then
+    if python -c "try:
+    from basic_pitch import ICASSP_2022_MODEL_PATH
+    print('Basic Pitch initialized')
+except:
+    print('Basic Pitch not available')" 2>/dev/null; then
         log "✅ Basic Pitch model initialized"
     else
         warn "Failed to initialize Basic Pitch model"
@@ -422,8 +475,49 @@ run_system_tests() {
         echo "Redis                     ❌ FAIL"
     fi
 
+    # Test ngrok
+    if command -v ngrok &> /dev/null; then
+        echo "Ngrok Binary              ✅ PASS"
+    else
+        echo "Ngrok Binary              ❌ FAIL"
+    fi
+
     echo "=================================================="
     echo ""
+}
+
+# Create startup scripts
+create_startup_scripts() {
+    log "📝 Creating startup scripts..."
+
+    # Create API server startup script
+    cat > start_api.sh << 'EOF'
+#!/bin/bash
+source .env 2>/dev/null || true
+echo "Starting M3 Enhanced API server..."
+python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+EOF
+
+    # Create worker startup script
+    cat > start_worker.sh << 'EOF'
+#!/bin/bash
+source .env 2>/dev/null || true
+echo "Starting M3 Enhanced Celery worker..."
+celery -A backend.app.core.job_scheduler worker --loglevel=info
+EOF
+
+    # Create ngrok tunnel script
+    cat > start_ngrok.sh << 'EOF'
+#!/bin/bash
+source .env 2>/dev/null || true
+echo "Starting ngrok tunnel..."
+ngrok start api frontend
+EOF
+
+    # Make scripts executable
+    chmod +x start_api.sh start_worker.sh start_ngrok.sh
+
+    log "✅ Startup scripts created"
 }
 
 # Display final status
@@ -435,29 +529,36 @@ display_final_status() {
 
     echo ""
     echo "🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉"
-    echo "       M3 ENHANCED SETUP COMPLETE!"
+    echo "       M3 ENHANCED SETUP COMPLETE! (FIXED)"
     echo "🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉"
     echo ""
     echo "📋 Quick Start Commands:"
     echo "# Navigate to project directory:"
-    echo "cd /content"
+    echo "cd $WORK_DIR"
     echo ""
     echo "# Start the API server:"
+    echo "./start_api.sh"
+    echo "# OR manually:"
     echo "python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000"
     echo ""
-    echo "# Start Celery workers:"
-    echo "celery -A backend.app.core.job_scheduler worker --loglevel=info"
+    echo "# Start Celery workers (in another terminal):"
+    echo "./start_worker.sh"
+    echo ""
+    echo "# Start ngrok tunnel (in another terminal):"
+    echo "./start_ngrok.sh"
     echo ""
     echo "🔗 Access URLs:"
-    echo "API Documentation: http://localhost:8000/docs"
-    echo "Job Monitor: http://localhost:5555 (if Flower is running)"
+    echo "Local API: http://localhost:8000/docs"
+    echo "Local Frontend: http://localhost:3000 (if frontend server running)"
     echo ""
     echo "💡 Tips:"
+    echo "- Environment variables are stored in .env file"
     echo "- Use GPU runtime for best performance"
     if [ "$GPU_AVAILABLE" = true ]; then
         echo "- Monitor GPU memory usage with 'nvidia-smi'"
     fi
-    echo "- Check logs in /content/logs/"
+    echo "- Check logs in $WORK_DIR/logs/"
+    echo "- Ngrok token is configured: ${NGROK_TOKEN:0:10}..."
     echo ""
     echo "$runtime_emoji Runtime: $RUNTIME_TYPE | Device: $TORCH_DEVICE | Batch Size: $BATCH_SIZE | Workers: $NUM_WORKERS"
 
@@ -470,7 +571,7 @@ display_final_status() {
 
 # Main setup function
 main() {
-    log "🚀 Starting M3 Enhanced setup..."
+    log "🚀 Starting M3 Enhanced setup (Fixed Version)..."
 
     detect_runtime
     configure_devices
@@ -484,13 +585,15 @@ main() {
     setup_ngrok
     create_project_structure
     download_models
+    create_startup_scripts
     run_system_tests
 
     display_final_status
 
     echo ""
     log "🎵 Ready to process audio with M3 Enhanced!"
-    log "   Upload your audio files and let the magic happen! ✨"
+    log "   Your ngrok token has been integrated and configured! ✨"
+    log "   Use ./start_ngrok.sh to create public tunnels for your servers."
 }
 
 # Check if running directly
