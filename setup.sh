@@ -159,8 +159,8 @@ install_system_dependencies() {
     apt-get update -qq || error "Failed to update package lists"
 
     # Remove conflicting packages first
-    apt-get remove -y r-base-dev libbz2-dev libreadline-dev || true
-    apt-get autoremove -y || true
+    apt-get remove -y r-base-dev libbz2-dev libreadline-dev 2>/dev/null || true
+    apt-get autoremove -y 2>/dev/null || true
 
     # Essential system packages in dependency order
     declare -a CRITICAL_PACKAGES=(
@@ -346,10 +346,10 @@ EOF
 
     # Check if systemctl is available (not in all containers)
     if command -v systemctl &> /dev/null; then
-        systemctl enable redis-server || warn "Failed to enable Redis (may be in container)"
-        systemctl start redis-server || warn "Failed to start Redis via systemctl, trying manual start"
+        systemctl enable redis-server 2>/dev/null || warn "Failed to enable Redis (may be in container)"
+        systemctl start redis-server 2>/dev/null || warn "Failed to start Redis via systemctl, trying manual start"
         sleep 2
-        if systemctl is-active --quiet redis-server; then
+        if systemctl is-active --quiet redis-server 2>/dev/null; then
             success "Redis service started via systemctl"
         else
             warn "Redis not started via systemctl, trying manual start..."
@@ -395,7 +395,7 @@ setup_python_environment() {
     success "Python environment ready"
 }
 
-# Install PyTorch/TensorFlow with verification
+# Install PyTorch/TensorFlow with verification - FIXED TensorFlow version
 install_ml_frameworks() {
     log "Installing ML frameworks with verification..."
 
@@ -419,8 +419,8 @@ install_ml_frameworks() {
         python3 -c "import torch; torch.zeros(1); print('PyTorch CPU verified')" || error "PyTorch CPU verification failed"
 
         log "Installing TensorFlow CPU version..."
-        # Install specific tensorflow version that works with our numpy constraints
-        python3 -m pip install "tensorflow>=2.13.0,<2.16.0" || error "Failed to install TensorFlow CPU"
+        # Install current compatible tensorflow version
+        python3 -m pip install "tensorflow>=2.16.0" || error "Failed to install TensorFlow CPU"
 
         # Verify TensorFlow CPU
         python3 -c "import tensorflow as tf; print('TensorFlow CPU verified')" || error "TensorFlow CPU verification failed"
