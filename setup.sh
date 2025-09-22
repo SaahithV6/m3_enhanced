@@ -2,6 +2,7 @@
 # M3 Enhanced - Intelligent Setup Script (Fixed Version)
 # Automatically detects and optimizes for GPU/CPU runtimes
 # Fixes Python package installation errors and integrates provided ngrok token
+# All-in-one script that includes ngrok tunnel setup
 
 set -e  # Exit on any error
 
@@ -245,7 +246,7 @@ install_python_packages() {
 
     # Install specific versions to avoid conflicts
     python -m pip install "resampy>=0.2.2,<0.4.3" --quiet --force-reinstall 2>/dev/null || warn "Failed to fix resampy version"
-    python -m pip install "tensorflow>=2.4.1,<2.15.1" --quiet --force-reinstall 2>/dev/null || warn "Failed to fix tensorflow version"
+    python -m pip install "tensorflow>=2.4.1,<2.20.0" --quiet --force-reinstall 2>/dev/null || warn "Failed to fix tensorflow version"
 
     # Try basic-pitch with dependency resolution
     if python -m pip install basic-pitch --quiet --retries 1 --timeout 60; then
@@ -342,9 +343,10 @@ setup_ngrok() {
         python -c "from pyngrok import ngrok; ngrok.set_auth_token('$NGROK_TOKEN')" 2>/dev/null
         log "✅ Ngrok authentication configured with provided token"
 
-        # Create ngrok configuration
-        mkdir -p ~/.ngrok2
-        cat > ~/.ngrok2/ngrok.yml << EOF
+        # Create ngrok configuration - use newer format
+        mkdir -p ~/.config/ngrok
+        cat > ~/.config/ngrok/ngrok.yml << EOF
+version: "2"
 authtoken: $NGROK_TOKEN
 tunnels:
   api:
@@ -423,6 +425,42 @@ except:
         log "✅ Basic Pitch model initialized"
     else
         warn "Failed to initialize Basic Pitch model"
+    fi
+}
+
+# Start ngrok tunnels
+start_ngrok_tunnels() {
+    log "🌐 Starting ngrok tunnels for API and frontend..."
+
+    # Kill any existing ngrok processes
+    pkill -f ngrok || true
+    sleep 2
+
+    # Start API tunnel in background
+    nohup ngrok http 8000 --log=stdout > ngrok_api.log 2>&1 &
+    API_NGROK_PID=$!
+    sleep 3
+
+    # Start frontend tunnel in background
+    nohup ngrok http 3000 --log=stdout > ngrok_frontend.log 2>&1 &
+    FRONTEND_NGROK_PID=$!
+    sleep 3
+
+    # Get tunnel URLs
+    API_URL=$(curl -s http://localhost:4040/api/tunnels | python -c "import sys, json; data = json.load(sys.stdin); print(next((t['public_url'] for t in data['tunnels'] if ':8000' in t['config']['addr']), 'Not found'))" 2>/dev/null || echo "API tunnel not ready")
+    FRONTEND_URL=$(curl -s http://localhost:4041/api/tunnels | python -c "import sys, json; data = json.load(sys.stdin); print(next((t['public_url'] for t in data['tunnels'] if ':3000' in t['config']['addr']), 'Not found'))" 2>/dev/null || echo "Frontend tunnel not ready")
+
+    echo "API_NGROK_PID=$API_NGROK_PID" >> .env
+    echo "FRONTEND_NGROK_PID=$FRONTEND_NGROK_PID" >> .env
+    echo "API_URL=$API_URL" >> .env
+    echo "FRONTEND_URL=$FRONTEND_URL" >> .env
+
+    log "✅ Ngrok tunnels started"
+    if [ "$API_URL" != "API tunnel not ready" ]; then
+        log "🔗 API URL: $API_URL"
+    fi
+    if [ "$FRONTEND_URL" != "Frontend tunnel not ready" ]; then
+        log "🔗 Frontend URL: $FRONTEND_URL"
     fi
 }
 
@@ -506,16 +544,31 @@ echo "Starting M3 Enhanced Celery worker..."
 celery -A backend.app.core.job_scheduler worker --loglevel=info
 EOF
 
-    # Create ngrok tunnel script
-    cat > start_ngrok.sh << 'EOF'
+    # Create individual ngrok scripts for specific ports
+    cat > start_ngrok_api.sh << 'EOF'
 #!/bin/bash
 source .env 2>/dev/null || true
-echo "Starting ngrok tunnel..."
-ngrok start api frontend
+echo "Starting ngrok tunnel for API (port 8000)..."
+ngrok http 8000
+EOF
+
+    cat > start_ngrok_frontend.sh << 'EOF'
+#!/bin/bash
+source .env 2>/dev/null || true
+echo "Starting ngrok tunnel for Frontend (port 3000)..."
+ngrok http 3000
+EOF
+
+    # Create kill ngrok script
+    cat > stop_ngrok.sh << 'EOF'
+#!/bin/bash
+source .env 2>/dev/null || true
+echo "Stopping all ngrok tunnels..."
+pkill -f ngrok || echo "No ngrok processes found"
 EOF
 
     # Make scripts executable
-    chmod +x start_api.sh start_worker.sh start_ngrok.sh
+    chmod +x start_api.sh start_worker.sh start_ngrok_api.sh start_ngrok_frontend.sh stop_ngrok.sh
 
     log "✅ Startup scripts created"
 }
@@ -529,7 +582,7 @@ display_final_status() {
 
     echo ""
     echo "🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉"
-    echo "       M3 ENHANCED SETUP COMPLETE! (FIXED)"
+    echo "       M3 ENHANCED SETUP COMPLETE! (ALL-IN-ONE)"
     echo "🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉"
     echo ""
     echo "📋 Quick Start Commands:"
@@ -544,12 +597,28 @@ display_final_status() {
     echo "# Start Celery workers (in another terminal):"
     echo "./start_worker.sh"
     echo ""
-    echo "# Start ngrok tunnel (in another terminal):"
-    echo "./start_ngrok.sh"
+    echo "# Start ngrok tunnels (choose one):"
+    echo "./start_ngrok_api.sh     # For API only"
+    echo "./start_ngrok_frontend.sh # For frontend only"
+    echo ""
+    echo "# Stop all ngrok tunnels:"
+    echo "./stop_ngrok.sh"
     echo ""
     echo "🔗 Access URLs:"
     echo "Local API: http://localhost:8000/docs"
     echo "Local Frontend: http://localhost:3000 (if frontend server running)"
+
+    # Show ngrok URLs if available
+    if [ -f ".env" ]; then
+        source .env 2>/dev/null || true
+        if [ -n "$API_URL" ] && [ "$API_URL" != "API tunnel not ready" ]; then
+            echo "Public API: $API_URL/docs"
+        fi
+        if [ -n "$FRONTEND_URL" ] && [ "$FRONTEND_URL" != "Frontend tunnel not ready" ]; then
+            echo "Public Frontend: $FRONTEND_URL"
+        fi
+    fi
+
     echo ""
     echo "💡 Tips:"
     echo "- Environment variables are stored in .env file"
@@ -559,6 +628,7 @@ display_final_status() {
     fi
     echo "- Check logs in $WORK_DIR/logs/"
     echo "- Ngrok token is configured: ${NGROK_TOKEN:0:10}..."
+    echo "- Ngrok tunnels have been pre-configured and started"
     echo ""
     echo "$runtime_emoji Runtime: $RUNTIME_TYPE | Device: $TORCH_DEVICE | Batch Size: $BATCH_SIZE | Workers: $NUM_WORKERS"
 
@@ -571,7 +641,7 @@ display_final_status() {
 
 # Main setup function
 main() {
-    log "🚀 Starting M3 Enhanced setup (Fixed Version)..."
+    log "🚀 Starting M3 Enhanced setup (All-in-One Version)..."
 
     detect_runtime
     configure_devices
@@ -586,6 +656,10 @@ main() {
     create_project_structure
     download_models
     create_startup_scripts
+
+    # Start ngrok tunnels automatically
+    start_ngrok_tunnels
+
     run_system_tests
 
     display_final_status
@@ -593,7 +667,7 @@ main() {
     echo ""
     log "🎵 Ready to process audio with M3 Enhanced!"
     log "   Your ngrok token has been integrated and configured! ✨"
-    log "   Use ./start_ngrok.sh to create public tunnels for your servers."
+    log "   Ngrok tunnels are already running - check the URLs above!"
 }
 
 # Check if running directly
