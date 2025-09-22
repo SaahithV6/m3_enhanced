@@ -1,33 +1,71 @@
-Errors with setup.sh cause this to crash. figure out whats wrong and fix it. I want a completely ironed out approach to this and need it to just work. I dont want any workarounds or anything where teh script continues after vital system components dont work. Its a slog but I just need setup.sh fixed to make everything work. If necessary you can fix up the other stuff. Also send your code as a file in this session, dont edit or do anything. Also I dont want any emojis in this document. Also I would like you to pipe all of this output and create a new file called results.txt that gets all of the verbose output in the terminal because colab clips some stuff
+Errors with setup.sh cause this to crash. figure out whats wrong and fix it. I want a completely ironed out approach to this and need it to just work. I dont want any workarounds or anything where teh script continues after vital system components dont work. Its a slog but I just need setup.sh fixed to make everything work. If necessary you can fix up the other stuff. Also send your code as a file in this session, dont edit or do anything. Also I dont want any emojis in this document.
 
-Use 'apt autoremove' to remove them.
+=== M3 Enhanced Setup Log - Mon Sep 22 07:24:36 PM UTC 2025 ===
+Working Directory: /home/m3_enhanced
+=======================================
+
+=======================================================
+         M3 Enhanced - Bulletproof Setup
+              No Fallbacks - Just Works
+=======================================================
+
+[0;32m[2025-09-22 19:24:36] Starting bulletproof M3 Enhanced setup...[0m
+[0;32m[2025-09-22 19:24:36] Verifying system requirements...[0m
+[0;32m[SUCCESS] System requirements verified[0m
+[0;32m[2025-09-22 19:24:36] Detecting runtime environment...[0m
+[0;32m[2025-09-22 19:24:36] CPU runtime: 2 cores[0m
+[0;32m[2025-09-22 19:24:36] Standard Linux environment detected[0m
+[0;32m[2025-09-22 19:24:36] Configuring device-specific settings...[0m
+[0;32m[2025-09-22 19:24:36] CPU config: device=cpu, batch_size=1, workers=2[0m
+[0;32m[2025-09-22 19:24:36] Installing and verifying system dependencies...[0m
+W: Skipping acquire of configured file 'main/source/Sources' as repository 'https://r2u.stat.illinois.edu/ubuntu jammy InRelease' does not seem to provide it (sources.list entry misspelt?)
+Reading package lists...
+Building dependency tree...
+Reading state information...
 The following packages will be REMOVED:
-  r-base-dev
-0 upgraded, 0 newly installed, 1 to remove and 41 not upgraded.
-After this operation, 15.4 kB disk space will be freed.
+  libbz2-dev libreadline-dev r-base-dev
+0 upgraded, 0 newly installed, 3 to remove and 41 not upgraded.
+After this operation, 915 kB disk space will be freed.
+(Reading database ...
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
 (Reading database ... 126435 files and directories currently installed.)
 Removing r-base-dev (4.5.1-1.2204.0) ...
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
-The following packages will be REMOVED:
-  libbz2-dev libreadline-dev
-0 upgraded, 0 newly installed, 2 to remove and 41 not upgraded.
-After this operation, 900 kB disk space will be freed.
-(Reading database ... 126432 files and directories currently installed.)
 Removing libbz2-dev:amd64 (1.0.8-5build1) ...
 Removing libreadline-dev:amd64 (8.1.2-1) ...
-[2025-09-22 19:03:01] Installing critical package: git
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+Reading package lists...
+Building dependency tree...
+Reading state information...
+0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
+[0;32m[2025-09-22 19:24:51] Installing critical package: git[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 git is already the newest version (1:2.34.1-1ubuntu1.15).
 0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
-[SUCCESS] Package verified: git
-[2025-09-22 19:03:05] Installing critical package: pkg-config
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: git[0m
+[0;32m[2025-09-22 19:24:54] Installing critical package: pkg-config[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
@@ -39,7 +77,7 @@ The following NEW packages will be installed:
 Need to get 48.2 kB of archives.
 After this operation, 5,120 B of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy/main amd64 pkg-config amd64 0.29.2-1ubuntu3 [48.2 kB]
-Fetched 48.2 kB in 0s (126 kB/s)
+Fetched 48.2 kB in 0s (142 kB/s)
 dpkg: pkgconf: dependency problems, but removing anyway as you requested:
  libsndfile1-dev:amd64 depends on pkg-config; however:
   Package pkg-config is not installed.
@@ -63,6 +101,27 @@ dpkg: pkgconf: dependency problems, but removing anyway as you requested:
   Package pkg-config is not installed.
   Package pkgconf which provides pkg-config is to be removed.
 
+(Reading database ...
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
 (Reading database ... 126413 files and directories currently installed.)
 Removing pkgconf (1.8.0-1) ...
 Removing 'diversion of /usr/bin/pkg-config to /usr/bin/pkg-config.real by pkgconf'
@@ -70,66 +129,87 @@ Removing 'diversion of /usr/share/aclocal/pkg.m4 to /usr/share/aclocal/pkg.real.
 Removing 'diversion of /usr/share/man/man1/pkg-config.1.gz to /usr/share/man/man1/pkg-config.real.1.gz by pkgconf'
 Removing 'diversion of /usr/share/pkg-config-crosswrapper to /usr/share/pkg-config-crosswrapper.real by pkgconf'
 Selecting previously unselected package pkg-config.
+(Reading database ...
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
 (Reading database ... 126392 files and directories currently installed.)
 Preparing to unpack .../pkg-config_0.29.2-1ubuntu3_amd64.deb ...
 Unpacking pkg-config (0.29.2-1ubuntu3) ...
 Setting up pkg-config (0.29.2-1ubuntu3) ...
 Processing triggers for man-db (2.10.2-1) ...
-[SUCCESS] Package verified: pkg-config
-[2025-09-22 19:03:12] Installing critical package: software-properties-common
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: pkg-config[0m
+[0;32m[2025-09-22 19:25:02] Installing critical package: software-properties-common[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 software-properties-common is already the newest version (0.99.22.9).
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
 0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
-[SUCCESS] Package verified: software-properties-common
-[2025-09-22 19:03:16] Installing critical package: unzip
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: software-properties-common[0m
+[0;32m[2025-09-22 19:25:05] Installing critical package: unzip[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 unzip is already the newest version (6.0-26ubuntu3.2).
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
 0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
-[SUCCESS] Package verified: unzip
-[2025-09-22 19:03:20] Installing critical package: wget
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: unzip[0m
+[0;32m[2025-09-22 19:25:09] Installing critical package: wget[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 wget is already the newest version (1.21.2-2ubuntu1.1).
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
 0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
-[SUCCESS] Package verified: wget
-[2025-09-22 19:03:24] Installing critical package: build-essential
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: wget[0m
+[0;32m[2025-09-22 19:25:12] Installing critical package: build-essential[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 build-essential is already the newest version (12.9ubuntu3).
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
 0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
-[SUCCESS] Package verified: build-essential
-[2025-09-22 19:03:27] Installing critical package: curl
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: build-essential[0m
+[0;32m[2025-09-22 19:25:16] Installing critical package: curl[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 curl is already the newest version (7.81.0-1ubuntu1.20).
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
 0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
-[SUCCESS] Package verified: curl
-[2025-09-22 19:03:31] Installing audio package: lame
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: curl[0m
+[0;32m[2025-09-22 19:25:19] Installing audio package: lame[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
@@ -141,18 +221,39 @@ The following NEW packages will be installed:
 Need to get 51.3 kB of archives.
 After this operation, 129 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy/universe amd64 lame amd64 3.100-3build2 [51.3 kB]
-Fetched 51.3 kB in 0s (125 kB/s)
+Fetched 51.3 kB in 0s (153 kB/s)
 Selecting previously unselected package lame.
+(Reading database ...
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
 (Reading database ... 126407 files and directories currently installed.)
 Preparing to unpack .../lame_3.100-3build2_amd64.deb ...
 Unpacking lame (3.100-3build2) ...
 Setting up lame (3.100-3build2) ...
 Processing triggers for man-db (2.10.2-1) ...
-[SUCCESS] Package verified: lame
-[2025-09-22 19:03:37] Installing audio package: libportaudio2
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: lame[0m
+[0;32m[2025-09-22 19:25:26] Installing audio package: libportaudio2[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
@@ -162,8 +263,29 @@ The following NEW packages will be installed:
 Need to get 65.3 kB of archives.
 After this operation, 223 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libportaudio2 amd64 19.6.0-1.1 [65.3 kB]
-Fetched 65.3 kB in 0s (156 kB/s)
+Fetched 65.3 kB in 0s (179 kB/s)
 Selecting previously unselected package libportaudio2:amd64.
+(Reading database ...
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
 (Reading database ... 126412 files and directories currently installed.)
 Preparing to unpack .../libportaudio2_19.6.0-1.1_amd64.deb ...
 Unpacking libportaudio2:amd64 (19.6.0-1.1) ...
@@ -197,11 +319,11 @@ Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
 
-[SUCCESS] Package verified: libportaudio2
-[2025-09-22 19:03:48] Installing audio package: flac
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: libportaudio2[0m
+[0;32m[2025-09-22 19:25:35] Installing audio package: flac[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
@@ -211,28 +333,49 @@ The following NEW packages will be installed:
 Need to get 130 kB of archives.
 After this operation, 359 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 flac amd64 1.3.3-2ubuntu0.2 [130 kB]
-Fetched 130 kB in 1s (256 kB/s)
+Fetched 130 kB in 0s (1,487 kB/s)
 Selecting previously unselected package flac.
+(Reading database ...
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
 (Reading database ... 126418 files and directories currently installed.)
 Preparing to unpack .../flac_1.3.3-2ubuntu0.2_amd64.deb ...
 Unpacking flac (1.3.3-2ubuntu0.2) ...
 Setting up flac (1.3.3-2ubuntu0.2) ...
 Processing triggers for man-db (2.10.2-1) ...
-[SUCCESS] Package verified: flac
-[2025-09-22 19:03:55] Installing audio package: libasound2-dev
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: flac[0m
+[0;32m[2025-09-22 19:25:41] Installing audio package: libasound2-dev[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 libasound2-dev is already the newest version (1.2.6.1-1ubuntu1).
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
 0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
-[SUCCESS] Package verified: libasound2-dev
-[2025-09-22 19:03:58] Installing audio package: portaudio19-dev
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: libasound2-dev[0m
+[0;32m[2025-09-22 19:25:45] Installing audio package: portaudio19-dev[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
@@ -247,8 +390,29 @@ Need to get 122 kB of archives.
 After this operation, 703 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libportaudiocpp0 amd64 19.6.0-1.1 [16.1 kB]
 Get:2 http://archive.ubuntu.com/ubuntu jammy/universe amd64 portaudio19-dev amd64 19.6.0-1.1 [106 kB]
-Fetched 122 kB in 1s (206 kB/s)
+Fetched 122 kB in 0s (1,352 kB/s)
 Selecting previously unselected package libportaudiocpp0:amd64.
+(Reading database ...
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
 (Reading database ... 126426 files and directories currently installed.)
 Preparing to unpack .../libportaudiocpp0_19.6.0-1.1_amd64.deb ...
 Unpacking libportaudiocpp0:amd64 (19.6.0-1.1) ...
@@ -286,22 +450,21 @@ Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
 
-[SUCCESS] Package verified: portaudio19-dev
-[2025-09-22 19:04:05] Installing audio package: libfftw3-dev
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: portaudio19-dev[0m
+[0;32m[2025-09-22 19:25:52] Installing audio package: libfftw3-dev[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
 The following additional packages will be installed:
-  libfftw3-bin libfftw3-double3 libfftw3-long3 libfftw3-quad3
-  libfftw3-single3
+  libfftw3-bin libfftw3-double3 libfftw3-long3 libfftw3-quad3 libfftw3-single3
 Suggested packages:
   libfftw3-doc
 The following NEW packages will be installed:
-  libfftw3-bin libfftw3-dev libfftw3-double3 libfftw3-long3
-  libfftw3-quad3 libfftw3-single3
+  libfftw3-bin libfftw3-dev libfftw3-double3 libfftw3-long3 libfftw3-quad3
+  libfftw3-single3
 0 upgraded, 6 newly installed, 0 to remove and 41 not upgraded.
 Need to get 4,654 kB of archives.
 After this operation, 24.7 MB of additional disk space will be used.
@@ -311,8 +474,29 @@ Get:3 http://archive.ubuntu.com/ubuntu jammy/main amd64 libfftw3-quad3 amd64 3.3
 Get:4 http://archive.ubuntu.com/ubuntu jammy/main amd64 libfftw3-single3 amd64 3.3.8-2ubuntu8 [800 kB]
 Get:5 http://archive.ubuntu.com/ubuntu jammy/main amd64 libfftw3-bin amd64 3.3.8-2ubuntu8 [35.5 kB]
 Get:6 http://archive.ubuntu.com/ubuntu jammy/main amd64 libfftw3-dev amd64 3.3.8-2ubuntu8 [2,101 kB]
-Fetched 4,654 kB in 1s (4,190 kB/s)
+Fetched 4,654 kB in 0s (30.5 MB/s)
 Selecting previously unselected package libfftw3-double3:amd64.
+(Reading database ...
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
 (Reading database ... 126464 files and directories currently installed.)
 Preparing to unpack .../0-libfftw3-double3_3.3.8-2ubuntu8_amd64.deb ...
 Unpacking libfftw3-double3:amd64 (3.3.8-2ubuntu8) ...
@@ -367,33 +551,33 @@ Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
 
-[SUCCESS] Package verified: libfftw3-dev
-[2025-09-22 19:04:14] Installing audio package: libportaudiocpp0
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: libfftw3-dev[0m
+[0;32m[2025-09-22 19:26:00] Installing audio package: libportaudiocpp0[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 libportaudiocpp0 is already the newest version (19.6.0-1.1).
 libportaudiocpp0 set to manually installed.
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
 0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
-[SUCCESS] Package verified: libportaudiocpp0
-[2025-09-22 19:04:17] Installing audio package: libmagic1
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: libportaudiocpp0[0m
+[0;32m[2025-09-22 19:26:03] Installing audio package: libmagic1[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 libmagic1 is already the newest version (1:5.41-3ubuntu0.1).
 libmagic1 set to manually installed.
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
 0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
-[SUCCESS] Package verified: libmagic1
-[2025-09-22 19:04:21] Installing audio package: libmagic-dev
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: libmagic1[0m
+[0;32m[2025-09-22 19:26:06] Installing audio package: libmagic-dev[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
@@ -403,18 +587,39 @@ The following NEW packages will be installed:
 Need to get 105 kB of archives.
 After this operation, 389 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libmagic-dev amd64 1:5.41-3ubuntu0.1 [105 kB]
-Fetched 105 kB in 0s (217 kB/s)
+Fetched 105 kB in 0s (1,200 kB/s)
 Selecting previously unselected package libmagic-dev:amd64.
+(Reading database ...
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
 (Reading database ... 126567 files and directories currently installed.)
 Preparing to unpack .../libmagic-dev_1%3a5.41-3ubuntu0.1_amd64.deb ...
 Unpacking libmagic-dev:amd64 (1:5.41-3ubuntu0.1) ...
 Setting up libmagic-dev:amd64 (1:5.41-3ubuntu0.1) ...
 Processing triggers for man-db (2.10.2-1) ...
-[SUCCESS] Package verified: libmagic-dev
-[2025-09-22 19:04:27] Installing audio package: vorbis-tools
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: libmagic-dev[0m
+[0;32m[2025-09-22 19:26:13] Installing audio package: vorbis-tools[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
@@ -430,8 +635,29 @@ After this operation, 1,018 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy/main amd64 libao-common all 1.2.2+20180113-1.1ubuntu3 [6,568 B]
 Get:2 http://archive.ubuntu.com/ubuntu jammy/main amd64 libao4 amd64 1.2.2+20180113-1.1ubuntu3 [35.2 kB]
 Get:3 http://archive.ubuntu.com/ubuntu jammy/universe amd64 vorbis-tools amd64 1.4.2-1 [195 kB]
-Fetched 236 kB in 1s (374 kB/s)
+Fetched 236 kB in 0s (2,641 kB/s)
 Selecting previously unselected package libao-common.
+(Reading database ...
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
 (Reading database ... 126577 files and directories currently installed.)
 Preparing to unpack .../libao-common_1.2.2+20180113-1.1ubuntu3_all.deb ...
 Unpacking libao-common (1.2.2+20180113-1.1ubuntu3) ...
@@ -475,31 +701,31 @@ Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
 
-[SUCCESS] Package verified: vorbis-tools
-[2025-09-22 19:04:35] Installing audio package: libsndfile1-dev
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: vorbis-tools[0m
+[0;32m[2025-09-22 19:26:20] Installing audio package: libsndfile1-dev[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 libsndfile1-dev is already the newest version (1.0.31-2ubuntu0.2).
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
 0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
-[SUCCESS] Package verified: libsndfile1-dev
-[2025-09-22 19:04:38] Installing audio package: ffmpeg
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: libsndfile1-dev[0m
+[0;32m[2025-09-22 19:26:23] Installing audio package: ffmpeg[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 ffmpeg is already the newest version (7:4.4.2-0ubuntu0.22.04.1).
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
 0 upgraded, 0 newly installed, 0 to remove and 41 not upgraded.
-[SUCCESS] Package verified: ffmpeg
-[2025-09-22 19:04:41] Installing audio package: opus-tools
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: ffmpeg[0m
+[0;32m[2025-09-22 19:26:27] Installing audio package: opus-tools[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
@@ -512,8 +738,29 @@ Need to get 225 kB of archives.
 After this operation, 622 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libpcap0.8 amd64 1.10.1-4ubuntu1.22.04.1 [145 kB]
 Get:2 http://archive.ubuntu.com/ubuntu jammy/universe amd64 opus-tools amd64 0.1.10-1.1 [79.7 kB]
-Fetched 225 kB in 0s (1,300 kB/s)
+Fetched 225 kB in 0s (2,361 kB/s)
 Selecting previously unselected package libpcap0.8:amd64.
+(Reading database ...
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
 (Reading database ... 126635 files and directories currently installed.)
 Preparing to unpack .../libpcap0.8_1.10.1-4ubuntu1.22.04.1_amd64.deb ...
 Unpacking libpcap0.8:amd64 (1.10.1-4ubuntu1.22.04.1) ...
@@ -552,11 +799,11 @@ Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
 /sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
 
 Processing triggers for man-db (2.10.2-1) ...
-[SUCCESS] Package verified: opus-tools
-[2025-09-22 19:04:48] Installing service package: htop
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: opus-tools[0m
+[0;32m[2025-09-22 19:26:33] Installing service package: htop[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
@@ -571,8 +818,29 @@ Need to get 140 kB of archives.
 After this operation, 404 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu jammy/main amd64 libnl-genl-3-200 amd64 3.5.0-0.1 [12.4 kB]
 Get:2 http://archive.ubuntu.com/ubuntu jammy/main amd64 htop amd64 3.0.5-7build2 [128 kB]
-Fetched 140 kB in 1s (263 kB/s)
+Fetched 140 kB in 0s (1,580 kB/s)
 Selecting previously unselected package libnl-genl-3-200:amd64.
+(Reading database ...
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
 (Reading database ... 126655 files and directories currently installed.)
 Preparing to unpack .../libnl-genl-3-200_3.5.0-0.1_amd64.deb ...
 Unpacking libnl-genl-3-200:amd64 (3.5.0-0.1) ...
@@ -613,26 +881,24 @@ Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
 
-[SUCCESS] Package verified: htop
-[2025-09-22 19:04:55] Installing service package: nginx
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: htop[0m
+[0;32m[2025-09-22 19:26:40] Installing service package: nginx[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
 The following additional packages will be installed:
   libnginx-mod-http-geoip2 libnginx-mod-http-image-filter
-  libnginx-mod-http-xslt-filter libnginx-mod-mail
-  libnginx-mod-stream libnginx-mod-stream-geoip2 nginx-common
-  nginx-core
+  libnginx-mod-http-xslt-filter libnginx-mod-mail libnginx-mod-stream
+  libnginx-mod-stream-geoip2 nginx-common nginx-core
 Suggested packages:
   fcgiwrap nginx-doc ssl-cert
 The following NEW packages will be installed:
   libnginx-mod-http-geoip2 libnginx-mod-http-image-filter
-  libnginx-mod-http-xslt-filter libnginx-mod-mail
-  libnginx-mod-stream libnginx-mod-stream-geoip2 nginx
-  nginx-common nginx-core
+  libnginx-mod-http-xslt-filter libnginx-mod-mail libnginx-mod-stream
+  libnginx-mod-stream-geoip2 nginx nginx-common nginx-core
 0 upgraded, 9 newly installed, 0 to remove and 41 not upgraded.
 Need to get 698 kB of archives.
 After this operation, 2,391 kB of additional disk space will be used.
@@ -645,9 +911,30 @@ Get:6 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libnginx-mod-str
 Get:7 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libnginx-mod-stream-geoip2 amd64 1.18.0-6ubuntu14.7 [10.1 kB]
 Get:8 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 nginx-core amd64 1.18.0-6ubuntu14.7 [483 kB]
 Get:9 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 nginx amd64 1.18.0-6ubuntu14.7 [3,878 B]
-Fetched 698 kB in 1s (841 kB/s)
 Preconfiguring packages ...
+Fetched 698 kB in 1s (970 kB/s)
 Selecting previously unselected package nginx-common.
+(Reading database ...
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
 (Reading database ... 126670 files and directories currently installed.)
 Preparing to unpack .../0-nginx-common_1.18.0-6ubuntu14.7_all.deb ...
 Unpacking nginx-common (1.18.0-6ubuntu14.7) ...
@@ -688,22 +975,21 @@ invoke-rc.d: could not determine current runlevel
 invoke-rc.d: policy-rc.d denied execution of start.
 Setting up nginx (1.18.0-6ubuntu14.7) ...
 Processing triggers for man-db (2.10.2-1) ...
-[SUCCESS] Package verified: nginx
-[2025-09-22 19:05:04] Installing service package: redis-server
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
+[0;32m[SUCCESS] Package verified: nginx[0m
+[0;32m[2025-09-22 19:26:49] Installing service package: redis-server[0m
+Reading package lists...
+Building dependency tree...
+Reading state information...
 The following package was automatically installed and is no longer required:
   libpkgconf3
 Use 'apt autoremove' to remove it.
 The following additional packages will be installed:
-  libjemalloc2 liblua5.1-0 liblzf1 lua-bitop lua-cjson
-  redis-tools
+  libjemalloc2 liblua5.1-0 liblzf1 lua-bitop lua-cjson redis-tools
 Suggested packages:
   ruby-redis
 The following NEW packages will be installed:
-  libjemalloc2 liblua5.1-0 liblzf1 lua-bitop lua-cjson
-  redis-server redis-tools
+  libjemalloc2 liblua5.1-0 liblzf1 lua-bitop lua-cjson redis-server
+  redis-tools
 0 upgraded, 7 newly installed, 0 to remove and 41 not upgraded.
 Need to get 1,273 kB of archives.
 After this operation, 5,725 kB of additional disk space will be used.
@@ -714,8 +1000,29 @@ Get:4 http://archive.ubuntu.com/ubuntu jammy/universe amd64 lua-bitop amd64 1.0.
 Get:5 http://archive.ubuntu.com/ubuntu jammy/universe amd64 lua-cjson amd64 2.1.0+dfsg-2.1 [17.4 kB]
 Get:6 http://archive.ubuntu.com/ubuntu jammy/universe amd64 redis-tools amd64 5:6.0.16-1ubuntu1 [856 kB]
 Get:7 http://archive.ubuntu.com/ubuntu jammy/universe amd64 redis-server amd64 5:6.0.16-1ubuntu1 [45.9 kB]
-Fetched 1,273 kB in 1s (1,364 kB/s)
+Fetched 1,273 kB in 1s (1,531 kB/s)
 Selecting previously unselected package libjemalloc2:amd64.
+(Reading database ...
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
 (Reading database ... 126762 files and directories currently installed.)
 Preparing to unpack .../0-libjemalloc2_5.2.1-4ubuntu1_amd64.deb ...
 Unpacking libjemalloc2:amd64 (5.2.1-4ubuntu1) ...
@@ -778,7 +1085,7 @@ Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
 
-[SUCCESS] Package verified: redis-server
+[0;32m[SUCCESS] Package verified: redis-server[0m
 /sbin/ldconfig.real: /usr/local/lib/libhwloc.so.15 is not a symbolic link
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbmalloc.so.2 is not a symbolic link
@@ -807,9 +1114,243 @@ Processing triggers for libc-bin (2.35-0ubuntu3.8) ...
 
 /sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link
 
-[2025-09-22 19:05:13] Verifying critical libraries...
-[2025-09-22 19:05:13] fftw3 found via pkg-config
-[2025-09-22 19:05:13] sndfile found via pkg-config
-[ERROR] PortAudio library verification failed completely
-/home/m3_enhanced#
-[0] 0:bash*                         "bd17f73e28cf" 19:16 22-Sep-25
+[0;32m[2025-09-22 19:26:57] Verifying critical libraries...[0m
+[0;32m[2025-09-22 19:26:57] Verifying fftw3 library...[0m
+[0;32m[2025-09-22 19:26:57] fftw3 found via pkg-config[0m
+[0;32m[SUCCESS] FFTW3 library verified[0m
+[0;32m[2025-09-22 19:26:57] Verifying sndfile library...[0m
+[0;32m[2025-09-22 19:26:57] sndfile found via pkg-config[0m
+[0;32m[SUCCESS] libsndfile library verified[0m
+[0;32m[2025-09-22 19:26:57] Verifying portaudio-2.0 library...[0m
+[0;32m[2025-09-22 19:26:57] portaudio-2.0 found via pkg-config[0m
+[0;32m[SUCCESS] PortAudio library verified[0m
+[0;32m[2025-09-22 19:26:57] Starting and verifying Redis service...[0m
+Synchronizing state of redis-server.service with SysV service script with /lib/systemd/systemd-sysv-install.
+Executing: /lib/systemd/systemd-sysv-install enable redis-server
+System has not been booted with systemd as init system (PID 1). Can't operate.
+Failed to connect to bus: Host is down
+[1;33m[WARNING] Failed to start Redis via systemctl, trying manual start[0m
+System has not been booted with systemd as init system (PID 1). Can't operate.
+Failed to connect to bus: Host is down
+[1;33m[WARNING] Redis not started via systemctl, trying manual start...[0m
+[0;32m[SUCCESS] Redis is responding to ping[0m
+[0;32m[SUCCESS] All system dependencies installed and verified[0m
+[0;32m[2025-09-22 19:27:02] Setting up Python environment with verification...[0m
+Python 3.12.11
+Requirement already satisfied: pip in /usr/local/lib/python3.12/dist-packages (24.1.2)
+Collecting pip
+  Downloading pip-25.2-py3-none-any.whl.metadata (4.7 kB)
+Requirement already satisfied: setuptools in /usr/local/lib/python3.12/dist-packages (75.2.0)
+Collecting setuptools
+  Downloading setuptools-80.9.0-py3-none-any.whl.metadata (6.6 kB)
+Requirement already satisfied: wheel in /usr/local/lib/python3.12/dist-packages (0.45.1)
+Downloading pip-25.2-py3-none-any.whl (1.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 45.7 MB/s eta 0:00:00
+Downloading setuptools-80.9.0-py3-none-any.whl (1.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 58.6 MB/s eta 0:00:00
+Installing collected packages: setuptools, pip
+  Attempting uninstall: setuptools
+    Found existing installation: setuptools 75.2.0
+    Uninstalling setuptools-75.2.0:
+      Successfully uninstalled setuptools-75.2.0
+  Attempting uninstall: pip
+    Found existing installation: pip 24.1.2
+    Uninstalling pip-24.1.2:
+      Successfully uninstalled pip-24.1.2
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+ipython 7.34.0 requires jedi>=0.16, which is not installed.
+Successfully installed pip-25.2 setuptools-80.9.0
+pip 25.2 from /usr/local/lib/python3.12/dist-packages/pip (python 3.12)
+Requirement already satisfied: Cython in /usr/local/lib/python3.12/dist-packages (3.0.12)
+Collecting Cython
+  Downloading cython-3.1.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (5.0 kB)
+Requirement already satisfied: numpy in /usr/local/lib/python3.12/dist-packages (2.0.2)
+Collecting numpy
+  Downloading numpy-2.3.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+Downloading cython-3.1.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (3.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 77.3 MB/s  0:00:00
+Downloading numpy-2.3.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.6/16.6 MB 167.3 MB/s  0:00:00
+Installing collected packages: numpy, Cython
+  Attempting uninstall: numpy
+    Found existing installation: numpy 2.0.2
+    Uninstalling numpy-2.0.2:
+      Successfully uninstalled numpy-2.0.2
+  Attempting uninstall: Cython
+    Found existing installation: Cython 3.0.12
+    Uninstalling Cython-3.0.12:
+      Successfully uninstalled Cython-3.0.12
+
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+opencv-python-headless 4.12.0.88 requires numpy<2.3.0,>=2; python_version >= "3.9", but you have numpy 2.3.3 which is incompatible.
+opencv-python 4.12.0.88 requires numpy<2.3.0,>=2; python_version >= "3.9", but you have numpy 2.3.3 which is incompatible.
+opencv-contrib-python 4.12.0.88 requires numpy<2.3.0,>=2; python_version >= "3.9", but you have numpy 2.3.3 which is incompatible.
+tensorflow 2.19.0 requires numpy<2.2.0,>=1.26.0, but you have numpy 2.3.3 which is incompatible.
+numba 0.60.0 requires numpy<2.1,>=1.22, but you have numpy 2.3.3 which is incompatible.
+cupy-cuda12x 13.3.0 requires numpy<2.3,>=1.22, but you have numpy 2.3.3 which is incompatible.
+Successfully installed Cython-3.1.4 numpy-2.3.3
+[0;32m[SUCCESS] Python environment ready[0m
+[0;32m[2025-09-22 19:27:34] Installing ML frameworks with verification...[0m
+[0;32m[2025-09-22 19:27:34] Installing PyTorch CPU version...[0m
+Looking in indexes: https://download.pytorch.org/whl/cpu
+Requirement already satisfied: torch in /usr/local/lib/python3.12/dist-packages (2.8.0+cu126)
+Requirement already satisfied: torchvision in /usr/local/lib/python3.12/dist-packages (0.23.0+cu126)
+Requirement already satisfied: torchaudio in /usr/local/lib/python3.12/dist-packages (2.8.0+cu126)
+Requirement already satisfied: filelock in /usr/local/lib/python3.12/dist-packages (from torch) (3.19.1)
+Requirement already satisfied: typing-extensions>=4.10.0 in /usr/local/lib/python3.12/dist-packages (from torch) (4.15.0)
+Requirement already satisfied: setuptools in /usr/local/lib/python3.12/dist-packages (from torch) (80.9.0)
+Requirement already satisfied: sympy>=1.13.3 in /usr/local/lib/python3.12/dist-packages (from torch) (1.13.3)
+Requirement already satisfied: networkx in /usr/local/lib/python3.12/dist-packages (from torch) (3.5)
+Requirement already satisfied: jinja2 in /usr/local/lib/python3.12/dist-packages (from torch) (3.1.6)
+Requirement already satisfied: fsspec in /usr/local/lib/python3.12/dist-packages (from torch) (2025.3.0)
+Requirement already satisfied: nvidia-cuda-nvrtc-cu12==12.6.77 in /usr/local/lib/python3.12/dist-packages (from torch) (12.6.77)
+Requirement already satisfied: nvidia-cuda-runtime-cu12==12.6.77 in /usr/local/lib/python3.12/dist-packages (from torch) (12.6.77)
+Requirement already satisfied: nvidia-cuda-cupti-cu12==12.6.80 in /usr/local/lib/python3.12/dist-packages (from torch) (12.6.80)
+Requirement already satisfied: nvidia-cudnn-cu12==9.10.2.21 in /usr/local/lib/python3.12/dist-packages (from torch) (9.10.2.21)
+Requirement already satisfied: nvidia-cublas-cu12==12.6.4.1 in /usr/local/lib/python3.12/dist-packages (from torch) (12.6.4.1)
+Requirement already satisfied: nvidia-cufft-cu12==11.3.0.4 in /usr/local/lib/python3.12/dist-packages (from torch) (11.3.0.4)
+Requirement already satisfied: nvidia-curand-cu12==10.3.7.77 in /usr/local/lib/python3.12/dist-packages (from torch) (10.3.7.77)
+Requirement already satisfied: nvidia-cusolver-cu12==11.7.1.2 in /usr/local/lib/python3.12/dist-packages (from torch) (11.7.1.2)
+Requirement already satisfied: nvidia-cusparse-cu12==12.5.4.2 in /usr/local/lib/python3.12/dist-packages (from torch) (12.5.4.2)
+Requirement already satisfied: nvidia-cusparselt-cu12==0.7.1 in /usr/local/lib/python3.12/dist-packages (from torch) (0.7.1)
+Requirement already satisfied: nvidia-nccl-cu12==2.27.3 in /usr/local/lib/python3.12/dist-packages (from torch) (2.27.3)
+Requirement already satisfied: nvidia-nvtx-cu12==12.6.77 in /usr/local/lib/python3.12/dist-packages (from torch) (12.6.77)
+Requirement already satisfied: nvidia-nvjitlink-cu12==12.6.85 in /usr/local/lib/python3.12/dist-packages (from torch) (12.6.85)
+Requirement already satisfied: nvidia-cufile-cu12==1.11.1.6 in /usr/local/lib/python3.12/dist-packages (from torch) (1.11.1.6)
+Requirement already satisfied: triton==3.4.0 in /usr/local/lib/python3.12/dist-packages (from torch) (3.4.0)
+Requirement already satisfied: numpy in /usr/local/lib/python3.12/dist-packages (from torchvision) (2.3.3)
+Requirement already satisfied: pillow!=8.3.*,>=5.3.0 in /usr/local/lib/python3.12/dist-packages (from torchvision) (11.3.0)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from sympy>=1.13.3->torch) (1.3.0)
+Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.12/dist-packages (from jinja2->torch) (3.0.2)
+PyTorch CPU verified
+[0;32m[2025-09-22 19:27:46] Installing TensorFlow CPU version...[0m
+Requirement already satisfied: tensorflow in /usr/local/lib/python3.12/dist-packages (2.19.0)
+Requirement already satisfied: absl-py>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (1.4.0)
+Requirement already satisfied: astunparse>=1.6.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (1.6.3)
+Requirement already satisfied: flatbuffers>=24.3.25 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (25.2.10)
+Requirement already satisfied: gast!=0.5.0,!=0.5.1,!=0.5.2,>=0.2.1 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (0.6.0)
+Requirement already satisfied: google-pasta>=0.1.1 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (0.2.0)
+Requirement already satisfied: libclang>=13.0.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (18.1.1)
+Requirement already satisfied: opt-einsum>=2.3.2 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (3.4.0)
+Requirement already satisfied: packaging in /usr/local/lib/python3.12/dist-packages (from tensorflow) (25.0)
+Requirement already satisfied: protobuf!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<6.0.0dev,>=3.20.3 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (5.29.5)
+Requirement already satisfied: requests<3,>=2.21.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (2.32.4)
+Requirement already satisfied: setuptools in /usr/local/lib/python3.12/dist-packages (from tensorflow) (80.9.0)
+Requirement already satisfied: six>=1.12.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (1.17.0)
+Requirement already satisfied: termcolor>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (3.1.0)
+Requirement already satisfied: typing-extensions>=3.6.6 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (4.15.0)
+Requirement already satisfied: wrapt>=1.11.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (1.17.3)
+Requirement already satisfied: grpcio<2.0,>=1.24.3 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (1.75.0)
+Requirement already satisfied: tensorboard~=2.19.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (2.19.0)
+Requirement already satisfied: keras>=3.5.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (3.10.0)
+Collecting numpy<2.2.0,>=1.26.0 (from tensorflow)
+  Downloading numpy-2.1.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (62 kB)
+Requirement already satisfied: h5py>=3.11.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (3.14.0)
+Requirement already satisfied: ml-dtypes<1.0.0,>=0.5.1 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (0.5.3)
+Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2.21.0->tensorflow) (3.4.3)
+Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2.21.0->tensorflow) (3.10)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2.21.0->tensorflow) (2.5.0)
+Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2.21.0->tensorflow) (2025.8.3)
+Requirement already satisfied: markdown>=2.6.8 in /usr/local/lib/python3.12/dist-packages (from tensorboard~=2.19.0->tensorflow) (3.9)
+Requirement already satisfied: tensorboard-data-server<0.8.0,>=0.7.0 in /usr/local/lib/python3.12/dist-packages (from tensorboard~=2.19.0->tensorflow) (0.7.2)
+Requirement already satisfied: werkzeug>=1.0.1 in /usr/local/lib/python3.12/dist-packages (from tensorboard~=2.19.0->tensorflow) (3.1.3)
+Requirement already satisfied: wheel<1.0,>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from astunparse>=1.6.0->tensorflow) (0.45.1)
+Requirement already satisfied: rich in /usr/local/lib/python3.12/dist-packages (from keras>=3.5.0->tensorflow) (13.9.4)
+Requirement already satisfied: namex in /usr/local/lib/python3.12/dist-packages (from keras>=3.5.0->tensorflow) (0.1.0)
+Requirement already satisfied: optree in /usr/local/lib/python3.12/dist-packages (from keras>=3.5.0->tensorflow) (0.17.0)
+Requirement already satisfied: MarkupSafe>=2.1.1 in /usr/local/lib/python3.12/dist-packages (from werkzeug>=1.0.1->tensorboard~=2.19.0->tensorflow) (3.0.2)
+Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.12/dist-packages (from rich->keras>=3.5.0->tensorflow) (4.0.0)
+Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.12/dist-packages (from rich->keras>=3.5.0->tensorflow) (2.19.2)
+Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.12/dist-packages (from markdown-it-py>=2.2.0->rich->keras>=3.5.0->tensorflow) (0.1.2)
+Downloading numpy-2.1.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.0/16.0 MB 63.8 MB/s  0:00:00
+Installing collected packages: numpy
+  Attempting uninstall: numpy
+    Found existing installation: numpy 2.3.3
+    Uninstalling numpy-2.3.3:
+      Successfully uninstalled numpy-2.3.3
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+numba 0.60.0 requires numpy<2.1,>=1.22, but you have numpy 2.1.3 which is incompatible.
+Successfully installed numpy-2.1.3
+2025-09-22 19:27:57.101356: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1758569277.138733    3540 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1758569277.151272    3540 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+W0000 00:00:1758569277.172763    3540 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1758569277.172805    3540 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1758569277.172810    3540 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1758569277.172813    3540 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+2025-09-22 19:27:57.178304: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+TensorFlow CPU verified
+[0;32m[SUCCESS] ML frameworks installed and verified[0m
+[0;32m[2025-09-22 19:28:04] Installing audio processing packages with dependency resolution...[0m
+[0;32m[2025-09-22 19:28:04] Installing core audio package: librosa[0m
+Requirement already satisfied: librosa in /usr/local/lib/python3.12/dist-packages (0.11.0)
+Requirement already satisfied: audioread>=2.1.9 in /usr/local/lib/python3.12/dist-packages (from librosa) (3.0.1)
+Requirement already satisfied: numba>=0.51.0 in /usr/local/lib/python3.12/dist-packages (from librosa) (0.60.0)
+Requirement already satisfied: numpy>=1.22.3 in /usr/local/lib/python3.12/dist-packages (from librosa) (2.1.3)
+Requirement already satisfied: scipy>=1.6.0 in /usr/local/lib/python3.12/dist-packages (from librosa) (1.16.2)
+Requirement already satisfied: scikit-learn>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from librosa) (1.6.1)
+Requirement already satisfied: joblib>=1.0 in /usr/local/lib/python3.12/dist-packages (from librosa) (1.5.2)
+Requirement already satisfied: decorator>=4.3.0 in /usr/local/lib/python3.12/dist-packages (from librosa) (4.4.2)
+Requirement already satisfied: soundfile>=0.12.1 in /usr/local/lib/python3.12/dist-packages (from librosa) (0.13.1)
+Requirement already satisfied: pooch>=1.1 in /usr/local/lib/python3.12/dist-packages (from librosa) (1.8.2)
+Requirement already satisfied: soxr>=0.3.2 in /usr/local/lib/python3.12/dist-packages (from librosa) (1.0.0)
+Requirement already satisfied: typing_extensions>=4.1.1 in /usr/local/lib/python3.12/dist-packages (from librosa) (4.15.0)
+Requirement already satisfied: lazy_loader>=0.1 in /usr/local/lib/python3.12/dist-packages (from librosa) (0.4)
+Requirement already satisfied: msgpack>=1.0 in /usr/local/lib/python3.12/dist-packages (from librosa) (1.1.1)
+Requirement already satisfied: packaging in /usr/local/lib/python3.12/dist-packages (from lazy_loader>=0.1->librosa) (25.0)
+Requirement already satisfied: llvmlite<0.44,>=0.43.0dev0 in /usr/local/lib/python3.12/dist-packages (from numba>=0.51.0->librosa) (0.43.0)
+Collecting numpy>=1.22.3 (from librosa)
+  Downloading numpy-2.0.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (60 kB)
+Requirement already satisfied: platformdirs>=2.5.0 in /usr/local/lib/python3.12/dist-packages (from pooch>=1.1->librosa) (4.4.0)
+Requirement already satisfied: requests>=2.19.0 in /usr/local/lib/python3.12/dist-packages (from pooch>=1.1->librosa) (2.32.4)
+Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests>=2.19.0->pooch>=1.1->librosa) (3.4.3)
+Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests>=2.19.0->pooch>=1.1->librosa) (3.10)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests>=2.19.0->pooch>=1.1->librosa) (2.5.0)
+Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests>=2.19.0->pooch>=1.1->librosa) (2025.8.3)
+Requirement already satisfied: threadpoolctl>=3.1.0 in /usr/local/lib/python3.12/dist-packages (from scikit-learn>=1.1.0->librosa) (3.6.0)
+Requirement already satisfied: cffi>=1.0 in /usr/local/lib/python3.12/dist-packages (from soundfile>=0.12.1->librosa) (2.0.0)
+Requirement already satisfied: pycparser in /usr/local/lib/python3.12/dist-packages (from cffi>=1.0->soundfile>=0.12.1->librosa) (2.23)
+Downloading numpy-2.0.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (19.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 19.2/19.2 MB 77.4 MB/s  0:00:00
+Installing collected packages: numpy
+  Attempting uninstall: numpy
+    Found existing installation: numpy 2.1.3
+    Uninstalling numpy-2.1.3:
+      Successfully uninstalled numpy-2.1.3
+Successfully installed numpy-2.0.2
+[0;32m[SUCCESS] Package verified: librosa[0m
+[0;32m[2025-09-22 19:28:14] Installing core audio package: soundfile[0m
+Requirement already satisfied: soundfile in /usr/local/lib/python3.12/dist-packages (0.13.1)
+Requirement already satisfied: cffi>=1.0 in /usr/local/lib/python3.12/dist-packages (from soundfile) (2.0.0)
+Requirement already satisfied: numpy in /usr/local/lib/python3.12/dist-packages (from soundfile) (2.0.2)
+Requirement already satisfied: pycparser in /usr/local/lib/python3.12/dist-packages (from cffi>=1.0->soundfile) (2.23)
+[0;32m[SUCCESS] Package verified: soundfile[0m
+[0;32m[2025-09-22 19:28:17] Installing core audio package: resampy>=0.2.2,<0.4.3[0m
+Collecting resampy<0.4.3,>=0.2.2
+  Downloading resampy-0.4.2-py3-none-any.whl.metadata (2.8 kB)
+Requirement already satisfied: numpy>=1.17 in /usr/local/lib/python3.12/dist-packages (from resampy<0.4.3,>=0.2.2) (2.0.2)
+Requirement already satisfied: numba>=0.53 in /usr/local/lib/python3.12/dist-packages (from resampy<0.4.3,>=0.2.2) (0.60.0)
+Requirement already satisfied: llvmlite<0.44,>=0.43.0dev0 in /usr/local/lib/python3.12/dist-packages (from numba>=0.53->resampy<0.4.3,>=0.2.2) (0.43.0)
+Downloading resampy-0.4.2-py3-none-any.whl (3.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.1/3.1 MB 14.5 MB/s  0:00:00
+Installing collected packages: resampy
+Successfully installed resampy-0.4.2
+[0;32m[SUCCESS] Package verified: resampy[0m
+[0;32m[2025-09-22 19:28:26] Installing core audio package: audioread[0m
+Requirement already satisfied: audioread in /usr/local/lib/python3.12/dist-packages (3.0.1)
+[0;32m[SUCCESS] Package verified: audioread[0m
+[0;32m[2025-09-22 19:28:28] Installing core audio package: scipy[0m
+Requirement already satisfied: scipy in /usr/local/lib/python3.12/dist-packages (1.16.2)
+Requirement already satisfied: numpy<2.6,>=1.25.2 in /usr/local/lib/python3.12/dist-packages (from scipy) (2.0.2)
+[0;32m[SUCCESS] Package verified: scipy[0m
+[0;32m[2025-09-22 19:28:31] Installing core audio package: scikit-learn[0m
+Requirement already satisfied: scikit-learn in /usr/local/lib/python3.12/dist-packages (1.6.1)
+Requirement already satisfied: numpy>=1.19.5 in /usr/local/lib/python3.12/dist-packages (from scikit-learn) (2.0.2)
+Requirement already satisfied: scipy>=1.6.0 in /usr/local/lib/python3.12/dist-packages (from scikit-learn) (1.16.2)
+Requirement already satisfied: joblib>=1.2.0 in /usr/local/lib/python3.12/dist-packages (from scikit-learn) (1.5.2)
+Requirement already satisfied: threadpoolctl>=3.1.0 in /usr/local/lib/python3.12/dist-packages (from scikit-learn) (3.6.0)
+FATAL ERROR: scikit-learn not importable after installation
+[0;31m[ERROR] scikit-learn not importable after installation[0m
