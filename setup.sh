@@ -241,62 +241,55 @@ install_system_dependencies() {
         apt-get install -y nvidia-cuda-toolkit nvtop || error "Failed to install GPU packages"
     fi
 
-    # Refresh library cache and verify critical libraries with proper library detection
+    # Refresh library cache
     ldconfig
 
     log "Verifying critical libraries..."
 
-    # More comprehensive FFTW3 library checking - look for any variant
-    if ! ldconfig -p | grep -E "(libfftw3|fftw3)" &> /dev/null; then
-        warn "FFTW3 library not found in ldconfig cache, checking with dpkg..."
-        if ! dpkg -l | grep -q "libfftw3"; then
-            error "FFTW3 library not found after installation"
-        else
-            log "FFTW3 packages found via dpkg, continuing..."
+    # Enhanced library checking with multiple methods
+    verify_library() {
+        local lib_name=$1
+        local pkg_name=$2
+        local lib_pattern=$3
+
+        # Method 1: Check with ldconfig
+        if ldconfig -p | grep -q "$lib_pattern"; then
+            log "$lib_name library found in system cache"
+            return 0
         fi
-    else
-        log "FFTW3 library found in system cache"
-    fi
 
-    # Check for libsndfile1
-    if ! ldconfig -p | grep -q "libsndfile"; then
-        warn "libsndfile library not found in cache, checking with dpkg..."
-        if ! dpkg -l | grep -q "libsndfile"; then
-            error "libsndfile library not found after installation"
-        else
-            log "libsndfile packages found via dpkg, continuing..."
+        # Method 2: Check with dpkg
+        if dpkg -l | grep -q "$pkg_name"; then
+            log "$lib_name packages found via dpkg"
+            # Method 3: Check for actual library files
+            if find /usr/lib* /lib* -name "*${lib_pattern}*" 2>/dev/null | grep -q "${lib_pattern}"; then
+                log "$lib_name library files found in filesystem"
+                return 0
+            fi
         fi
-    else
-        log "libsndfile library found in system cache"
-    fi
 
-    # Check for portaudio
-    if ! ldconfig -p | grep -q "portaudio"; then
-        warn "PortAudio library not found in cache, checking with dpkg..."
-        if ! dpkg -l | grep -q "portaudio"; then
-            error "PortAudio library not found after installation"
-        else
-            log "PortAudio packages found via dpkg, continuing..."
+        # Method 4: Try to use pkg-config
+        if pkg-config --exists "$lib_name" 2>/dev/null; then
+            log "$lib_name found via pkg-config"
+            return 0
         fi
-    else
-        log "PortAudio library found in system cache"
+
+        return 1
+    }
+
+    # Verify FFTW3
+    if ! verify_library "fftw3" "libfftw3" "libfftw3"; then
+        error "FFTW3 library verification failed completely"
     fi
 
-    # More robust pkg-config verification with fallback
-    log "Verifying pkg-config functionality..."
-
-    # Try to find FFTW3 via pkg-config
-    if pkg-config --exists fftw3 2>/dev/null; then
-        log "pkg-config found FFTW3"
-    else
-        warn "pkg-config cannot find FFTW3, but libraries are installed - continuing"
+    # Verify libsndfile
+    if ! verify_library "sndfile" "libsndfile" "libsndfile"; then
+        error "libsndfile library verification failed completely"
     fi
 
-    # Try to find libsndfile via pkg-config
-    if pkg-config --exists sndfile 2>/dev/null; then
-        log "pkg-config found libsndfile"
-    else
-        warn "pkg-config cannot find libsndfile, but libraries are installed - continuing"
+    # Verify portaudio
+    if ! verify_library "portaudio" "portaudio" "libportaudio"; then
+        error "PortAudio library verification failed completely"
     fi
 
     success "Critical libraries verified"
