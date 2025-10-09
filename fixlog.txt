@@ -1,0 +1,101 @@
+M3 Enhanced Setup Script - Complete Fix Log
+==========================================
+
+CRITICAL ISSUES IDENTIFIED AND FIXED:
+
+1. NUMPY VERSION INCOMPATIBILITY (PRIMARY ISSUE)
+   - Problem: Script upgraded numpy to 2.3.3, but pesq package was compiled with numpy 1.x
+   - Error: "numpy.core.multiarray failed to import"
+   - Fix: Locked numpy to ">=1.22.0,<2.0.0" for compatibility with all audio packages
+   - Change Location: Lines 281-284 (install_ml_frameworks function)
+
+2. PACKAGE DEPENDENCY RESOLUTION ORDER
+   - Problem: Packages installed without considering dependency conflicts
+   - Fix: Reorganized installation order with strict version constraints
+   - Change Location: Lines 286-306 (ML frameworks), Lines 323-427 (audio packages)
+
+3. AUDIO-SEPARATOR NUMPY INCOMPATIBILITY
+   - Problem: audio-separator forced numpy upgrade to 2.x
+   - Fix: Install with --no-deps flag and manually install dependencies
+   - Change Location: Lines 395-401
+
+4. PESQ PACKAGE COMPILATION ISSUE
+   - Problem: pesq compiled against numpy 1.x crashes with numpy 2.x
+   - Fix: Ensure numpy 1.x installed before pesq installation
+   - Change Location: Lines 385-390
+
+5. ENHANCED SYSTEM CLEANUP
+   - Problem: Conflicting system packages causing build issues
+   - Fix: Comprehensive removal of conflicting packages before fresh install
+   - Change Location: Lines 134-165
+
+6. COMPREHENSIVE TESTING WITH ERROR HANDLING
+   - Problem: Tests failed silently or with unclear errors
+   - Fix: Enhanced test suite with proper error isolation and numpy compatibility checks
+   - Change Location: Lines 601-679
+
+7. VERSION CONSTRAINT MANAGEMENT
+   - Problem: Packages installed with latest versions causing conflicts
+   - Fix: Added explicit version constraints for all critical packages
+   - Applied Throughout: All package installation sections
+
+SPECIFIC CHANGES BY LINE NUMBER:
+
+Change #1 (Lines 281-284): Install compatible numpy FIRST
+- Added: python3 -m pip install "numpy>=1.22.0,<2.0.0"
+
+Change #2 (Lines 286-288): PyTorch CPU installation
+- Added: --index-url https://download.pytorch.org/whl/cpu
+
+Change #3 (Lines 311-315): Scipy version constraint
+- Added: "scipy>=1.9.0,<1.12.0"
+
+Change #4 (Lines 318-320): Numba version constraint
+- Added: "numba>=0.56.0,<0.60.0"
+
+Change #5 (Lines 323-325): Scikit-learn version constraint
+- Added: "scikit-learn>=1.1.0,<1.4.0"
+
+Change #6 (Lines 395-401): Audio-separator no-deps installation
+- Added: --no-deps flag with manual dependency installation
+
+Change #7 (Lines 403-415): Basic Pitch with warnings suppressed
+- Added: warnings.filterwarnings('ignore') for clean installation
+
+Change #8 (Lines 625-650): Enhanced test suite
+- Added: Comprehensive numpy compatibility testing
+
+Change #9 (Lines 134-165): Enhanced system cleanup
+- Added: Complete removal of conflicting packages
+
+Change #10 (Lines 52-68): Enhanced logging functions
+- Improved: Better error reporting and file logging
+
+DEPENDENCY VERSION MATRIX:
+- numpy: >=1.22.0,<2.0.0 (CRITICAL)
+- scipy: >=1.9.0,<1.12.0
+- numba: >=0.56.0,<0.60.0
+- scikit-learn: >=1.1.0,<1.4.0
+- librosa: >=0.8.0,<0.11.0
+- music21: >=7.0.0,<9.0.0
+- pytorch: CPU version (no CUDA conflicts)
+- tensorflow: >=2.16.0 (latest)
+
+SYSTEM PACKAGES VERIFIED:
+- All audio processing libraries (FFTW, PortAudio, libsndfile)
+- Redis server with connection testing
+- Build tools and dependencies
+- Package manager cleanup
+
+TESTING ENHANCEMENTS:
+- PyTorch tensor operations
+- TensorFlow basic functionality
+- NumPy version compatibility
+- Audio library imports with warnings suppressed
+- Model loading and verification
+- Web framework functionality
+- All packages individually tested
+
+This fix addresses every single dependency issue identified in the terminal log,
+ensures proper version compatibility, and provides comprehensive error handling
+with detailed logging for future troubleshooting.
