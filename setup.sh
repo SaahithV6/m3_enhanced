@@ -7,17 +7,6 @@ set -e  # Exit immediately on any error
 set -u  # Exit on undefined variables
 set -o pipefail  # Exit on pipe failures
 
-# Redirect all output to both console and results.txt
-exec > >(tee -a results.txt) 2>&1
-
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
-NC='\033[0m' # No Color
-
 # Configuration
 NGROK_TOKEN="31u9zGx10xxBE4AU0nQo5p2kXkF_6EFLZJFdmHuH6B8TyQUwv"
 WORK_DIR=$(pwd)
@@ -25,28 +14,49 @@ PYTHON_VERSION="3.12"
 MIN_DISK_SPACE_GB=10
 MIN_RAM_GB=8
 
-# Initialize results file
-echo "=== M3 Enhanced Setup Log - $(date) ===" > results.txt
-echo "Working Directory: $WORK_DIR" >> results.txt
-echo "=======================================" >> results.txt
+# Initialize results file and setup comprehensive logging
+RESULTS_FILE="$WORK_DIR/results.txt"
+echo "=== M3 Enhanced Setup Log - $(date) ===" > "$RESULTS_FILE"
+echo "Working Directory: $WORK_DIR" >> "$RESULTS_FILE"
+echo "=======================================" >> "$RESULTS_FILE"
 
-# Logging functions
+# Setup comprehensive output redirection
+# This ensures ALL output (stdout and stderr) goes to both console and results.txt
+exec > >(tee -a "$RESULTS_FILE") 2>&1
+
+# Colors for output (will appear in console but not in file)
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+NC='\033[0m' # No Color
+
+# Logging functions - enhanced to ensure file logging
 log() {
-    echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')] $1${NC}"
+    local message="[$(date +'%Y-%m-%d %H:%M:%S')] $1"
+    echo -e "${GREEN}${message}${NC}"
+    # Ensure it's also written to file without color codes
+    echo "$message" >> "$RESULTS_FILE"
 }
 
 warn() {
-    echo -e "${YELLOW}[WARNING] $1${NC}"
+    local message="[WARNING] $1"
+    echo -e "${YELLOW}${message}${NC}"
+    echo "$message" >> "$RESULTS_FILE"
 }
 
 error() {
-    echo -e "${RED}[ERROR] $1${NC}"
-    echo "FATAL ERROR: $1" >> results.txt
+    local message="[ERROR] $1"
+    echo -e "${RED}${message}${NC}"
+    echo "FATAL ERROR: $1" >> "$RESULTS_FILE"
     exit 1
 }
 
 success() {
-    echo -e "${GREEN}[SUCCESS] $1${NC}"
+    local message="[SUCCESS] $1"
+    echo -e "${GREEN}${message}${NC}"
+    echo "$message" >> "$RESULTS_FILE"
 }
 
 # Function to verify package installation
@@ -906,6 +916,13 @@ main() {
     run_comprehensive_tests
 
     display_final_status
+
+    # Final confirmation that results.txt contains everything
+    echo ""
+    echo "=== LOGGING COMPLETE ==="
+    echo "All output has been saved to: $RESULTS_FILE"
+    echo "File size: $(du -h "$RESULTS_FILE" | cut -f1)"
+    echo "========================="
 }
 
 # Execute main function
