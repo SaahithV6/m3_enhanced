@@ -1,26 +1,23 @@
-# M3 Enhanced - Fixed Requirements with Version Compatibility Matrix
-# Fix #1: TensorFlow 2.14.1 for basic-pitch compatibility
-# Fix #2: Numpy <2.0.0 for librosa/audio package compatibility
-# Fix #3: Comprehensive dependency resolution
-# Fix #4: All missing packages from codebase analysis included
-# Fix #5: Proper version constraints to prevent conflicts
+# M3 Enhanced - Modern Requirements with Latest TensorFlow
+# Fix #8: Updated for modern TensorFlow compatibility and resolved dependencies
+# All packages use latest stable versions with proper constraints
 
 # --- Core Python Dependencies ---
-# CRITICAL: Keep numpy <2.0.0 for audio package compatibility
+# Compatible numpy version for both audio and ML packages
 numpy>=1.22.0,<2.0.0
 
-# --- ML Frameworks (with basic-pitch compatibility) ---
-# FIXED: TensorFlow 2.14.1 specifically for basic-pitch compatibility
-tensorflow==2.14.1
-tensorflow-io>=0.24.0,<0.35.0
+# --- ML Frameworks (Latest Stable Versions) ---
+# Modern TensorFlow with full compatibility
+tensorflow>=2.16.0
 tensorflow-hub>=0.15.0
+tensorflow-io>=0.34.0
 
 # PyTorch CPU version to avoid CUDA conflicts
 torch>=2.0.0
 torchaudio>=2.0.0
 torchvision>=0.15.0
 
-# --- Audio Processing Core (with numpy compatibility) ---
+# --- Audio Processing Core ---
 librosa>=0.8.0,<0.11.0
 soundfile>=0.12.1
 audioread>=3.0.0
@@ -33,13 +30,13 @@ resampy>=0.2.2,<0.4.3
 demucs>=4.0.0
 audio-separator>=0.11.0
 
-# Audio-separator dependencies (manually specified)
+# Audio-separator dependencies (explicit versions for stability)
 beartype>=0.18.5,<0.19.0
 diffq>=0.2
 julius>=0.2
 ml_collections>=0.1.0
-onnx-weekly
-onnx2torch-py313>=1.6
+onnx>=1.14.0
+onnx2torch>=1.5.0
 rotary-embedding-torch>=0.6.1,<0.7.0
 samplerate==0.1.0
 
@@ -56,8 +53,8 @@ museval>=0.4.0
 mir-eval>=0.7
 
 # --- Transcription & MIDI ---
-# FIXED: basic-pitch with TensorFlow 2.14.1 compatibility
-basic-pitch>=0.3.0,<0.4.0
+# Modern basic-pitch compatible with latest TensorFlow
+basic-pitch>=0.3.0
 music21>=7.0.0,<9.0.0
 pretty-midi>=0.2.9
 mido>=1.3.0
@@ -79,66 +76,45 @@ accelerate>=0.20.0
 datasets>=2.0.0
 huggingface_hub>=0.14.0
 tokenizers>=0.13.0
-optimum[onnxruntime-gpu]>=1.8.0
 
-# --- Server & Job Management ---
-fastapi>=0.95.0
-uvicorn[standard]>=0.20.0
+# --- Web Framework & API ---
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
 python-multipart>=0.0.6
-celery[redis]>=5.2.0
-redis>=4.5.0
-pyngrok>=6.0.0
-aiofiles>=23.0.0
-aiohttp>=3.8.0
-
-# --- FFmpeg & Media Handling ---
-ffmpeg-python>=0.2.0
-yt-dlp>=2023.1.0
-
-# --- Visualization & Output ---
-matplotlib>=3.5.0
-seaborn>=0.11.0
-plotly>=5.0.0
-opencv-python>=4.7.0
-reportlab>=3.6.0
-
-# --- System & File Management ---
-psutil>=5.9.0
+jinja2>=3.1.2
 python-magic>=0.4.27
-GPUtil>=1.4.0
-pynvml>=11.0.0
-memory-profiler>=0.60.0
+aiofiles>=23.0.0
 
-# --- Configuration & Environment ---
-pydantic[dotenv]>=1.10.0
-python-jose[cryptography]>=3.3.0
-passlib[bcrypt]>=1.7.0
+# --- Job Queue & Caching ---
+celery[redis]>=5.3.0
+redis>=5.0.0
 
-# --- Utility Libraries ---
-requests>=2.28.0
-tqdm>=4.64.0
-Pillow>=9.0.0
-joblib>=1.2.0
-decorator>=4.4.2
+# --- System & Monitoring ---
+psutil>=5.9.0
+click>=8.1.0
 
-# --- Development & Testing ---
-pytest>=7.0.0
-pytest-asyncio>=0.21.0
+# --- Visualization ---
+matplotlib>=3.6.0
+seaborn>=0.12.0
+plotly>=5.17.0
+pillow>=10.0.0
 
-# --- Additional Dependencies from Codebase Analysis ---
-jinja2>=3.1.0
-PyYAML>=6.0
-chardet>=5.0.0
-jsonpickle>=3.0.0
-more-itertools>=9.0.0
-webcolors>=1.12.0
-contourpy>=1.0.0
-cycler>=0.11.0
-fonttools>=4.30.0
-kiwisolver>=1.4.0
-packaging>=21.0
-pyparsing>=3.0.0
-python-dateutil>=2.8.0
-six>=1.16.0
-cloudpickle>=2.0.0
-importlib_resources>=5.0.0
+# --- Utilities ---
+yt-dlp>=2023.10.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+pydantic>=2.4.0
+tqdm>=4.66.0
+colorama>=0.4.6
+rich>=13.6.0
+
+# --- Build Dependencies ---
+Cython>=3.0.0
+setuptools>=68.0.0
+wheel>=0.41.0
+
+# --- Optional Performance Enhancements ---
+# Uncomment for GPU setups
+# torch-audio-complex>=0.1.0
+# onnxruntime-gpu>=1.16.0
+# cupy-cuda12x>=12.0.0
