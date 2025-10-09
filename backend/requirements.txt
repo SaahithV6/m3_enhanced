@@ -1,97 +1,144 @@
-# M3 Enhanced - requirements.txt
-# Original dependencies are preserved, with newly discovered packages added.
+# M3 Enhanced - Fixed Requirements with Version Compatibility Matrix
+# Fix #1: TensorFlow 2.14.1 for basic-pitch compatibility
+# Fix #2: Numpy <2.0.0 for librosa/audio package compatibility
+# Fix #3: Comprehensive dependency resolution
+# Fix #4: All missing packages from codebase analysis included
+# Fix #5: Proper version constraints to prevent conflicts
 
-# --- Server & Job Management ---
-fastapi
-uvicorn[standard]
-python-multipart
-celery[redis]
-redis
-pyngrok
-aiofiles
+# --- Core Python Dependencies ---
+# CRITICAL: Keep numpy <2.0.0 for audio package compatibility
+numpy>=1.22.0,<2.0.0
 
-# --- Audio Processing & ML ---
-demucs==4.0.1
-audio-separator  # MVSEP-MDX23 models
-librosa>=0.10.0
-numpy<2.0.0
-scipy
-soundfile
-pydub
+# --- ML Frameworks (with basic-pitch compatibility) ---
+# FIXED: TensorFlow 2.14.1 specifically for basic-pitch compatibility
+tensorflow==2.14.1
+tensorflow-io>=0.24.0,<0.35.0
+tensorflow-hub>=0.15.0
 
-# --- Studio-Grade Audio Processing ---
-noisereduce
-pyrubberband  # Time/pitch manipulation
-pedalboard  # Spotify's audio effects library
-
-# --- FFmpeg & Media Handling ---
-ffmpeg-python
-yt-dlp
-
-# --- Advanced Transcription Models ---
-basic-pitch
-music21
-mir-eval  # Music information retrieval evaluation
-pretty-midi
-mido
-
-# --- Deep Learning & Audio Classification ---
+# PyTorch CPU version to avoid CUDA conflicts
 torch>=2.0.0
 torchaudio>=2.0.0
-torchvision
-transformers>=4.40.0
-accelerate
-openl3
-tensorflow  # For YAMNet
-tensorflow-hub
+torchvision>=0.15.0
 
-# --- Quality Assessment ---
-pesq  # Perceptual evaluation
-pystoi  # Short-time objective intelligibility
-museval  # Music source separation evaluation
+# --- Audio Processing Core (with numpy compatibility) ---
+librosa>=0.8.0,<0.11.0
+soundfile>=0.12.1
+audioread>=3.0.0
+scipy>=1.9.0,<1.12.0
+scikit-learn>=1.1.0,<1.4.0
+numba>=0.56.0,<0.60.0
+resampy>=0.2.2,<0.4.3
+
+# --- Audio Separation & Enhancement ---
+demucs>=4.0.0
+audio-separator>=0.11.0
+
+# Audio-separator dependencies (manually specified)
+beartype>=0.18.5,<0.19.0
+diffq>=0.2
+julius>=0.2
+ml_collections>=0.1.0
+onnx-weekly
+onnx2torch-py313>=1.6
+rotary-embedding-torch>=0.6.1,<0.7.0
+samplerate==0.1.0
+
+# --- Studio-Grade Audio Processing ---
+noisereduce>=3.0.0
+pyrubberband>=0.3.0
+pedalboard>=0.7.0
+pydub>=0.25.1
+
+# --- Audio Analysis & Quality Assessment ---
+pesq>=0.0.3
+pystoi>=0.3.3
+museval>=0.4.0
+mir-eval>=0.7
+
+# --- Transcription & MIDI ---
+# FIXED: basic-pitch with TensorFlow 2.14.1 compatibility
+basic-pitch>=0.3.0,<0.4.0
+music21>=7.0.0,<9.0.0
+pretty-midi>=0.2.9
+mido>=1.3.0
+crepe>=0.0.12
+
+# --- Advanced Audio Libraries ---
+openl3>=0.4.1
+madmom>=0.16.1
+laion-clap>=1.1.4
 
 # --- MIDI Synthesis ---
-midi2audio
-fluidsynth
-pyfluidsynth
+midi2audio>=0.1.1
+fluidsynth>=0.2
+pyfluidsynth>=1.3.0
+
+# --- ML/AI Libraries ---
+transformers>=4.20.0
+accelerate>=0.20.0
+datasets>=2.0.0
+huggingface_hub>=0.14.0
+tokenizers>=0.13.0
+optimum[onnxruntime-gpu]>=1.8.0
+
+# --- Server & Job Management ---
+fastapi>=0.95.0
+uvicorn[standard]>=0.20.0
+python-multipart>=0.0.6
+celery[redis]>=5.2.0
+redis>=4.5.0
+pyngrok>=6.0.0
+aiofiles>=23.0.0
+aiohttp>=3.8.0
+
+# --- FFmpeg & Media Handling ---
+ffmpeg-python>=0.2.0
+yt-dlp>=2023.1.0
 
 # --- Visualization & Output ---
-matplotlib
-opencv-python
-reportlab  # PDF sheet music generation
+matplotlib>=3.5.0
+seaborn>=0.11.0
+plotly>=5.0.0
+opencv-python>=4.7.0
+reportlab>=3.6.0
 
 # --- System & File Management ---
-psutil
-python-magic
-GPUtil
-pynvml
+psutil>=5.9.0
+python-magic>=0.4.27
+GPUtil>=1.4.0
+pynvml>=11.0.0
+memory-profiler>=0.60.0
 
 # --- Configuration & Environment ---
-pydantic[dotenv]
+pydantic[dotenv]>=1.10.0
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.0
 
-# --- Audio Analysis & Classification ---
-laion-clap
+# --- Utility Libraries ---
+requests>=2.28.0
+tqdm>=4.64.0
+Pillow>=9.0.0
+joblib>=1.2.0
+decorator>=4.4.2
 
 # --- Development & Testing ---
-pytest
-pytest-asyncio
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
 
-# --- Added Packages from Code Analysis ---
-# These packages were imported in the project files but not listed above.
-
-requests             # For making HTTP requests in scripts (colab_setup.py)
-resampy              # High-quality audio resampling (used by librosa, explicitly imported)
-datasets             # Used by Hugging Face Transformers
-seaborn              # For advanced data visualization
-plotly               # For interactive plotting
-Pillow               # For image manipulation (used by music21, matplotlib, etc.)
-aiohttp              # Asynchronous HTTP client (download_models.py)
-tqdm                 # For progress bars in scripts
-scikit-learn         # For machine learning components (ICA, KMeans)
-crepe                # Monophonic pitch tracker for transcription
-numba                # JIT compiler for librosa performance
-madmom               # Advanced Music Information Retrieval library
-memory-profiler      # For benchmarking and development
-optimum[onnxruntime-gpu] # For ONNX model optimization
-onnxruntime-gpu      # GPU-accelerated ONNX runtime (install if using ONNX models on GPU)
-cupy-cuda12x         # For GPU-accelerated array operations (match your CUDA version)
+# --- Additional Dependencies from Codebase Analysis ---
+jinja2>=3.1.0
+PyYAML>=6.0
+chardet>=5.0.0
+jsonpickle>=3.0.0
+more-itertools>=9.0.0
+webcolors>=1.12.0
+contourpy>=1.0.0
+cycler>=0.11.0
+fonttools>=4.30.0
+kiwisolver>=1.4.0
+packaging>=21.0
+pyparsing>=3.0.0
+python-dateutil>=2.8.0
+six>=1.16.0
+cloudpickle>=2.0.0
+importlib_resources>=5.0.0
