@@ -1,608 +1,491 @@
 I need you to fully audit and rebuild the entire setup process for this project from scratch, especially the setup.sh file, ensuring every pipeline, system, and dependency is properly configured without skipping steps or relying on assumptions from previous attempts—even failed ones, as some got closer despite import issues. Do not use any logging systems that interfere with terminal output; all imports and commands must run raw in the terminal so I can clearly see what's going on. The script must stop if any vital system component fails—no silent failures or workarounds. You're allowed to change anything in the codebase to ensure functionality works exactly as programmed in the backend, as described in the README, but if you change requirements.txt, you must first perform a full code audit of the entire project to identify used and unused libraries, only removing packages if they are proven to be completely unused and improperly called. Use the most modern and stable versions of dependencies possible, and avoid partial or outdated installs (e.g., don’t use old versions like music21 8.x if newer ones are compatible). All system and Python dependencies should be installed and run entirely through setup.sh, which must be the only entry point for setting up and running the program. Do not delete any sections of code. Do not include any emojis in any part of the code or documentation. When making changes, append them clearly to fixlog.txt, using inline comments and a detailed, line-by-line changelog—never delete anything from fixlog.txt, only add new entries. Save the complete terminal output from each run to a file called result.txt for further analysis. Each change iteration should be clearly numbered to ensure we don’t lose track of progress. Deliver all modified code as files in this session. Finally, the ideal length of setup.sh should be between 900 to 1500 lines, unless more are needed to properly manage all dependencies and ensure full system stability. Also make sure you are aware of the entire file tree because you've had problems in teh past with organizing them.
 
+Archive:  m3_enhanced.zip
+   creating: m3_enhanced/
+   creating: m3_enhanced/.git/
+   creating: m3_enhanced/.git/branches/
+  inflating: m3_enhanced/.git/description
+   creating: m3_enhanced/.git/hooks/
+  inflating: m3_enhanced/.git/hooks/applypatch-msg.sample
+  inflating: m3_enhanced/.git/hooks/commit-msg.sample
+  inflating: m3_enhanced/.git/hooks/fsmonitor-watchman.sample
+  inflating: m3_enhanced/.git/hooks/post-update.sample
+  inflating: m3_enhanced/.git/hooks/pre-applypatch.sample
+  inflating: m3_enhanced/.git/hooks/pre-commit.sample
+  inflating: m3_enhanced/.git/hooks/pre-merge-commit.sample
+  inflating: m3_enhanced/.git/hooks/pre-push.sample
+  inflating: m3_enhanced/.git/hooks/pre-rebase.sample
+  inflating: m3_enhanced/.git/hooks/pre-receive.sample
+  inflating: m3_enhanced/.git/hooks/prepare-commit-msg.sample
+  inflating: m3_enhanced/.git/hooks/push-to-checkout.sample
+  inflating: m3_enhanced/.git/hooks/sendemail-validate.sample
+  inflating: m3_enhanced/.git/hooks/update.sample
+   creating: m3_enhanced/.git/info/
+  inflating: m3_enhanced/.git/info/exclude
+   creating: m3_enhanced/.git/objects/
+   creating: m3_enhanced/.git/objects/pack/
+  inflating: m3_enhanced/.git/objects/pack/pack-c56faa93401ad16ef4d114edac8916d3e8ec55af.pack
+  inflating: m3_enhanced/.git/objects/pack/pack-c56faa93401ad16ef4d114edac8916d3e8ec55af.rev
+  inflating: m3_enhanced/.git/objects/pack/pack-c56faa93401ad16ef4d114edac8916d3e8ec55af.idx
+   creating: m3_enhanced/.git/objects/info/
+   creating: m3_enhanced/.git/objects/1f/
+  inflating: m3_enhanced/.git/objects/1f/c58b1341163ee8e3280769adcb265c4d25ba5f
+   creating: m3_enhanced/.git/objects/a0/
+ extracting: m3_enhanced/.git/objects/a0/09d0ed82585ab465847f38bc3e78294e3249e4
+   creating: m3_enhanced/.git/objects/09/
+  inflating: m3_enhanced/.git/objects/09/c1bcd930c21d1777833279bc8f79225a6027b7
+ extracting: m3_enhanced/.git/objects/09/c2c90719c71ccbb9a573b093c3b6d4cdaf6f16
+  inflating: m3_enhanced/.git/objects/09/0d68b29a4fcc20048d719d95bf0d264fab8580
+   creating: m3_enhanced/.git/objects/b4/
+  inflating: m3_enhanced/.git/objects/b4/20bd5abdd04d2213aa72f5bb0409c9a454320e
+ extracting: m3_enhanced/.git/objects/b4/93e6364e7bcd573effaa3e559503e67dc57429
+  inflating: m3_enhanced/.git/objects/b4/f2e54a82e2920f384a7288a1582673b4acf357
+   creating: m3_enhanced/.git/objects/5f/
+ extracting: m3_enhanced/.git/objects/5f/cf7e34c9684abdd50d5e7592ff966df845bdb3
+   creating: m3_enhanced/.git/objects/84/
+  inflating: m3_enhanced/.git/objects/84/fa2be30e35f4b4f74e0bd93bf2f20e8e322fa2
+   creating: m3_enhanced/.git/objects/44/
+  inflating: m3_enhanced/.git/objects/44/8e906a1821a07885bdefa9af7cec6067040cc1
+ extracting: m3_enhanced/.git/objects/44/c23bc676dfac96632f061c48facc60feceea65
+   creating: m3_enhanced/.git/objects/54/
+ extracting: m3_enhanced/.git/objects/54/db568b936249f86645542a858d1875fcacd1d6
+   creating: m3_enhanced/.git/objects/f0/
+  inflating: m3_enhanced/.git/objects/f0/3190cde5a7f959f34c6624bc63c7b9ad2eba02
+  inflating: m3_enhanced/.git/objects/f0/22ada9a7c5b0c14643086f7c068db0061a6dcf
+   creating: m3_enhanced/.git/objects/6d/
+ extracting: m3_enhanced/.git/objects/6d/606da0738884164044084211d51794545a325a
+   creating: m3_enhanced/.git/objects/f8/
+ extracting: m3_enhanced/.git/objects/f8/f7c6d72ec9ba255a1a1402081945bd1f226d89
+   creating: m3_enhanced/.git/objects/6e/
+ extracting: m3_enhanced/.git/objects/6e/975d98e2daf4ca3f1e85378a1116a8344639a1
+   creating: m3_enhanced/.git/objects/0a/
+ extracting: m3_enhanced/.git/objects/0a/0b27e912573a2bba5b2cc05ebf2e49ca51f3f5
+   creating: m3_enhanced/.git/objects/01/
+  inflating: m3_enhanced/.git/objects/01/cbb001ddcbb2199d75a8011a53821cf88898cb
+   creating: m3_enhanced/.git/objects/91/
+ extracting: m3_enhanced/.git/objects/91/b848f5f000d945e33771b074a67edd707bba0a
+  inflating: m3_enhanced/.git/objects/91/d8618c8fff0b110135d8a48f79b692ad9f4582
+ extracting: m3_enhanced/.git/objects/91/43d33f1523c5ff3fba047c511c0722430880a0
+   creating: m3_enhanced/.git/objects/3e/
+  inflating: m3_enhanced/.git/objects/3e/5e83e0ea3628a3e020c5d272ad37b7c6dd70ce
+   creating: m3_enhanced/.git/objects/dd/
+  inflating: m3_enhanced/.git/objects/dd/5b1c04e7bb0d6534cd2e6a3d30aa7375b31b59
+   creating: m3_enhanced/.git/objects/f3/
+ extracting: m3_enhanced/.git/objects/f3/d89de8679a412986c44e5c8335366e7a10d91e
+   creating: m3_enhanced/.git/objects/29/
+  inflating: m3_enhanced/.git/objects/29/b6bcaa8a3fd42a77866ca098f7e72d906bdb71
+ extracting: m3_enhanced/.git/objects/29/4eec1698990171ed9926be6e1f6da095dbb3ae
+   creating: m3_enhanced/.git/objects/d1/
+  inflating: m3_enhanced/.git/objects/d1/483bd040c958aabc5158fc8c603d4d284d5053
+   creating: m3_enhanced/.git/objects/7e/
+  inflating: m3_enhanced/.git/objects/7e/2d43fd98f731ca684af3c120b24396380bd79c
+   creating: m3_enhanced/.git/objects/4b/
+ extracting: m3_enhanced/.git/objects/4b/489a783b3d5b1d19f8f8fb1501c61a88f431f1
+ extracting: m3_enhanced/.git/objects/4b/e284c546d716d94fcecd8103a5d69bf66f5861
+   creating: m3_enhanced/.git/objects/51/
+  inflating: m3_enhanced/.git/objects/51/3d980354702b2712e3c4c5e35426811cabe15f
+  inflating: m3_enhanced/.git/objects/51/5fe57a621f19b437a600bcf09af67668acaca5
+   creating: m3_enhanced/.git/objects/ab/
+  inflating: m3_enhanced/.git/objects/ab/dedcdbeaef6dd867451e0c4a1370e3f2b26c79
+ extracting: m3_enhanced/.git/objects/ab/d680bb8c814ee5881658372d371a6e942ffb68
+   creating: m3_enhanced/.git/objects/a7/
+ extracting: m3_enhanced/.git/objects/a7/c3394abee1dd65711551d7f2c349be2a4ad053
+ extracting: m3_enhanced/.git/objects/a7/064a9c4fa882c8ff744c2a5b2fb68865e3a269
+   creating: m3_enhanced/.git/objects/f5/
+  inflating: m3_enhanced/.git/objects/f5/96953734846fece0c901a2ad778ddf44851f5e
+ extracting: m3_enhanced/.git/objects/f5/91b301ce9ff308ffaa0107ffae95b1cd141f06
+ extracting: m3_enhanced/.git/objects/f5/6df45723ae97edd0124a0691b150d186772474
+   creating: m3_enhanced/.git/objects/f7/
+  inflating: m3_enhanced/.git/objects/f7/0422c8d9c649d0f9932b2ee1ac4f6d9573c2c2
+  inflating: m3_enhanced/.git/objects/f7/b8d10d682beb92dcd89b6baff6daa323bad54e
+ extracting: m3_enhanced/.git/objects/f7/10ca0cf8823aa8f0d2a12adb6728df13f47c27
+  inflating: m3_enhanced/.git/objects/f7/03425c1fd1cfeb5fd1fa9154bad0cbe28d4efb
+ extracting: m3_enhanced/.git/objects/f7/c22242f2637eb5335c506e1516be47c9f1f38f
+  inflating: m3_enhanced/.git/objects/f7/5a6ed70838065ac028cd7b74e1c8c0c228d58a
+   creating: m3_enhanced/.git/objects/d9/
+ extracting: m3_enhanced/.git/objects/d9/ca96eed7a1c7a4e326a495ec2d8173d2c41709
+   creating: m3_enhanced/.git/objects/9b/
+  inflating: m3_enhanced/.git/objects/9b/0b530968be25eb07f6a8636dc24fc8df0f14da
+   creating: m3_enhanced/.git/objects/c8/
+  inflating: m3_enhanced/.git/objects/c8/bd4b4cabd39c8f12c8e8dc06e00b98ab629376
+ extracting: m3_enhanced/.git/objects/c8/a791b6d435564de2466ed0ff4ba8e903cdea52
+ extracting: m3_enhanced/.git/objects/c8/da7d0275908fe07e733eb0310628890faa05cb
+  inflating: m3_enhanced/.git/objects/c8/063c589e3be6c60955db0ff964437dc607510a
+   creating: m3_enhanced/.git/objects/e9/
+ extracting: m3_enhanced/.git/objects/e9/abefa7e43428d69bae7aaa769f350119e0cdb1
+   creating: m3_enhanced/.git/objects/ef/
+  inflating: m3_enhanced/.git/objects/ef/4825208fad36d80d8ac9431fb6e6e6645bbb6f
+   creating: m3_enhanced/.git/objects/45/
+  inflating: m3_enhanced/.git/objects/45/459f052b3f612de7e1a4cb3d0dca4a0b0dc52d
+   creating: m3_enhanced/.git/objects/8a/
+  inflating: m3_enhanced/.git/objects/8a/b34c50c8d7860f8a6c5e49e3f42ef81cc53194
+  inflating: m3_enhanced/.git/objects/8a/9d2e3b86750492e7e59dec0e02455a322c247d
+   creating: m3_enhanced/.git/objects/11/
+ extracting: m3_enhanced/.git/objects/11/a5c5b4c052e9690bc225a1bcef15ba47d35e2d
+   creating: m3_enhanced/.git/objects/97/
+  inflating: m3_enhanced/.git/objects/97/bcf9c36780ad4a1085c837601729b9141ce0b2
+   creating: m3_enhanced/.git/objects/73/
+  inflating: m3_enhanced/.git/objects/73/369c7decac6cd050d9e13fb4da6ff49155a5f2
+   creating: m3_enhanced/.git/objects/38/
+ extracting: m3_enhanced/.git/objects/38/1279a472c85e76855f8dfe68d1ffc775ef1074
+  inflating: m3_enhanced/.git/objects/38/25d73e1a337f7d3e60a58b6f61a09eab20e850
+   creating: m3_enhanced/.git/objects/ec/
+  inflating: m3_enhanced/.git/objects/ec/f5e4601ab1d79d7888c83b5b75f8d6f6ba39fa
+   creating: m3_enhanced/.git/objects/64/
+  inflating: m3_enhanced/.git/objects/64/9d92da39bbf92aeadc2fa368d03c8e925aec87
+  inflating: m3_enhanced/.git/objects/64/b9cda8e8ebe2d7255dd627488e4a84ff64154a
+   creating: m3_enhanced/.git/objects/fa/
+ extracting: m3_enhanced/.git/objects/fa/62e4b353da7e36c87a01f01f07689d05c9763f
+  inflating: m3_enhanced/.git/objects/fa/20f3e55e5d87ce7c3cc42582a94ea403eee261
+  inflating: m3_enhanced/.git/objects/fa/e9d265666145ce7f2c7ce412d06cf9c4d694d9
+   creating: m3_enhanced/.git/objects/36/
+ extracting: m3_enhanced/.git/objects/36/48ecbbc7ece54f9da4bf8c3d2fc8aba8f79036
+  inflating: m3_enhanced/.git/objects/36/28674412228add337c76c076008cb8e33f3e45
+   creating: m3_enhanced/.git/objects/c9/
+ extracting: m3_enhanced/.git/objects/c9/8c3a5b3dcbbd6dabc32f81a9efa487b854936a
+   creating: m3_enhanced/.git/objects/61/
+ extracting: m3_enhanced/.git/objects/61/6d2d98233fd926b0416c7b31fdef47bae5ff83
+   creating: m3_enhanced/.git/objects/89/
+ extracting: m3_enhanced/.git/objects/89/ddd5ad10b9471bb3116e4af654af7eef96e7d1
+   creating: m3_enhanced/.git/objects/98/
+ extracting: m3_enhanced/.git/objects/98/4d12c19598436952d5b19a7e74a22a4a521d51
+   creating: m3_enhanced/.git/objects/2b/
+  inflating: m3_enhanced/.git/objects/2b/c5a89dc5917c916c1b1dbf1306c8bfa252dc9c
+  inflating: m3_enhanced/.git/objects/2b/134dce6abe6f1ffa80f09c2aebcc041f27b1e1
+  inflating: m3_enhanced/.git/objects/2b/fccf1ff66021a0439f31cc95966da2137da83f
+   creating: m3_enhanced/.git/objects/db/
+  inflating: m3_enhanced/.git/objects/db/52b7d643c7c73e41b3d2df1fd8c64506c8f33b
+   creating: m3_enhanced/.git/objects/18/
+  inflating: m3_enhanced/.git/objects/18/f83e7915a413edfb2261804c067f7ebb207aba
+   creating: m3_enhanced/.git/objects/59/
+ extracting: m3_enhanced/.git/objects/59/ab50c9f25ecf0e2361573097a5f5d44c1334fd
+   creating: m3_enhanced/.git/objects/f6/
+  inflating: m3_enhanced/.git/objects/f6/b66c1a7ef997e9958dc375c349ce8c57e817c9
+   creating: m3_enhanced/.git/objects/12/
+  inflating: m3_enhanced/.git/objects/12/7eea2e7df6002b4b019fd7fb22bd8832ebb67e
+   creating: m3_enhanced/.git/objects/af/
+ extracting: m3_enhanced/.git/objects/af/6c8e06bd1842d3b4d509ca33c95a88ecc20de4
+  inflating: m3_enhanced/.git/objects/af/e3dbca819173972ffead131d8a68fda39a72b0
+   creating: m3_enhanced/.git/objects/9c/
+  inflating: m3_enhanced/.git/objects/9c/22e7b61542695ea37134f37a57b727b985fe8b
+   creating: m3_enhanced/.git/objects/23/
+ extracting: m3_enhanced/.git/objects/23/93b67c27a888a8375a460189d5debd12653e14
+   creating: m3_enhanced/.git/objects/3b/
+  inflating: m3_enhanced/.git/objects/3b/114aea6998c75d5a6ecefffe23b68c07d69def
+   creating: m3_enhanced/.git/objects/3d/
+  inflating: m3_enhanced/.git/objects/3d/61f8e8da19937711d0961f98c59bbfe29b6341
+   creating: m3_enhanced/.git/objects/e4/
+  inflating: m3_enhanced/.git/objects/e4/2b983446e26684428bec48d819c35ff5b83698
+   creating: m3_enhanced/.git/objects/08/
+ extracting: m3_enhanced/.git/objects/08/0f950f531cc0fab077f02cfab7c74faefda07b
+   creating: m3_enhanced/.git/objects/96/
+  inflating: m3_enhanced/.git/objects/96/afdef163375bcb527b425419dd18b94455497f
+   creating: m3_enhanced/.git/objects/06/
+  inflating: m3_enhanced/.git/objects/06/51822cce0906a67bdcbcf2407e8fc1ed2a5c49
+   creating: m3_enhanced/.git/objects/8d/
+  inflating: m3_enhanced/.git/objects/8d/8cc268927643af62212a13e16cf11013aa4f7e
+   creating: m3_enhanced/.git/objects/42/
+  inflating: m3_enhanced/.git/objects/42/9eb3388863f3c5e469253e52f23930288ddb0e
+   creating: m3_enhanced/.git/objects/3a/
+ extracting: m3_enhanced/.git/objects/3a/2b32e1fc6f17d17fcb9cc4dbdd2ab92e05f9a6
+   creating: m3_enhanced/.git/objects/d0/
+  inflating: m3_enhanced/.git/objects/d0/68534e8d6446578eae261fb3d642a7af075654
+   creating: m3_enhanced/.git/objects/7d/
+ extracting: m3_enhanced/.git/objects/7d/1f00660e7f9cefa400e40f662497ffadcd6c0e
+ extracting: m3_enhanced/.git/objects/7d/4369f907de8a80c12ff5c90981f562635daab8
+   creating: m3_enhanced/.git/objects/f1/
+  inflating: m3_enhanced/.git/objects/f1/1179c837de4d1253be92f6458757b8522a4f9a
+   creating: m3_enhanced/.git/objects/d4/
+ extracting: m3_enhanced/.git/objects/d4/ca6f7089f945f6e472f9ff85dc0888a33ef501
+  inflating: m3_enhanced/.git/objects/d4/8049dd293a2809c73cebe2bfcacd4f73ffd989
+   creating: m3_enhanced/.git/objects/2c/
+  inflating: m3_enhanced/.git/objects/2c/b8746f2c8f73c8e085b8b0708d40ef9637b77b
+   creating: m3_enhanced/.git/objects/72/
+ extracting: m3_enhanced/.git/objects/72/b09cea593125d91441571dda3377b48312edf2
+   creating: m3_enhanced/.git/objects/8f/
+  inflating: m3_enhanced/.git/objects/8f/dfff5e25bc7d26a4f9921c4e68d335d14fa8f3
+ extracting: m3_enhanced/.git/objects/8f/7dc57f0d1803a4d27c137a92c210ea0c6228b4
+   creating: m3_enhanced/.git/objects/6b/
+  inflating: m3_enhanced/.git/objects/6b/2fb56d9fbf0794ba1be0f39cb508c72b607a55
+   creating: m3_enhanced/.git/objects/1a/
+ extracting: m3_enhanced/.git/objects/1a/e9695b705ea66baa76514b4ba4972f0fd1fb3e
+   creating: m3_enhanced/.git/objects/70/
+ extracting: m3_enhanced/.git/objects/70/e37822aed8258a56a1cc59656fcdcb085edb0a
+   creating: m3_enhanced/.git/objects/1d/
+  inflating: m3_enhanced/.git/objects/1d/9277e14eeb1ac8e2eea103b1865e13f13182e0
+  inflating: m3_enhanced/.git/objects/1d/da4bbfd3f00ea50d90fd25d61b7cf7b3fc40ef
+  inflating: m3_enhanced/.git/objects/1d/aab0ded08715bedfd42d479da6743d8a7b7e19
+   creating: m3_enhanced/.git/objects/6f/
+ extracting: m3_enhanced/.git/objects/6f/0949123e33689770339d9724a124c991c99f3f
+  inflating: m3_enhanced/.git/objects/6f/b962d94c6f49bdc28e05972318c5e369b9339f
+   creating: m3_enhanced/.git/objects/65/
+  inflating: m3_enhanced/.git/objects/65/00259f6bb6ed509ee90fbf294af23fe6adbd0a
+   creating: m3_enhanced/.git/objects/83/
+  inflating: m3_enhanced/.git/objects/83/0bb5646717f5a8118075eebe351c7e3b6a3fb4
+   creating: m3_enhanced/.git/objects/95/
+ extracting: m3_enhanced/.git/objects/95/5ce34aafd35ccbd373163e7f0c50f915a5e432
+  inflating: m3_enhanced/.git/objects/95/b8f2ad169008812c6c5179563f318aafe851eb
+ extracting: m3_enhanced/.git/objects/95/0ef1baf39ccde0c7e12b5f5291aa036bb91d61
+   creating: m3_enhanced/.git/objects/a6/
+  inflating: m3_enhanced/.git/objects/a6/37a855db283c810a526c9e324009b3125b9a55
+  inflating: m3_enhanced/.git/objects/a6/b5c1c65e90f191e032825c0f626f098f008f34
+   creating: m3_enhanced/.git/objects/c4/
+  inflating: m3_enhanced/.git/objects/c4/277443fe2351e67c30738ee6f914d0615f7940
+   creating: m3_enhanced/.git/objects/93/
+  inflating: m3_enhanced/.git/objects/93/a6c1febaa2bed026b0fd7144472e7490add1ea
+   creating: m3_enhanced/.git/objects/33/
+ extracting: m3_enhanced/.git/objects/33/a1bf442f3038a7f2ba4556860e6b279a65c583
+   creating: m3_enhanced/.git/objects/d8/
+ extracting: m3_enhanced/.git/objects/d8/7badac1077261522125f727193f649e24484c3
+  inflating: m3_enhanced/.git/objects/d8/8b42b6acd9948580ef85baf020e0eb711f6127
+   creating: m3_enhanced/.git/objects/bd/
+  inflating: m3_enhanced/.git/objects/bd/4136458bb62d5cc4459b0eb6720aa69868ebcc
+   creating: m3_enhanced/.git/objects/b5/
+ extracting: m3_enhanced/.git/objects/b5/7f5c68ff35679bd8d183387a5a93e48142007f
+   creating: m3_enhanced/.git/objects/c2/
+ extracting: m3_enhanced/.git/objects/c2/65d9008c3decd7fedd4dc9212744f61fc9afee
+   creating: m3_enhanced/.git/objects/00/
+  inflating: m3_enhanced/.git/objects/00/a32a46185eae5e8a8531077b15e9aabea39247
+  inflating: m3_enhanced/.git/objects/00/0bee6f2c55d373d903f94e14b908bef65607c1
+   creating: m3_enhanced/.git/objects/ba/
+  inflating: m3_enhanced/.git/objects/ba/4f5eea305086df732184449f24b4e87abdedb7
+   creating: m3_enhanced/.git/objects/5c/
+ extracting: m3_enhanced/.git/objects/5c/93103eac6b4eaf4d70a47df7bfc0f79d95a82a
+   creating: m3_enhanced/.git/objects/b9/
+ extracting: m3_enhanced/.git/objects/b9/04d4aed0ef4e1a1b64952b67e2da8e3afbb5e0
+   creating: m3_enhanced/.git/objects/b1/
+  inflating: m3_enhanced/.git/objects/b1/e13c8db3bbdb046da255f37d5a3c8d3a379c16
+   creating: m3_enhanced/.git/objects/0e/
+  inflating: m3_enhanced/.git/objects/0e/002e279afa509f0a60ed8b5ac8babccd4275cf
+   creating: m3_enhanced/.git/objects/aa/
+ extracting: m3_enhanced/.git/objects/aa/48467b38053ff21ff446ba0c769e71a7849b63
+   creating: m3_enhanced/.git/objects/ac/
+ extracting: m3_enhanced/.git/objects/ac/526490d4ef09ff4f2364e9f70c6207977a5d6e
+  inflating: m3_enhanced/.git/objects/ac/6107557e4cb6d1e2d420e2ea7f6a4846fca60f
+ extracting: m3_enhanced/.git/objects/ac/65df26bba3b4fc9fea2b5f16a65e1b33ca5fd1
+   creating: m3_enhanced/.git/objects/39/
+  inflating: m3_enhanced/.git/objects/39/c4351ee73fbfd14efbafa465c073e35df495a2
+   creating: m3_enhanced/.git/objects/9d/
+ extracting: m3_enhanced/.git/objects/9d/fa661ebd10e3a89b395e9077508570dd51d8c5
+   creating: m3_enhanced/.git/objects/86/
+ extracting: m3_enhanced/.git/objects/86/03f2b177b100054accd1a7e20f6a22162b1bf8
+  inflating: m3_enhanced/.git/objects/86/4167924a64edf21eb43b2c75fe62cb0805a64e
+   creating: m3_enhanced/.git/objects/17/
+ extracting: m3_enhanced/.git/objects/17/be38ff003479d1e12323db6533aba68f0360ff
+   creating: m3_enhanced/.git/objects/8b/
+  inflating: m3_enhanced/.git/objects/8b/2b94ca03aa96a7b72b4a1564c88175352ec78d
+   creating: m3_enhanced/.git/objects/a4/
+  inflating: m3_enhanced/.git/objects/a4/1cb219c668f80d0ca5daa3ee59854e450b33c2
+   creating: m3_enhanced/.git/objects/c1/
+  inflating: m3_enhanced/.git/objects/c1/bcbf0f542bd0e7386b6835481820b9c021bc9d
+   creating: m3_enhanced/.git/objects/e1/
+  inflating: m3_enhanced/.git/objects/e1/ade5f51c38e0bc00024d43350d8ca2894af3ba
+   creating: m3_enhanced/.git/objects/5e/
+  inflating: m3_enhanced/.git/objects/5e/f8997cf7e539ee7fc3433c1ecb1dc0c24fefeb
+   creating: m3_enhanced/.git/objects/37/
+ extracting: m3_enhanced/.git/objects/37/779f01e223d07b81c34f67fabdb89a1270845e
+   creating: m3_enhanced/.git/objects/0f/
+ extracting: m3_enhanced/.git/objects/0f/8dd022197416952a3e95134182ddd06b498105
+   creating: m3_enhanced/.git/objects/ce/
+  inflating: m3_enhanced/.git/objects/ce/8821e947f5f92528855955d3972fc15947f6b1
+ extracting: m3_enhanced/.git/objects/ce/31b7d8b734207d50a2c4bc29470af2e20a5152
+   creating: m3_enhanced/.git/objects/13/
+  inflating: m3_enhanced/.git/objects/13/9923f2686020d524977df766c33e825ee5daf3
+   creating: m3_enhanced/.git/objects/0c/
+  inflating: m3_enhanced/.git/objects/0c/285f8f32b24a020295cebb469eef28bface85e
+   creating: m3_enhanced/.git/objects/32/
+ extracting: m3_enhanced/.git/objects/32/d5658244dd72663340c77bbeb35ac90e2dd447
+   creating: m3_enhanced/.git/objects/04/
+ extracting: m3_enhanced/.git/objects/04/8a5672550b7949ba0e974c8223b4a83e8d2c1f
+   creating: m3_enhanced/.git/objects/20/
+ extracting: m3_enhanced/.git/objects/20/d5a6fe894d4b853f03ca5083aff0c8182a6f24
+   creating: m3_enhanced/.git/objects/03/
+  inflating: m3_enhanced/.git/objects/03/7dc6ade33be4dd8a5af6d5ef90c82766398ccd
+   creating: m3_enhanced/.git/objects/e3/
+ extracting: m3_enhanced/.git/objects/e3/1d39154ea19a2c9dbe60c963aa7d80ec3c4db0
+   creating: m3_enhanced/.git/objects/1c/
+  inflating: m3_enhanced/.git/objects/1c/38656eedfcd169710687d7cdd75553b0c5275d
+   creating: m3_enhanced/.git/objects/10/
+  inflating: m3_enhanced/.git/objects/10/db398438f1078165739b7120b04537d468a87a
+   creating: m3_enhanced/.git/objects/c0/
+  inflating: m3_enhanced/.git/objects/c0/c928134e54d5550a938316f814c639244e976b
+   creating: m3_enhanced/.git/refs/
+   creating: m3_enhanced/.git/refs/heads/
+ extracting: m3_enhanced/.git/refs/heads/working
+   creating: m3_enhanced/.git/refs/tags/
+   creating: m3_enhanced/.git/refs/remotes/
+   creating: m3_enhanced/.git/refs/remotes/origin/
+ extracting: m3_enhanced/.git/refs/remotes/origin/working
+ extracting: m3_enhanced/.git/refs/remotes/origin/HEAD
+   creating: m3_enhanced/.git/logs/
+   creating: m3_enhanced/.git/logs/refs/
+   creating: m3_enhanced/.git/logs/refs/remotes/
+   creating: m3_enhanced/.git/logs/refs/remotes/origin/
+  inflating: m3_enhanced/.git/logs/refs/remotes/origin/HEAD
+  inflating: m3_enhanced/.git/logs/refs/remotes/origin/working
+   creating: m3_enhanced/.git/logs/refs/heads/
+  inflating: m3_enhanced/.git/logs/refs/heads/working
+  inflating: m3_enhanced/.git/logs/HEAD
+  inflating: m3_enhanced/.git/FETCH_HEAD
+ extracting: m3_enhanced/.git/ORIG_HEAD
+ extracting: m3_enhanced/.git/COMMIT_EDITMSG
+ extracting: m3_enhanced/.git/HEAD
+  inflating: m3_enhanced/.git/packed-refs
+  inflating: m3_enhanced/.git/config
+  inflating: m3_enhanced/.git/index
+  inflating: m3_enhanced/.env.example
+  inflating: m3_enhanced/.gitattributes
+  inflating: m3_enhanced/LICENSE
+   creating: m3_enhanced/backend/
+   creating: m3_enhanced/backend/app/
+   creating: m3_enhanced/backend/app/core/
+  inflating: m3_enhanced/backend/app/core/config.py
+ extracting: m3_enhanced/backend/app/core/init.py
+  inflating: m3_enhanced/backend/app/core/job_scheduler.py
+  inflating: m3_enhanced/backend/app/core/quality_metrics.py
+ extracting: m3_enhanced/backend/app/init.py
+  inflating: m3_enhanced/backend/app/main.py
+   creating: m3_enhanced/backend/app/models/
+ extracting: m3_enhanced/backend/app/models/init.py
+  inflating: m3_enhanced/backend/app/models/model_configs.py
+  inflating: m3_enhanced/backend/app/models/model_manager.py
+   creating: m3_enhanced/backend/app/postprocessing/
+ extracting: m3_enhanced/backend/app/postprocessing/init.py
+  inflating: m3_enhanced/backend/app/postprocessing/output_formatter.py
+  inflating: m3_enhanced/backend/app/postprocessing/sheet_renderer.py
+  inflating: m3_enhanced/backend/app/postprocessing/tablature_generator.py
+   creating: m3_enhanced/backend/app/preprocessing/
+  inflating: m3_enhanced/backend/app/preprocessing/audio_enhancer.py
+  inflating: m3_enhanced/backend/app/preprocessing/format_converter.py
+ extracting: m3_enhanced/backend/app/preprocessing/init.py
+  inflating: m3_enhanced/backend/app/preprocessing/noise_reducer.py
+   creating: m3_enhanced/backend/app/processors/
+ extracting: m3_enhanced/backend/app/processors/init.py
+  inflating: m3_enhanced/backend/app/processors/instrument_classifier.py
+  inflating: m3_enhanced/backend/app/processors/lead_rhythm_analyzer.py
+  inflating: m3_enhanced/backend/app/processors/multipass_separator.py
+  inflating: m3_enhanced/backend/app/processors/transcription_engine.py
+   creating: m3_enhanced/backend/app/utils/
+  inflating: m3_enhanced/backend/app/utils/audio_utils.py
+  inflating: m3_enhanced/backend/app/utils/file_manager.py
+ extracting: m3_enhanced/backend/app/utils/init.py
+  inflating: m3_enhanced/backend/app/utils/midi_utils.py
+   creating: m3_enhanced/backend/docker/
+  inflating: m3_enhanced/backend/docker/Dockerfile
+  inflating: m3_enhanced/backend/docker/docker-compose.yml
+  inflating: m3_enhanced/backend/docker/gpu.Dockerfile
+   creating: m3_enhanced/backend/scripts/
+  inflating: m3_enhanced/backend/scripts/benchmark_models.py
+  inflating: m3_enhanced/backend/scripts/colab_setup.py
+  inflating: m3_enhanced/backend/scripts/download_models.py
+  inflating: m3_enhanced/backend/requirements.txt
+  inflating: m3_enhanced/colab_setup.py
+   creating: m3_enhanced/config/
+  inflating: m3_enhanced/config/celery.conf
+  inflating: m3_enhanced/config/nginx.conf
+  inflating: m3_enhanced/config/redis.conf
+  inflating: m3_enhanced/docker-compose.yml
+   creating: m3_enhanced/docs/
+  inflating: m3_enhanced/docs/API.md
+  inflating: m3_enhanced/docs/PIPELINE.md
+  inflating: m3_enhanced/docs/SETUP.md
+  inflating: m3_enhanced/filesystem_structure.txt
+   creating: m3_enhanced/frontend/
+   creating: m3_enhanced/frontend/static/
+  inflating: m3_enhanced/frontend/static/app.js
+  inflating: m3_enhanced/frontend/static/index.html
+  inflating: m3_enhanced/frontend/static/style.css
+  inflating: m3_enhanced/requirements-dev.txt
+   creating: m3_enhanced/tests/
+ extracting: m3_enhanced/tests/init.py
+  inflating: m3_enhanced/tests/test_full_pipeline.py
+  inflating: m3_enhanced/tests/test_separation.py
+  inflating: m3_enhanced/tests/test_transcription.py
+  inflating: m3_enhanced/README.md
+  inflating: m3_enhanced/note.txt
+  inflating: m3_enhanced/setup.sh
+  inflating: m3_enhanced/fixlog.txt
+  inflating: m3_enhanced/Text File.txt
+
 =======================================================
-         M3 Enhanced - COMPLETELY FIXED Setup Script
-              Robust Production Deployment
+         M3 Enhanced - SONIC ACCURACY PRODUCTION Setup
+              Zero-Compromise Audio Fidelity v6.0
 =======================================================
 
-Requirement already satisfied: pip in /usr/local/lib/python3.12/dist-packages (24.1.2)
-Collecting pip
-  Downloading pip-25.2-py3-none-any.whl.metadata (4.7 kB)
-Requirement already satisfied: setuptools in /usr/local/lib/python3.12/dist-packages (75.2.0)
-Collecting setuptools
-  Downloading setuptools-80.9.0-py3-none-any.whl.metadata (6.6 kB)
-Requirement already satisfied: wheel in /usr/local/lib/python3.12/dist-packages (0.45.1)
-Downloading pip-25.2-py3-none-any.whl (1.8 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 13.4 MB/s eta 0:00:00
-Downloading setuptools-80.9.0-py3-none-any.whl (1.2 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 50.7 MB/s eta 0:00:00
-Installing collected packages: setuptools, pip
-  Attempting uninstall: setuptools
-    Found existing installation: setuptools 75.2.0
-    Uninstalling setuptools-75.2.0:
-      Successfully uninstalled setuptools-75.2.0
-  Attempting uninstall: pip
-    Found existing installation: pip 24.1.2
-    Uninstalling pip-24.1.2:
-      Successfully uninstalled pip-24.1.2
-ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-ipython 7.34.0 requires jedi>=0.16, which is not installed.
-Successfully installed pip-25.2 setuptools-80.9.0
-Collecting numpy<2.0.0,>=1.22.0
-  Downloading numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)
-Downloading numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (18.0 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 18.0/18.0 MB 92.1 MB/s  0:00:00
-Installing collected packages: numpy
-  Attempting uninstall: numpy
-    Found existing installation: numpy 2.0.2
-    Uninstalling numpy-2.0.2:
-      Successfully uninstalled numpy-2.0.2
-ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-thinc 8.3.6 requires numpy<3.0.0,>=2.0.0, but you have numpy 1.26.4 which is incompatible.
-opencv-python-headless 4.12.0.88 requires numpy<2.3.0,>=2; python_version >= "3.9", but you have numpy 1.26.4 which is incompatible.
-opencv-contrib-python 4.12.0.88 requires numpy<2.3.0,>=2; python_version >= "3.9", but you have numpy 1.26.4 which is incompatible.
-opencv-python 4.12.0.88 requires numpy<2.3.0,>=2; python_version >= "3.9", but you have numpy 1.26.4 which is incompatible.
-Successfully installed numpy-1.26.4
-Looking in indexes: https://download.pytorch.org/whl/cpu
-Requirement already satisfied: torch in /usr/local/lib/python3.12/dist-packages (2.8.0+cu126)
-Requirement already satisfied: torchvision in /usr/local/lib/python3.12/dist-packages (0.23.0+cu126)
-Requirement already satisfied: torchaudio in /usr/local/lib/python3.12/dist-packages (2.8.0+cu126)
-Requirement already satisfied: filelock in /usr/local/lib/python3.12/dist-packages (from torch) (3.19.1)
-Requirement already satisfied: typing-extensions>=4.10.0 in /usr/local/lib/python3.12/dist-packages (from torch) (4.15.0)
-Requirement already satisfied: setuptools in /usr/local/lib/python3.12/dist-packages (from torch) (80.9.0)
-Requirement already satisfied: sympy>=1.13.3 in /usr/local/lib/python3.12/dist-packages (from torch) (1.13.3)
-Requirement already satisfied: networkx in /usr/local/lib/python3.12/dist-packages (from torch) (3.5)
-Requirement already satisfied: jinja2 in /usr/local/lib/python3.12/dist-packages (from torch) (3.1.6)
-Requirement already satisfied: fsspec in /usr/local/lib/python3.12/dist-packages (from torch) (2025.3.0)
-Requirement already satisfied: nvidia-cuda-nvrtc-cu12==12.6.77 in /usr/local/lib/python3.12/dist-packages (from torch) (12.6.77)
-Requirement already satisfied: nvidia-cuda-runtime-cu12==12.6.77 in /usr/local/lib/python3.12/dist-packages (from torch) (12.6.77)
-Requirement already satisfied: nvidia-cuda-cupti-cu12==12.6.80 in /usr/local/lib/python3.12/dist-packages (from torch) (12.6.80)
-Requirement already satisfied: nvidia-cudnn-cu12==9.10.2.21 in /usr/local/lib/python3.12/dist-packages (from torch) (9.10.2.21)
-Requirement already satisfied: nvidia-cublas-cu12==12.6.4.1 in /usr/local/lib/python3.12/dist-packages (from torch) (12.6.4.1)
-Requirement already satisfied: nvidia-cufft-cu12==11.3.0.4 in /usr/local/lib/python3.12/dist-packages (from torch) (11.3.0.4)
-Requirement already satisfied: nvidia-curand-cu12==10.3.7.77 in /usr/local/lib/python3.12/dist-packages (from torch) (10.3.7.77)
-Requirement already satisfied: nvidia-cusolver-cu12==11.7.1.2 in /usr/local/lib/python3.12/dist-packages (from torch) (11.7.1.2)
-Requirement already satisfied: nvidia-cusparse-cu12==12.5.4.2 in /usr/local/lib/python3.12/dist-packages (from torch) (12.5.4.2)
-Requirement already satisfied: nvidia-cusparselt-cu12==0.7.1 in /usr/local/lib/python3.12/dist-packages (from torch) (0.7.1)
-Requirement already satisfied: nvidia-nccl-cu12==2.27.3 in /usr/local/lib/python3.12/dist-packages (from torch) (2.27.3)
-Requirement already satisfied: nvidia-nvtx-cu12==12.6.77 in /usr/local/lib/python3.12/dist-packages (from torch) (12.6.77)
-Requirement already satisfied: nvidia-nvjitlink-cu12==12.6.85 in /usr/local/lib/python3.12/dist-packages (from torch) (12.6.85)
-Requirement already satisfied: nvidia-cufile-cu12==1.11.1.6 in /usr/local/lib/python3.12/dist-packages (from torch) (1.11.1.6)
-Requirement already satisfied: triton==3.4.0 in /usr/local/lib/python3.12/dist-packages (from torch) (3.4.0)
-Requirement already satisfied: numpy in /usr/local/lib/python3.12/dist-packages (from torchvision) (1.26.4)
-Requirement already satisfied: pillow!=8.3.*,>=5.3.0 in /usr/local/lib/python3.12/dist-packages (from torchvision) (11.3.0)
-Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from sympy>=1.13.3->torch) (1.3.0)
-Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.12/dist-packages (from jinja2->torch) (3.0.3)
-Requirement already satisfied: tensorflow in /usr/local/lib/python3.12/dist-packages (2.19.0)
-Requirement already satisfied: absl-py>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (1.4.0)
-Requirement already satisfied: astunparse>=1.6.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (1.6.3)
-Requirement already satisfied: flatbuffers>=24.3.25 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (25.9.23)
-Requirement already satisfied: gast!=0.5.0,!=0.5.1,!=0.5.2,>=0.2.1 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (0.6.0)
-Requirement already satisfied: google-pasta>=0.1.1 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (0.2.0)
-Requirement already satisfied: libclang>=13.0.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (18.1.1)
-Requirement already satisfied: opt-einsum>=2.3.2 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (3.4.0)
-Requirement already satisfied: packaging in /usr/local/lib/python3.12/dist-packages (from tensorflow) (25.0)
-Requirement already satisfied: protobuf!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<6.0.0dev,>=3.20.3 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (5.29.5)
-Requirement already satisfied: requests<3,>=2.21.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (2.32.4)
-Requirement already satisfied: setuptools in /usr/local/lib/python3.12/dist-packages (from tensorflow) (80.9.0)
-Requirement already satisfied: six>=1.12.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (1.17.0)
-Requirement already satisfied: termcolor>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (3.1.0)
-Requirement already satisfied: typing-extensions>=3.6.6 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (4.15.0)
-Requirement already satisfied: wrapt>=1.11.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (1.17.3)
-Requirement already satisfied: grpcio<2.0,>=1.24.3 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (1.75.1)
-Requirement already satisfied: tensorboard~=2.19.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (2.19.0)
-Requirement already satisfied: keras>=3.5.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (3.10.0)
-Requirement already satisfied: numpy<2.2.0,>=1.26.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (1.26.4)
-Requirement already satisfied: h5py>=3.11.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (3.14.0)
-Requirement already satisfied: ml-dtypes<1.0.0,>=0.5.1 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (0.5.3)
-Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2.21.0->tensorflow) (3.4.3)
-Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2.21.0->tensorflow) (3.10)
-Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2.21.0->tensorflow) (2.5.0)
-Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2.21.0->tensorflow) (2025.8.3)
-Requirement already satisfied: markdown>=2.6.8 in /usr/local/lib/python3.12/dist-packages (from tensorboard~=2.19.0->tensorflow) (3.9)
-Requirement already satisfied: tensorboard-data-server<0.8.0,>=0.7.0 in /usr/local/lib/python3.12/dist-packages (from tensorboard~=2.19.0->tensorflow) (0.7.2)
-Requirement already satisfied: werkzeug>=1.0.1 in /usr/local/lib/python3.12/dist-packages (from tensorboard~=2.19.0->tensorflow) (3.1.3)
-Requirement already satisfied: wheel<1.0,>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from astunparse>=1.6.0->tensorflow) (0.45.1)
-Requirement already satisfied: rich in /usr/local/lib/python3.12/dist-packages (from keras>=3.5.0->tensorflow) (13.9.4)
-Requirement already satisfied: namex in /usr/local/lib/python3.12/dist-packages (from keras>=3.5.0->tensorflow) (0.1.0)
-Requirement already satisfied: optree in /usr/local/lib/python3.12/dist-packages (from keras>=3.5.0->tensorflow) (0.17.0)
-Requirement already satisfied: MarkupSafe>=2.1.1 in /usr/local/lib/python3.12/dist-packages (from werkzeug>=1.0.1->tensorboard~=2.19.0->tensorflow) (3.0.3)
-Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.12/dist-packages (from rich->keras>=3.5.0->tensorflow) (4.0.0)
-Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.12/dist-packages (from rich->keras>=3.5.0->tensorflow) (2.19.2)
-Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.12/dist-packages (from markdown-it-py>=2.2.0->rich->keras>=3.5.0->tensorflow) (0.1.2)
-Requirement already satisfied: scikit-learn>=1.3.0 in /usr/local/lib/python3.12/dist-packages (1.6.1)
-Requirement already satisfied: numpy>=1.19.5 in /usr/local/lib/python3.12/dist-packages (from scikit-learn>=1.3.0) (1.26.4)
-Requirement already satisfied: scipy>=1.6.0 in /usr/local/lib/python3.12/dist-packages (from scikit-learn>=1.3.0) (1.16.2)
-Requirement already satisfied: joblib>=1.2.0 in /usr/local/lib/python3.12/dist-packages (from scikit-learn>=1.3.0) (1.5.2)
-Requirement already satisfied: threadpoolctl>=3.1.0 in /usr/local/lib/python3.12/dist-packages (from scikit-learn>=1.3.0) (3.6.0)
-Requirement already satisfied: scipy>=1.10.0 in /usr/local/lib/python3.12/dist-packages (1.16.2)
-Requirement already satisfied: numpy<2.6,>=1.25.2 in /usr/local/lib/python3.12/dist-packages (from scipy>=1.10.0) (1.26.4)
-Requirement already satisfied: transformers>=4.30.0 in /usr/local/lib/python3.12/dist-packages (4.56.2)
-Requirement already satisfied: filelock in /usr/local/lib/python3.12/dist-packages (from transformers>=4.30.0) (3.19.1)
-Requirement already satisfied: huggingface-hub<1.0,>=0.34.0 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.30.0) (0.35.3)
-Requirement already satisfied: numpy>=1.17 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.30.0) (1.26.4)
-Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.30.0) (25.0)
-Requirement already satisfied: pyyaml>=5.1 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.30.0) (6.0.3)
-Requirement already satisfied: regex!=2019.12.17 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.30.0) (2024.11.6)
-Requirement already satisfied: requests in /usr/local/lib/python3.12/dist-packages (from transformers>=4.30.0) (2.32.4)
-Requirement already satisfied: tokenizers<=0.23.0,>=0.22.0 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.30.0) (0.22.1)
-Requirement already satisfied: safetensors>=0.4.3 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.30.0) (0.6.2)
-Requirement already satisfied: tqdm>=4.27 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.30.0) (4.67.1)
-Requirement already satisfied: fsspec>=2023.5.0 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<1.0,>=0.34.0->transformers>=4.30.0) (2025.3.0)
-Requirement already satisfied: typing-extensions>=3.7.4.3 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<1.0,>=0.34.0->transformers>=4.30.0) (4.15.0)
-Requirement already satisfied: hf-xet<2.0.0,>=1.1.3 in /usr/local/lib/python3.12/dist-packages (from huggingface-hub<1.0,>=0.34.0->transformers>=4.30.0) (1.1.10)
-Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests->transformers>=4.30.0) (3.4.3)
-Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests->transformers>=4.30.0) (3.10)
-Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests->transformers>=4.30.0) (2.5.0)
-Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests->transformers>=4.30.0) (2025.8.3)
-Requirement already satisfied: accelerate>=0.20.0 in /usr/local/lib/python3.12/dist-packages (1.10.1)
-Requirement already satisfied: numpy<3.0.0,>=1.17 in /usr/local/lib/python3.12/dist-packages (from accelerate>=0.20.0) (1.26.4)
-Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.12/dist-packages (from accelerate>=0.20.0) (25.0)
-Requirement already satisfied: psutil in /usr/local/lib/python3.12/dist-packages (from accelerate>=0.20.0) (5.9.5)
-Requirement already satisfied: pyyaml in /usr/local/lib/python3.12/dist-packages (from accelerate>=0.20.0) (6.0.3)
-Requirement already satisfied: torch>=2.0.0 in /usr/local/lib/python3.12/dist-packages (from accelerate>=0.20.0) (2.8.0+cu126)
-Requirement already satisfied: huggingface_hub>=0.21.0 in /usr/local/lib/python3.12/dist-packages (from accelerate>=0.20.0) (0.35.3)
-Requirement already satisfied: safetensors>=0.4.3 in /usr/local/lib/python3.12/dist-packages (from accelerate>=0.20.0) (0.6.2)
-Requirement already satisfied: filelock in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.21.0->accelerate>=0.20.0) (3.19.1)
-Requirement already satisfied: fsspec>=2023.5.0 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.21.0->accelerate>=0.20.0) (2025.3.0)
-Requirement already satisfied: requests in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.21.0->accelerate>=0.20.0) (2.32.4)
-Requirement already satisfied: tqdm>=4.42.1 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.21.0->accelerate>=0.20.0) (4.67.1)
-Requirement already satisfied: typing-extensions>=3.7.4.3 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.21.0->accelerate>=0.20.0) (4.15.0)
-Requirement already satisfied: hf-xet<2.0.0,>=1.1.3 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.21.0->accelerate>=0.20.0) (1.1.10)
-Requirement already satisfied: setuptools in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (80.9.0)
-Requirement already satisfied: sympy>=1.13.3 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (1.13.3)
-Requirement already satisfied: networkx in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (3.5)
-Requirement already satisfied: jinja2 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (3.1.6)
-Requirement already satisfied: nvidia-cuda-nvrtc-cu12==12.6.77 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (12.6.77)
-Requirement already satisfied: nvidia-cuda-runtime-cu12==12.6.77 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (12.6.77)
-Requirement already satisfied: nvidia-cuda-cupti-cu12==12.6.80 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (12.6.80)
-Requirement already satisfied: nvidia-cudnn-cu12==9.10.2.21 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (9.10.2.21)
-Requirement already satisfied: nvidia-cublas-cu12==12.6.4.1 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (12.6.4.1)
-Requirement already satisfied: nvidia-cufft-cu12==11.3.0.4 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (11.3.0.4)
-Requirement already satisfied: nvidia-curand-cu12==10.3.7.77 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (10.3.7.77)
-Requirement already satisfied: nvidia-cusolver-cu12==11.7.1.2 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (11.7.1.2)
-Requirement already satisfied: nvidia-cusparse-cu12==12.5.4.2 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (12.5.4.2)
-Requirement already satisfied: nvidia-cusparselt-cu12==0.7.1 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (0.7.1)
-Requirement already satisfied: nvidia-nccl-cu12==2.27.3 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (2.27.3)
-Requirement already satisfied: nvidia-nvtx-cu12==12.6.77 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (12.6.77)
-Requirement already satisfied: nvidia-nvjitlink-cu12==12.6.85 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (12.6.85)
-Requirement already satisfied: nvidia-cufile-cu12==1.11.1.6 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (1.11.1.6)
-Requirement already satisfied: triton==3.4.0 in /usr/local/lib/python3.12/dist-packages (from torch>=2.0.0->accelerate>=0.20.0) (3.4.0)
-Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from sympy>=1.13.3->torch>=2.0.0->accelerate>=0.20.0) (1.3.0)
-Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.12/dist-packages (from jinja2->torch>=2.0.0->accelerate>=0.20.0) (3.0.3)
-Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests->huggingface_hub>=0.21.0->accelerate>=0.20.0) (3.4.3)
-Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests->huggingface_hub>=0.21.0->accelerate>=0.20.0) (3.10)
-Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests->huggingface_hub>=0.21.0->accelerate>=0.20.0) (2.5.0)
-Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests->huggingface_hub>=0.21.0->accelerate>=0.20.0) (2025.8.3)
-Requirement already satisfied: soundfile>=0.12.1 in /usr/local/lib/python3.12/dist-packages (0.13.1)
-Requirement already satisfied: cffi>=1.0 in /usr/local/lib/python3.12/dist-packages (from soundfile>=0.12.1) (2.0.0)
-Requirement already satisfied: numpy in /usr/local/lib/python3.12/dist-packages (from soundfile>=0.12.1) (1.26.4)
-Requirement already satisfied: pycparser in /usr/local/lib/python3.12/dist-packages (from cffi>=1.0->soundfile>=0.12.1) (2.23)
-Requirement already satisfied: audioread>=3.0.0 in /usr/local/lib/python3.12/dist-packages (3.0.1)
-Requirement already satisfied: librosa>=0.10.0 in /usr/local/lib/python3.12/dist-packages (0.11.0)
-Requirement already satisfied: audioread>=2.1.9 in /usr/local/lib/python3.12/dist-packages (from librosa>=0.10.0) (3.0.1)
-Requirement already satisfied: numba>=0.51.0 in /usr/local/lib/python3.12/dist-packages (from librosa>=0.10.0) (0.60.0)
-Requirement already satisfied: numpy>=1.22.3 in /usr/local/lib/python3.12/dist-packages (from librosa>=0.10.0) (1.26.4)
-Requirement already satisfied: scipy>=1.6.0 in /usr/local/lib/python3.12/dist-packages (from librosa>=0.10.0) (1.16.2)
-Requirement already satisfied: scikit-learn>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from librosa>=0.10.0) (1.6.1)
-Requirement already satisfied: joblib>=1.0 in /usr/local/lib/python3.12/dist-packages (from librosa>=0.10.0) (1.5.2)
-Requirement already satisfied: decorator>=4.3.0 in /usr/local/lib/python3.12/dist-packages (from librosa>=0.10.0) (4.4.2)
-Requirement already satisfied: soundfile>=0.12.1 in /usr/local/lib/python3.12/dist-packages (from librosa>=0.10.0) (0.13.1)
-Requirement already satisfied: pooch>=1.1 in /usr/local/lib/python3.12/dist-packages (from librosa>=0.10.0) (1.8.2)
-Requirement already satisfied: soxr>=0.3.2 in /usr/local/lib/python3.12/dist-packages (from librosa>=0.10.0) (1.0.0)
-Requirement already satisfied: typing_extensions>=4.1.1 in /usr/local/lib/python3.12/dist-packages (from librosa>=0.10.0) (4.15.0)
-Requirement already satisfied: lazy_loader>=0.1 in /usr/local/lib/python3.12/dist-packages (from librosa>=0.10.0) (0.4)
-Requirement already satisfied: msgpack>=1.0 in /usr/local/lib/python3.12/dist-packages (from librosa>=0.10.0) (1.1.1)
-Requirement already satisfied: packaging in /usr/local/lib/python3.12/dist-packages (from lazy_loader>=0.1->librosa>=0.10.0) (25.0)
-Requirement already satisfied: llvmlite<0.44,>=0.43.0dev0 in /usr/local/lib/python3.12/dist-packages (from numba>=0.51.0->librosa>=0.10.0) (0.43.0)
-Requirement already satisfied: platformdirs>=2.5.0 in /usr/local/lib/python3.12/dist-packages (from pooch>=1.1->librosa>=0.10.0) (4.4.0)
-Requirement already satisfied: requests>=2.19.0 in /usr/local/lib/python3.12/dist-packages (from pooch>=1.1->librosa>=0.10.0) (2.32.4)
-Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests>=2.19.0->pooch>=1.1->librosa>=0.10.0) (3.4.3)
-Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests>=2.19.0->pooch>=1.1->librosa>=0.10.0) (3.10)
-Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests>=2.19.0->pooch>=1.1->librosa>=0.10.0) (2.5.0)
-Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests>=2.19.0->pooch>=1.1->librosa>=0.10.0) (2025.8.3)
-Requirement already satisfied: threadpoolctl>=3.1.0 in /usr/local/lib/python3.12/dist-packages (from scikit-learn>=1.1.0->librosa>=0.10.0) (3.6.0)
-Requirement already satisfied: cffi>=1.0 in /usr/local/lib/python3.12/dist-packages (from soundfile>=0.12.1->librosa>=0.10.0) (2.0.0)
-Requirement already satisfied: pycparser in /usr/local/lib/python3.12/dist-packages (from cffi>=1.0->soundfile>=0.12.1->librosa>=0.10.0) (2.23)
-Requirement already satisfied: pydub>=0.25.1 in /usr/local/lib/python3.12/dist-packages (0.25.1)
-Collecting resampy>=0.4.0
-  Downloading resampy-0.4.3-py3-none-any.whl.metadata (3.0 kB)
-Requirement already satisfied: numpy>=1.17 in /usr/local/lib/python3.12/dist-packages (from resampy>=0.4.0) (1.26.4)
-Requirement already satisfied: numba>=0.53 in /usr/local/lib/python3.12/dist-packages (from resampy>=0.4.0) (0.60.0)
-Requirement already satisfied: llvmlite<0.44,>=0.43.0dev0 in /usr/local/lib/python3.12/dist-packages (from numba>=0.53->resampy>=0.4.0) (0.43.0)
-Downloading resampy-0.4.3-py3-none-any.whl (3.1 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.1/3.1 MB 31.7 MB/s  0:00:00
-Installing collected packages: resampy
-Successfully installed resampy-0.4.3
-Collecting demucs
-  Downloading demucs-4.0.1.tar.gz (1.2 MB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 17.6 MB/s  0:00:00
-  Preparing metadata (setup.py): started
-  Preparing metadata (setup.py): finished with status 'done'
-Collecting dora-search (from demucs)
-  Downloading dora_search-0.1.12.tar.gz (87 kB)
-  Installing build dependencies: started
-  Installing build dependencies: finished with status 'done'
-  Getting requirements to build wheel: started
-  Getting requirements to build wheel: finished with status 'done'
-  Preparing metadata (pyproject.toml): started
-  Preparing metadata (pyproject.toml): finished with status 'done'
-Requirement already satisfied: einops in /usr/local/lib/python3.12/dist-packages (from demucs) (0.8.1)
-Collecting julius>=0.2.3 (from demucs)
-  Downloading julius-0.2.7.tar.gz (59 kB)
-  Preparing metadata (setup.py): started
-  Preparing metadata (setup.py): finished with status 'done'
-Collecting lameenc>=1.2 (from demucs)
-  Downloading lameenc-1.8.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl.metadata (9.9 kB)
-Collecting openunmix (from demucs)
-  Downloading openunmix-1.3.0-py3-none-any.whl.metadata (17 kB)
-Requirement already satisfied: pyyaml in /usr/local/lib/python3.12/dist-packages (from demucs) (6.0.3)
-Requirement already satisfied: torch>=1.8.1 in /usr/local/lib/python3.12/dist-packages (from demucs) (2.8.0+cu126)
-Requirement already satisfied: torchaudio>=0.8 in /usr/local/lib/python3.12/dist-packages (from demucs) (2.8.0+cu126)
-Requirement already satisfied: tqdm in /usr/local/lib/python3.12/dist-packages (from demucs) (4.67.1)
-Requirement already satisfied: filelock in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (3.19.1)
-Requirement already satisfied: typing-extensions>=4.10.0 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (4.15.0)
-Requirement already satisfied: setuptools in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (80.9.0)
-Requirement already satisfied: sympy>=1.13.3 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (1.13.3)
-Requirement already satisfied: networkx in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (3.5)
-Requirement already satisfied: jinja2 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (3.1.6)
-Requirement already satisfied: fsspec in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (2025.3.0)
-Requirement already satisfied: nvidia-cuda-nvrtc-cu12==12.6.77 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (12.6.77)
-Requirement already satisfied: nvidia-cuda-runtime-cu12==12.6.77 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (12.6.77)
-Requirement already satisfied: nvidia-cuda-cupti-cu12==12.6.80 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (12.6.80)
-Requirement already satisfied: nvidia-cudnn-cu12==9.10.2.21 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (9.10.2.21)
-Requirement already satisfied: nvidia-cublas-cu12==12.6.4.1 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (12.6.4.1)
-Requirement already satisfied: nvidia-cufft-cu12==11.3.0.4 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (11.3.0.4)
-Requirement already satisfied: nvidia-curand-cu12==10.3.7.77 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (10.3.7.77)
-Requirement already satisfied: nvidia-cusolver-cu12==11.7.1.2 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (11.7.1.2)
-Requirement already satisfied: nvidia-cusparse-cu12==12.5.4.2 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (12.5.4.2)
-Requirement already satisfied: nvidia-cusparselt-cu12==0.7.1 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (0.7.1)
-Requirement already satisfied: nvidia-nccl-cu12==2.27.3 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (2.27.3)
-Requirement already satisfied: nvidia-nvtx-cu12==12.6.77 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (12.6.77)
-Requirement already satisfied: nvidia-nvjitlink-cu12==12.6.85 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (12.6.85)
-Requirement already satisfied: nvidia-cufile-cu12==1.11.1.6 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (1.11.1.6)
-Requirement already satisfied: triton==3.4.0 in /usr/local/lib/python3.12/dist-packages (from torch>=1.8.1->demucs) (3.4.0)
-Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from sympy>=1.13.3->torch>=1.8.1->demucs) (1.3.0)
-Requirement already satisfied: omegaconf in /usr/local/lib/python3.12/dist-packages (from dora-search->demucs) (2.3.0)
-Collecting retrying (from dora-search->demucs)
-  Downloading retrying-1.4.2-py3-none-any.whl.metadata (5.5 kB)
-Collecting submitit (from dora-search->demucs)
-  Downloading submitit-1.5.3-py3-none-any.whl.metadata (7.9 kB)
-Collecting treetable (from dora-search->demucs)
-  Downloading treetable-0.2.6-py3-none-any.whl.metadata (5.3 kB)
-Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.12/dist-packages (from jinja2->torch>=1.8.1->demucs) (3.0.3)
-Requirement already satisfied: antlr4-python3-runtime==4.9.* in /usr/local/lib/python3.12/dist-packages (from omegaconf->dora-search->demucs) (4.9.3)
-Requirement already satisfied: numpy in /usr/local/lib/python3.12/dist-packages (from openunmix->demucs) (1.26.4)
-Requirement already satisfied: cloudpickle>=1.2.1 in /usr/local/lib/python3.12/dist-packages (from submitit->dora-search->demucs) (3.1.1)
-Downloading lameenc-1.8.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl (249 kB)
-Downloading openunmix-1.3.0-py3-none-any.whl (40 kB)
-Downloading retrying-1.4.2-py3-none-any.whl (10 kB)
-Downloading submitit-1.5.3-py3-none-any.whl (75 kB)
-Downloading treetable-0.2.6-py3-none-any.whl (7.4 kB)
-Building wheels for collected packages: demucs, julius, dora-search
-  DEPRECATION: Building 'demucs' using the legacy setup.py bdist_wheel mechanism, which will be removed in a future version. pip 25.3 will enforce this behaviour change. A possible replacement is to use the standardized build interface by setting the `--use-pep517` option, (possibly combined with `--no-build-isolation`), or adding a `pyproject.toml` file to the source tree of 'demucs'. Discussion can be found at https://github.com/pypa/pip/issues/6334
-  Building wheel for demucs (setup.py): started
-  Building wheel for demucs (setup.py): finished with status 'done'
-  Created wheel for demucs: filename=demucs-4.0.1-py3-none-any.whl size=78480 sha256=dd49efd3bcb1d1e51ea4bcf66495b863c1966dd6a6053e207a74467992217d8b
-  Stored in directory: /root/.cache/pip/wheels/1b/0c/20/a3b3daa1f9b65c8b0445729f94740ec335d0f86f1066c5c414
-  DEPRECATION: Building 'julius' using the legacy setup.py bdist_wheel mechanism, which will be removed in a future version. pip 25.3 will enforce this behaviour change. A possible replacement is to use the standardized build interface by setting the `--use-pep517` option, (possibly combined with `--no-build-isolation`), or adding a `pyproject.toml` file to the source tree of 'julius'. Discussion can be found at https://github.com/pypa/pip/issues/6334
-  Building wheel for julius (setup.py): started
-  Building wheel for julius (setup.py): finished with status 'done'
-  Created wheel for julius: filename=julius-0.2.7-py3-none-any.whl size=21966 sha256=52b04f0acac356c9cfec53e23d948962ada911bd1349ac3022fb745e1779ba40
-  Stored in directory: /root/.cache/pip/wheels/de/c1/ca/544dafe48401e8e2e17064dfe465a390fca9e8720ffa12e744
-  Building wheel for dora-search (pyproject.toml): started
-  Building wheel for dora-search (pyproject.toml): finished with status 'done'
-  Created wheel for dora-search: filename=dora_search-0.1.12-py3-none-any.whl size=75195 sha256=d4c10e3c075f28e9dad9b0bcf8ad9100a602e4cfbe296be1b03bf0c526469ab6
-  Stored in directory: /root/.cache/pip/wheels/55/40/4c/3478187386b56625ab5aa8a9070ff1eea704ddb27d15abe73f
-Successfully built demucs julius dora-search
-Installing collected packages: lameenc, treetable, submitit, retrying, julius, dora-search, openunmix, demucs
-
-Successfully installed demucs-4.0.1 dora-search-0.1.12 julius-0.2.7 lameenc-1.8.1 openunmix-1.3.0 retrying-1.4.2 submitit-1.5.3 treetable-0.2.6
-Collecting pretty-midi>=0.2.9
-  Downloading pretty_midi-0.2.11.tar.gz (5.6 MB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.6/5.6 MB 40.6 MB/s  0:00:00
-  Preparing metadata (setup.py): started
-  Preparing metadata (setup.py): finished with status 'done'
-Requirement already satisfied: numpy>=1.7.0 in /usr/local/lib/python3.12/dist-packages (from pretty-midi>=0.2.9) (1.26.4)
-Collecting mido>=1.1.16 (from pretty-midi>=0.2.9)
-  Downloading mido-1.3.3-py3-none-any.whl.metadata (6.4 kB)
-Requirement already satisfied: six in /usr/local/lib/python3.12/dist-packages (from pretty-midi>=0.2.9) (1.17.0)
-Requirement already satisfied: importlib_resources in /usr/local/lib/python3.12/dist-packages (from pretty-midi>=0.2.9) (6.5.2)
-Requirement already satisfied: packaging in /usr/local/lib/python3.12/dist-packages (from mido>=1.1.16->pretty-midi>=0.2.9) (25.0)
-Downloading mido-1.3.3-py3-none-any.whl (54 kB)
-Building wheels for collected packages: pretty-midi
-  DEPRECATION: Building 'pretty-midi' using the legacy setup.py bdist_wheel mechanism, which will be removed in a future version. pip 25.3 will enforce this behaviour change. A possible replacement is to use the standardized build interface by setting the `--use-pep517` option, (possibly combined with `--no-build-isolation`), or adding a `pyproject.toml` file to the source tree of 'pretty-midi'. Discussion can be found at https://github.com/pypa/pip/issues/6334
-  Building wheel for pretty-midi (setup.py): started
-  Building wheel for pretty-midi (setup.py): finished with status 'done'
-  Created wheel for pretty-midi: filename=pretty_midi-0.2.11-py3-none-any.whl size=5595978 sha256=c1374adb32688a8b8d1afc18dd8448a7ae4b66279fd0026aa94900761f165397
-  Stored in directory: /root/.cache/pip/wheels/f4/ad/93/a7042fe12668827574927ade9deec7f29aad2a1001b1501882
-Successfully built pretty-midi
-Installing collected packages: mido, pretty-midi
-
-Successfully installed mido-1.3.3 pretty-midi-0.2.11
-Requirement already satisfied: music21>=9.1.0 in /usr/local/lib/python3.12/dist-packages (9.3.0)
-Requirement already satisfied: chardet in /usr/local/lib/python3.12/dist-packages (from music21>=9.1.0) (5.2.0)
-Requirement already satisfied: joblib in /usr/local/lib/python3.12/dist-packages (from music21>=9.1.0) (1.5.2)
-Requirement already satisfied: jsonpickle in /usr/local/lib/python3.12/dist-packages (from music21>=9.1.0) (4.1.1)
-Requirement already satisfied: matplotlib in /usr/local/lib/python3.12/dist-packages (from music21>=9.1.0) (3.10.0)
-Requirement already satisfied: more-itertools in /usr/local/lib/python3.12/dist-packages (from music21>=9.1.0) (10.8.0)
-Requirement already satisfied: numpy in /usr/local/lib/python3.12/dist-packages (from music21>=9.1.0) (1.26.4)
-Requirement already satisfied: requests in /usr/local/lib/python3.12/dist-packages (from music21>=9.1.0) (2.32.4)
-Requirement already satisfied: webcolors>=1.5 in /usr/local/lib/python3.12/dist-packages (from music21>=9.1.0) (24.11.1)
-Requirement already satisfied: contourpy>=1.0.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib->music21>=9.1.0) (1.3.3)
-Requirement already satisfied: cycler>=0.10 in /usr/local/lib/python3.12/dist-packages (from matplotlib->music21>=9.1.0) (0.12.1)
-Requirement already satisfied: fonttools>=4.22.0 in /usr/local/lib/python3.12/dist-packages (from matplotlib->music21>=9.1.0) (4.60.1)
-Requirement already satisfied: kiwisolver>=1.3.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib->music21>=9.1.0) (1.4.9)
-Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.12/dist-packages (from matplotlib->music21>=9.1.0) (25.0)
-Requirement already satisfied: pillow>=8 in /usr/local/lib/python3.12/dist-packages (from matplotlib->music21>=9.1.0) (11.3.0)
-Requirement already satisfied: pyparsing>=2.3.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib->music21>=9.1.0) (3.2.5)
-Requirement already satisfied: python-dateutil>=2.7 in /usr/local/lib/python3.12/dist-packages (from matplotlib->music21>=9.1.0) (2.9.0.post0)
-Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.12/dist-packages (from python-dateutil>=2.7->matplotlib->music21>=9.1.0) (1.17.0)
-Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests->music21>=9.1.0) (3.4.3)
-Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests->music21>=9.1.0) (3.10)
-Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests->music21>=9.1.0) (2.5.0)
-Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests->music21>=9.1.0) (2025.8.3)
-Requirement already satisfied: mido>=1.3.0 in /usr/local/lib/python3.12/dist-packages (1.3.3)
-Requirement already satisfied: packaging in /usr/local/lib/python3.12/dist-packages (from mido>=1.3.0) (25.0)
-Collecting basic-pitch
-  Downloading basic_pitch-0.4.0-py2.py3-none-any.whl.metadata (12 kB)
-Requirement already satisfied: librosa>=0.8.0 in /usr/local/lib/python3.12/dist-packages (from basic-pitch) (0.11.0)
-Collecting mir-eval>=0.6 (from basic-pitch)
-  Downloading mir_eval-0.8.2-py3-none-any.whl.metadata (3.0 kB)
-Requirement already satisfied: numpy>=1.18 in /usr/local/lib/python3.12/dist-packages (from basic-pitch) (1.26.4)
-Requirement already satisfied: pretty-midi>=0.2.9 in /usr/local/lib/python3.12/dist-packages (from basic-pitch) (0.2.11)
-Collecting resampy<0.4.3,>=0.2.2 (from basic-pitch)
-  Downloading resampy-0.4.2-py3-none-any.whl.metadata (2.8 kB)
-Requirement already satisfied: scikit-learn in /usr/local/lib/python3.12/dist-packages (from basic-pitch) (1.6.1)
-Requirement already satisfied: scipy>=1.4.1 in /usr/local/lib/python3.12/dist-packages (from basic-pitch) (1.16.2)
-Requirement already satisfied: typing-extensions in /usr/local/lib/python3.12/dist-packages (from basic-pitch) (4.15.0)
-INFO: pip is looking at multiple versions of basic-pitch to determine which version is compatible with other requirements. This could take a while.
-Collecting basic-pitch
-  Downloading basic_pitch-0.3.3-py2.py3-none-any.whl.metadata (12 kB)
-  Downloading basic_pitch-0.3.2-py2.py3-none-any.whl.metadata (12 kB)
-  Downloading basic_pitch-0.3.1-py2.py3-none-any.whl.metadata (12 kB)
-  Downloading basic-pitch-0.3.0.tar.gz (3.5 MB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.5/3.5 MB 10.5 MB/s  0:00:00
-  Installing build dependencies: started
-  Installing build dependencies: finished with status 'done'
-  Getting requirements to build wheel: started
-  Getting requirements to build wheel: finished with status 'done'
-  Preparing metadata (pyproject.toml): started
-  Preparing metadata (pyproject.toml): finished with status 'done'
-  Downloading basic_pitch-0.2.6-py2.py3-none-any.whl.metadata (1.9 kB)
-Collecting numpy<1.24,>=1.18 (from basic-pitch)
-  Downloading numpy-1.23.5.tar.gz (10.7 MB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.7/10.7 MB 126.6 MB/s  0:00:00
-  Installing build dependencies: started
-  Installing build dependencies: finished with status 'done'
-  Getting requirements to build wheel: started
-  error: subprocess-exited-with-error
-
-  × Getting requirements to build wheel did not run successfully.
-  │ exit code: 1
-  ╰─> See above for output.
-
-  note: This error originates from a subprocess, and is likely not a problem with pip.
-  Getting requirements to build wheel: finished with status 'error'
-error: subprocess-exited-with-error
-
-× Getting requirements to build wheel did not run successfully.
-│ exit code: 1
-╰─> See above for output.
-
-note: This error originates from a subprocess, and is likely not a problem with pip.
-Collecting pesq
-  Downloading pesq-0.0.4.tar.gz (38 kB)
-  Preparing metadata (setup.py): started
-  Preparing metadata (setup.py): finished with status 'done'
-Collecting pystoi
-  Downloading pystoi-0.4.1-py2.py3-none-any.whl.metadata (4.0 kB)
-Requirement already satisfied: numpy in /usr/local/lib/python3.12/dist-packages (from pystoi) (1.26.4)
-Requirement already satisfied: scipy in /usr/local/lib/python3.12/dist-packages (from pystoi) (1.16.2)
-Downloading pystoi-0.4.1-py2.py3-none-any.whl (8.2 kB)
-Building wheels for collected packages: pesq
-  DEPRECATION: Building 'pesq' using the legacy setup.py bdist_wheel mechanism, which will be removed in a future version. pip 25.3 will enforce this behaviour change. A possible replacement is to use the standardized build interface by setting the `--use-pep517` option, (possibly combined with `--no-build-isolation`), or adding a `pyproject.toml` file to the source tree of 'pesq'. Discussion can be found at https://github.com/pypa/pip/issues/6334
-  Building wheel for pesq (setup.py): started
-  Building wheel for pesq (setup.py): finished with status 'done'
-  Created wheel for pesq: filename=pesq-0.0.4-cp312-cp312-linux_x86_64.whl size=285455 sha256=5a8369c3b5a4a73aebd2873c0b2385c39b7c61c32e17af6abbc165610a53071e
-  Stored in directory: /root/.cache/pip/wheels/9b/d4/a4/9cf3512534cd47ce4a036d1593ee4013f2bf7509e631a147a3
-Successfully built pesq
-Installing collected packages: pesq, pystoi
-
-Successfully installed pesq-0.0.4 pystoi-0.4.1
-Requirement already satisfied: fastapi>=0.104.0 in /usr/local/lib/python3.12/dist-packages (0.118.0)
-Requirement already satisfied: starlette<0.49.0,>=0.40.0 in /usr/local/lib/python3.12/dist-packages (from fastapi>=0.104.0) (0.48.0)
-Requirement already satisfied: pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4 in /usr/local/lib/python3.12/dist-packages (from fastapi>=0.104.0) (2.11.9)
-Requirement already satisfied: typing-extensions>=4.8.0 in /usr/local/lib/python3.12/dist-packages (from fastapi>=0.104.0) (4.15.0)
-Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4->fastapi>=0.104.0) (0.7.0)
-Requirement already satisfied: pydantic-core==2.33.2 in /usr/local/lib/python3.12/dist-packages (from pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4->fastapi>=0.104.0) (2.33.2)
-Requirement already satisfied: typing-inspection>=0.4.0 in /usr/local/lib/python3.12/dist-packages (from pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4->fastapi>=0.104.0) (0.4.2)
-Requirement already satisfied: anyio<5,>=3.6.2 in /usr/local/lib/python3.12/dist-packages (from starlette<0.49.0,>=0.40.0->fastapi>=0.104.0) (4.11.0)
-Requirement already satisfied: idna>=2.8 in /usr/local/lib/python3.12/dist-packages (from anyio<5,>=3.6.2->starlette<0.49.0,>=0.40.0->fastapi>=0.104.0) (3.10)
-Requirement already satisfied: sniffio>=1.1 in /usr/local/lib/python3.12/dist-packages (from anyio<5,>=3.6.2->starlette<0.49.0,>=0.40.0->fastapi>=0.104.0) (1.3.1)
-Requirement already satisfied: uvicorn>=0.24.0 in /usr/local/lib/python3.12/dist-packages (from uvicorn[standard]>=0.24.0) (0.37.0)
-Requirement already satisfied: click>=7.0 in /usr/local/lib/python3.12/dist-packages (from uvicorn>=0.24.0->uvicorn[standard]>=0.24.0) (8.3.0)
-Requirement already satisfied: h11>=0.8 in /usr/local/lib/python3.12/dist-packages (from uvicorn>=0.24.0->uvicorn[standard]>=0.24.0) (0.16.0)
-Collecting httptools>=0.6.3 (from uvicorn[standard]>=0.24.0)
-  Downloading httptools-0.6.4-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.6 kB)
-Requirement already satisfied: python-dotenv>=0.13 in /usr/local/lib/python3.12/dist-packages (from uvicorn[standard]>=0.24.0) (1.1.1)
-Requirement already satisfied: pyyaml>=5.1 in /usr/local/lib/python3.12/dist-packages (from uvicorn[standard]>=0.24.0) (6.0.3)
-Collecting uvloop>=0.15.1 (from uvicorn[standard]>=0.24.0)
-  Downloading uvloop-0.21.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
-Collecting watchfiles>=0.13 (from uvicorn[standard]>=0.24.0)
-  Downloading watchfiles-1.1.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
-Requirement already satisfied: websockets>=10.4 in /usr/local/lib/python3.12/dist-packages (from uvicorn[standard]>=0.24.0) (15.0.1)
-Requirement already satisfied: anyio>=3.0.0 in /usr/local/lib/python3.12/dist-packages (from watchfiles>=0.13->uvicorn[standard]>=0.24.0) (4.11.0)
-Requirement already satisfied: idna>=2.8 in /usr/local/lib/python3.12/dist-packages (from anyio>=3.0.0->watchfiles>=0.13->uvicorn[standard]>=0.24.0) (3.10)
-Requirement already satisfied: sniffio>=1.1 in /usr/local/lib/python3.12/dist-packages (from anyio>=3.0.0->watchfiles>=0.13->uvicorn[standard]>=0.24.0) (1.3.1)
-Requirement already satisfied: typing_extensions>=4.5 in /usr/local/lib/python3.12/dist-packages (from anyio>=3.0.0->watchfiles>=0.13->uvicorn[standard]>=0.24.0) (4.15.0)
-Downloading httptools-0.6.4-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (510 kB)
-Downloading uvloop-0.21.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (4.7 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.7/4.7 MB 52.3 MB/s  0:00:00
-Downloading watchfiles-1.1.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (452 kB)
-Installing collected packages: uvloop, httptools, watchfiles
-
-Successfully installed httptools-0.6.4 uvloop-0.21.0 watchfiles-1.1.0
-Requirement already satisfied: python-multipart>=0.0.6 in /usr/local/lib/python3.12/dist-packages (0.0.20)
-Requirement already satisfied: jinja2>=3.1.0 in /usr/local/lib/python3.12/dist-packages (3.1.6)
-Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.12/dist-packages (from jinja2>=3.1.0) (3.0.3)
-Requirement already satisfied: aiofiles>=23.1.0 in /usr/local/lib/python3.12/dist-packages (24.1.0)
-Collecting python-magic>=0.4.27
-  Downloading python_magic-0.4.27-py2.py3-none-any.whl.metadata (5.8 kB)
-Downloading python_magic-0.4.27-py2.py3-none-any.whl (13 kB)
-Installing collected packages: python-magic
-Successfully installed python-magic-0.4.27
-Requirement already satisfied: pydantic>=2.4.0 in /usr/local/lib/python3.12/dist-packages (2.11.9)
-Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic>=2.4.0) (0.7.0)
-Requirement already satisfied: pydantic-core==2.33.2 in /usr/local/lib/python3.12/dist-packages (from pydantic>=2.4.0) (2.33.2)
-Requirement already satisfied: typing-extensions>=4.12.2 in /usr/local/lib/python3.12/dist-packages (from pydantic>=2.4.0) (4.15.0)
-Requirement already satisfied: typing-inspection>=0.4.0 in /usr/local/lib/python3.12/dist-packages (from pydantic>=2.4.0) (0.4.2)
-Requirement already satisfied: pydantic-settings>=2.0.0 in /usr/local/lib/python3.12/dist-packages (2.11.0)
-Requirement already satisfied: pydantic>=2.7.0 in /usr/local/lib/python3.12/dist-packages (from pydantic-settings>=2.0.0) (2.11.9)
-Requirement already satisfied: python-dotenv>=0.21.0 in /usr/local/lib/python3.12/dist-packages (from pydantic-settings>=2.0.0) (1.1.1)
-Requirement already satisfied: typing-inspection>=0.4.0 in /usr/local/lib/python3.12/dist-packages (from pydantic-settings>=2.0.0) (0.4.2)
-Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic>=2.7.0->pydantic-settings>=2.0.0) (0.7.0)
-Requirement already satisfied: pydantic-core==2.33.2 in /usr/local/lib/python3.12/dist-packages (from pydantic>=2.7.0->pydantic-settings>=2.0.0) (2.33.2)
-Requirement already satisfied: typing-extensions>=4.12.2 in /usr/local/lib/python3.12/dist-packages (from pydantic>=2.7.0->pydantic-settings>=2.0.0) (4.15.0)
-Collecting celery>=5.3.0 (from celery[redis]>=5.3.0)
-  Downloading celery-5.5.3-py3-none-any.whl.metadata (22 kB)
-Collecting billiard<5.0,>=4.2.1 (from celery>=5.3.0->celery[redis]>=5.3.0)
-  Downloading billiard-4.2.2-py3-none-any.whl.metadata (4.8 kB)
-Collecting kombu<5.6,>=5.5.2 (from celery>=5.3.0->celery[redis]>=5.3.0)
-  Downloading kombu-5.5.4-py3-none-any.whl.metadata (3.5 kB)
-Collecting vine<6.0,>=5.1.0 (from celery>=5.3.0->celery[redis]>=5.3.0)
-  Downloading vine-5.1.0-py3-none-any.whl.metadata (2.7 kB)
-Requirement already satisfied: click<9.0,>=8.1.2 in /usr/local/lib/python3.12/dist-packages (from celery>=5.3.0->celery[redis]>=5.3.0) (8.3.0)
-Collecting click-didyoumean>=0.3.0 (from celery>=5.3.0->celery[redis]>=5.3.0)
-  Downloading click_didyoumean-0.3.1-py3-none-any.whl.metadata (3.9 kB)
-Collecting click-repl>=0.2.0 (from celery>=5.3.0->celery[redis]>=5.3.0)
-  Downloading click_repl-0.3.0-py3-none-any.whl.metadata (3.6 kB)
-Collecting click-plugins>=1.1.1 (from celery>=5.3.0->celery[redis]>=5.3.0)
-  Downloading click_plugins-1.1.1.2-py2.py3-none-any.whl.metadata (6.5 kB)
-Requirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.12/dist-packages (from celery>=5.3.0->celery[redis]>=5.3.0) (2.9.0.post0)
-Collecting amqp<6.0.0,>=5.1.1 (from kombu<5.6,>=5.5.2->celery>=5.3.0->celery[redis]>=5.3.0)
-  Downloading amqp-5.3.1-py3-none-any.whl.metadata (8.9 kB)
-Requirement already satisfied: tzdata>=2025.2 in /usr/local/lib/python3.12/dist-packages (from kombu<5.6,>=5.5.2->celery>=5.3.0->celery[redis]>=5.3.0) (2025.2)
-Requirement already satisfied: packaging in /usr/local/lib/python3.12/dist-packages (from kombu<5.6,>=5.5.2->celery>=5.3.0->celery[redis]>=5.3.0) (25.0)
-Requirement already satisfied: prompt-toolkit>=3.0.36 in /usr/local/lib/python3.12/dist-packages (from click-repl>=0.2.0->celery>=5.3.0->celery[redis]>=5.3.0) (3.0.52)
-Requirement already satisfied: wcwidth in /usr/local/lib/python3.12/dist-packages (from prompt-toolkit>=3.0.36->click-repl>=0.2.0->celery>=5.3.0->celery[redis]>=5.3.0) (0.2.14)
-Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.12/dist-packages (from python-dateutil>=2.8.2->celery>=5.3.0->celery[redis]>=5.3.0) (1.17.0)
-Collecting redis!=4.5.5,!=5.0.2,<=5.2.1,>=4.5.2 (from kombu[redis]; extra == "redis"->celery[redis]>=5.3.0)
-  Downloading redis-5.2.1-py3-none-any.whl.metadata (9.1 kB)
-Downloading celery-5.5.3-py3-none-any.whl (438 kB)
-Downloading billiard-4.2.2-py3-none-any.whl (86 kB)
-Downloading kombu-5.5.4-py3-none-any.whl (210 kB)
-Downloading vine-5.1.0-py3-none-any.whl (9.6 kB)
-Downloading amqp-5.3.1-py3-none-any.whl (50 kB)
-Downloading click_didyoumean-0.3.1-py3-none-any.whl (3.6 kB)
-Downloading click_plugins-1.1.1.2-py2.py3-none-any.whl (11 kB)
-Downloading click_repl-0.3.0-py3-none-any.whl (10 kB)
-Downloading redis-5.2.1-py3-none-any.whl (261 kB)
-Installing collected packages: vine, redis, click-plugins, click-didyoumean, billiard, click-repl, amqp, kombu, celery
-
-Successfully installed amqp-5.3.1 billiard-4.2.2 celery-5.5.3 click-didyoumean-0.3.1 click-plugins-1.1.1.2 click-repl-0.3.0 kombu-5.5.4 redis-5.2.1 vine-5.1.0
-Requirement already satisfied: redis>=5.0.0 in /usr/local/lib/python3.12/dist-packages (5.2.1)
-Requirement already satisfied: requests>=2.31.0 in /usr/local/lib/python3.12/dist-packages (2.32.4)
-Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests>=2.31.0) (3.4.3)
-Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests>=2.31.0) (3.10)
-Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests>=2.31.0) (2.5.0)
-Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests>=2.31.0) (2025.8.3)
-Requirement already satisfied: python-dotenv>=1.0.0 in /usr/local/lib/python3.12/dist-packages (1.1.1)
-Requirement already satisfied: click>=8.1.0 in /usr/local/lib/python3.12/dist-packages (8.3.0)
-Requirement already satisfied: tqdm>=4.65.0 in /usr/local/lib/python3.12/dist-packages (4.67.1)
-Requirement already satisfied: psutil>=5.9.0 in /usr/local/lib/python3.12/dist-packages (5.9.5)
-Requirement already satisfied: matplotlib>=3.7.0 in /usr/local/lib/python3.12/dist-packages (3.10.0)
-Requirement already satisfied: contourpy>=1.0.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0) (1.3.3)
-Requirement already satisfied: cycler>=0.10 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0) (0.12.1)
-Requirement already satisfied: fonttools>=4.22.0 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0) (4.60.1)
-Requirement already satisfied: kiwisolver>=1.3.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0) (1.4.9)
-Requirement already satisfied: numpy>=1.23 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0) (1.26.4)
-Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0) (25.0)
-Requirement already satisfied: pillow>=8 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0) (11.3.0)
-Requirement already satisfied: pyparsing>=2.3.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0) (3.2.5)
-Requirement already satisfied: python-dateutil>=2.7 in /usr/local/lib/python3.12/dist-packages (from matplotlib>=3.7.0) (2.9.0.post0)
-Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.12/dist-packages (from python-dateutil>=2.7->matplotlib>=3.7.0) (1.17.0)
-Requirement already satisfied: pillow>=10.0.0 in /usr/local/lib/python3.12/dist-packages (11.3.0)
-Downloading: "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/955717e8-8726e21a.th" to /root/.cache/torch/hub/checkpoints/955717e8-8726e21a.th
-Demucs model downloaded successfully
-Basic Pitch verification failed: No module named 'basic_pitch'
-Python: 3.12
-NumPy: 1.26.4
-PyTorch: 2.8.0+cu126
-TensorFlow: 2.19.0
-Core imports: PASSED
-Audio processing: PASSED
+[INFO] Starting M3 Enhanced sonic accuracy setup...
+[INFO] Version: 6.0.0
+[INFO] Zero-compromise audio fidelity mode enabled
+[STEP 1] Sonic Accuracy System Verification
+[INFO] Python 3.12 verified for sonic accuracy (compatible range: 3.10-3.12)
+[INFO] System verification completed - ready for sonic accuracy setup
+[STEP 2] Installing Precise System Dependencies for Sonic Accuracy
+Hit:1 https://cli.github.com/packages stable InRelease
+Get:2 https://cloud.r-project.org/bin/linux/ubuntu jammy-cran40/ InRelease [3,632 B]
+Get:3 http://security.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+Hit:4 http://archive.ubuntu.com/ubuntu jammy InRelease
+Get:5 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+Get:6 https://r2u.stat.illinois.edu/ubuntu jammy InRelease [6,555 B]
+Get:7 https://r2u.stat.illinois.edu/ubuntu jammy/main all Packages [9,338 kB]
+Get:8 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+Get:9 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [3,425 kB]
+Get:10 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [3,750 kB]
+Hit:11 https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy InRelease
+Hit:12 https://ppa.launchpadcontent.net/ubuntugis/ppa/ubuntu jammy InRelease
+Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1,584 kB]
+Get:14 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1,276 kB]
+Get:15 https://r2u.stat.illinois.edu/ubuntu jammy/main amd64 Packages [2,808 kB]
+Fetched 22.6 MB in 2s (14.1 MB/s)
+Reading package lists...
+W: Skipping acquire of configured file 'main/source/Sources' as repository 'https://r2u.stat.illinois.edu/ubuntu jammy InRelease' does not seem to provide it (sources.list entry misspelt?)
+[INFO] Installing critical audio package: build-essential
 Reading package lists...
 Building dependency tree...
 Reading state information...
-0 upgraded, 0 newly installed, 0 to remove and 42 not upgraded.
-Files removed: 223 (67.0 MB)
+build-essential is already the newest version (12.9ubuntu3).
+0 upgraded, 0 newly installed, 0 to remove and 6 not upgraded.
+[INFO] Installing critical audio package: ffmpeg
+Reading package lists...
+Building dependency tree...
+Reading state information...
+ffmpeg is already the newest version (7:4.4.2-0ubuntu0.22.04.1).
+0 upgraded, 0 newly installed, 0 to remove and 6 not upgraded.
+[INFO] Installing critical audio package: libsndfile1-dev
+Reading package lists...
+Building dependency tree...
+Reading state information...
+libsndfile1-dev is already the newest version (1.0.31-2ubuntu0.2).
+0 upgraded, 0 newly installed, 0 to remove and 6 not upgraded.
+[INFO] Installing critical audio package: libasound2-dev
+Reading package lists...
+Building dependency tree...
+Reading state information...
+libasound2-dev is already the newest version (1.2.6.1-1ubuntu1).
+0 upgraded, 0 newly installed, 0 to remove and 6 not upgraded.
+[INFO] Installing critical audio package: libportaudio19-dev
+Reading package lists...
+Building dependency tree...
+Reading state information...
+Package libportaudio19-dev is not available, but is referred to by another package.
+This may mean that the package is missing, has been obsoleted, or
+is only available from another source
+However the following packages replace it:
+  portaudio19-dev
 
-==============================================
-    M3 ENHANCED SETUP COMPLETE
-==============================================
+E: Package 'libportaudio19-dev' has no installation candidate
+[ERROR] Failed to install critical package: libportaudio19-dev
+[FATAL] Setup failed: Failed to install critical package: libportaudio19-dev
+Check logs: /home/m3_enhanced/logs/setup_20251010_065540.log and /home/m3_enhanced/logs/setup_errors_20251010_065540.log
+---------------------------------------------------------------------------
+CalledProcessError                        Traceback (most recent call last)
+/tmp/ipython-input-4147707630.py in <cell line: 0>()
+----> 1 get_ipython().run_cell_magic('bash', '', 'cd /home\nunzip m3_enhanced\ncd m3_enhanced\nchmod +x setup.sh\n./setup.sh\n')
 
-INSTALLATION SUMMARY:
-  Setup Time: 3m 43s
-  Runtime: CPU
-  Device: cpu
-  Workers: 2
-  Batch Size: 2
+5 frames
+/usr/local/lib/python3.12/dist-packages/IPython/core/magics/script.py in shebang(self, line, cell)
+    243             sys.stderr.flush()
+    244         if args.raise_error and p.returncode!=0:
+--> 245             raise CalledProcessError(p.returncode, cell, output=out, stderr=err)
+    246
+    247     def _run_script(self, p, cell, to_close):
 
-QUICK START:
-  ./start.sh     # Start services
-  ./status.sh    # Check status
-  ./stop.sh      # Stop services
-
-ACCESS POINTS:
-  API: http://localhost:8000
-  Health: curl http://localhost:8000/health
-
-IMPORTANT FILES:
-  Configuration: .env
-  Setup Log: /home/m3_enhanced/logs/setup_20251010_035219.log
-  Error Log: /home/m3_enhanced/logs/setup_errors_20251010_035219.log
-  Results: /home/m3_enhanced/result.txt
-
-FEATURES AVAILABLE:
-  Audio Separation (Demucs)
-  Music Transcription (Basic Pitch)
-  MIDI Processing
-  Web API Interface
-
-NEXT STEPS:
-  1. Run: ./start.sh
-  2. Test: curl http://localhost:8000/health
-  3. Check logs: tail -f logs/api.log
-
-==============================================
-   M3 Enhanced is ready!
-==============================================
-
-=== SETUP COMPLETE ===
-Result file: /home/m3_enhanced/result.txt
-Setup log: /home/m3_enhanced/logs/setup_20251010_035219.log
-Error log: /home/m3_enhanced/logs/setup_errors_20251010_035219.log
-=======================
-
-
-I mean this says its good, so I ran:
-
-%%bash
-cd /home/m3_enhanced
-chmod +x start.sh
-./start.sh
-it said this:
-
-Starting M3 Enhanced services...
-Starting Redis...
-Failed to start Redis
-Starting API server...
-M3 Enhanced started!
-API: http://localhost:8000
-Logs: tail -f logs/api.log
-
-but this link went nowhere and said localhost refused to connect.
- NOt only that ina  fix you did previously, it failed because of python version issues. Again, just make it work without workarounds and just works. Analyze the whole system and make a system that works.
-
-
+CalledProcessError: Command 'b'cd /home\nunzip m3_enhanced\ncd m3_enhanced\nchmod +x setup.sh\n./setup.sh\n'' returned non-zero exit status 1.
