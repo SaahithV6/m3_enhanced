@@ -1,14 +1,14 @@
 #!/bin/bash
 
 #=======================================================
-#         M3 Enhanced - COMPLETE REBUILD Setup Script
-#              Production-Ready Deployment v5.0
+#         M3 Enhanced - COMPREHENSIVE PRODUCTION Setup Script
+#              Maximum Reliability Deployment v5.3
 #=======================================================
 
 set -euo pipefail
 
 # Global Configuration
-readonly SCRIPT_VERSION="5.0.0"
+readonly SCRIPT_VERSION="5.3.0"
 readonly WORK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly START_TIME=$(date +%s)
 readonly TIMESTAMP=$(date +'%Y%m%d_%H%M%S')
@@ -55,8 +55,8 @@ exec 2>&1
 print_header() {
     echo ""
     echo "======================================================="
-    echo "         M3 Enhanced - COMPLETE REBUILD Setup Script"
-    echo "              Production-Ready Deployment v5.0"
+    echo "         M3 Enhanced - COMPREHENSIVE PRODUCTION Setup"
+    echo "              Maximum Reliability Deployment v5.3"
     echo "======================================================="
     echo ""
 }
@@ -110,7 +110,7 @@ install_package() {
     echo -e "${BLUE}Installing: $package${NC}"
 
     if ! DEBIAN_FRONTEND=noninteractive apt-get install -y "$package"; then
-        log_warn "Failed to install: $package"
+        log_error "Failed to install package: $package"
         return 1
     fi
 
@@ -128,7 +128,32 @@ pip_install() {
         return 1
     fi
 
+    log_info "Successfully installed Python package: $description"
     return 0
+}
+
+verify_package_installed() {
+    local package="$1"
+    if dpkg -l | grep -q "^ii  $package "; then
+        log_info "Verified: $package is installed"
+        return 0
+    else
+        log_error "Verification failed: $package is not installed"
+        return 1
+    fi
+}
+
+verify_python_package() {
+    local package="$1"
+    local import_name="${2:-$package}"
+
+    if python3 -c "import $import_name" 2>/dev/null; then
+        log_info "Verified: Python package $package is available"
+        return 0
+    else
+        log_error "Verification failed: Python package $package is not available"
+        return 1
+    fi
 }
 
 check_service() {
@@ -146,90 +171,199 @@ check_service() {
         sleep 2
     done
 
+    log_error "$service failed to start after $max_attempts attempts"
     return 1
 }
 
 #=======================================================
-#               SYSTEM VERIFICATION
+#               COMPREHENSIVE SYSTEM VERIFICATION
 #=======================================================
 
 verify_system() {
-    log_step 1 "Verifying System Requirements"
+    log_step 1 "Comprehensive System Verification"
 
     # Check if running as root
     if [ "$EUID" -eq 0 ]; then
         log_warn "Running as root - this may cause permission issues"
+        log_warn "Consider running as a regular user with sudo privileges"
     fi
 
-    # OS Detection
+    # Detailed OS Detection and Validation
     if [ ! -f /etc/os-release ]; then
-        fatal_error "Cannot determine operating system"
+        fatal_error "Cannot determine operating system - /etc/os-release not found"
     fi
 
     source /etc/os-release
     log_info "Operating System: $PRETTY_NAME"
+    log_info "OS ID: $ID"
+    log_info "OS Version ID: $VERSION_ID"
 
-    # Supported OS check
+    # Comprehensive OS Support Check
     case "$ID" in
-        ubuntu|debian)
-            log_info "Supported OS detected"
+        ubuntu)
+            if [[ "$VERSION_ID" < "20.04" ]]; then
+                fatal_error "Ubuntu version $VERSION_ID not supported (minimum: 20.04)"
+            fi
+            log_info "Ubuntu $VERSION_ID detected and supported"
+            ;;
+        debian)
+            if [[ "$VERSION_ID" < "11" ]]; then
+                fatal_error "Debian version $VERSION_ID not supported (minimum: 11)"
+            fi
+            log_info "Debian $VERSION_ID detected and supported"
             ;;
         *)
-            fatal_error "Unsupported operating system: $ID"
+            fatal_error "Unsupported operating system: $ID (supported: Ubuntu 20.04+, Debian 11+)"
             ;;
     esac
 
-    # Check disk space
+    # Comprehensive Disk Space Check
     local available_gb=$(df "$WORK_DIR" | awk 'NR==2 {print int($4/1024/1024)}')
-    log_info "Disk space: ${available_gb}GB available (${MIN_DISK_GB}GB required)"
+    local available_mb=$(df "$WORK_DIR" | awk 'NR==2 {print int($4/1024)}')
+    log_info "Available disk space: ${available_gb}GB (${available_mb}MB)"
+    log_info "Required disk space: ${MIN_DISK_GB}GB"
 
     if [ "$available_gb" -lt "$MIN_DISK_GB" ]; then
         fatal_error "Insufficient disk space: ${available_gb}GB available, ${MIN_DISK_GB}GB required"
     fi
 
-    # Check RAM
+    # Comprehensive RAM Check
     local ram_gb=$(free -g | awk 'NR==2{print $2}')
-    log_info "RAM: ${ram_gb}GB available"
+    local ram_mb=$(free -m | awk 'NR==2{print $2}')
+    log_info "Available RAM: ${ram_gb}GB (${ram_mb}MB)"
+    log_info "Recommended RAM: ${MIN_RAM_GB}GB"
 
     if [ "$ram_gb" -lt "$MIN_RAM_GB" ]; then
         log_warn "Low RAM detected: ${ram_gb}GB available, ${MIN_RAM_GB}GB recommended"
+        log_warn "Performance may be degraded with insufficient RAM"
     fi
 
-    # Check Python version
+    # Comprehensive Python Version Check
     if ! command -v python3 >/dev/null 2>&1; then
-        fatal_error "Python 3 not found"
+        fatal_error "Python 3 not found in PATH"
     fi
 
     local python_version=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')")
-    log_info "Python version: $python_version (supported)"
+    local python_major=$(python3 -c "import sys; print(sys.version_info.major)")
+    local python_minor=$(python3 -c "import sys; print(sys.version_info.minor)")
 
-    # Verify Python version compatibility
-    python3 -c "
-import sys
-version = sys.version_info
-if version.major != 3:
-    sys.exit(1)
-if version.minor < 8 or version.minor > 12:
-    sys.exit(1)
-" || fatal_error "Python version $python_version not supported (3.8-3.12 required)"
+    log_info "Python version: $python_version"
+    log_info "Python executable: $(which python3)"
+
+    # Detailed Python version compatibility check
+    if [ "$python_major" -ne 3 ]; then
+        fatal_error "Python major version $python_major not supported (required: 3)"
+    fi
+
+    if [ "$python_minor" -lt 8 ] || [ "$python_minor" -gt 12 ]; then
+        fatal_error "Python version $python_version not supported (supported: 3.8-3.12)"
+    fi
+
+    log_info "Python version $python_version is compatible"
+
+    # Comprehensive Repository Structure Verification
+    log_info "Verifying repository structure..."
+
+    # Check critical backend files
+    if [ ! -f "$WORK_DIR/backend/app/main.py" ]; then
+        fatal_error "FastAPI application not found at backend/app/main.py"
+    fi
+    log_info "Verified: FastAPI application exists at backend/app/main.py"
+
+    # Check frontend files
+    if [ ! -f "$WORK_DIR/frontend/static/index.html" ]; then
+        fatal_error "Frontend index.html not found at frontend/static/index.html"
+    fi
+    log_info "Verified: Frontend index.html exists at frontend/static/index.html"
+
+    if [ ! -f "$WORK_DIR/frontend/static/style.css" ]; then
+        fatal_error "Frontend CSS not found at frontend/static/style.css"
+    fi
+    log_info "Verified: Frontend CSS exists at frontend/static/style.css"
+
+    if [ ! -f "$WORK_DIR/frontend/static/app.js" ]; then
+        fatal_error "Frontend JavaScript not found at frontend/static/app.js"
+    fi
+    log_info "Verified: Frontend JavaScript exists at frontend/static/app.js"
+
+    # Check for additional backend structure
+    if [ -d "$WORK_DIR/backend/app/core" ]; then
+        log_info "Verified: Backend core module directory exists"
+    else
+        log_warn "Backend core module directory not found (may be created later)"
+    fi
+
+    if [ -d "$WORK_DIR/backend/app/models" ]; then
+        log_info "Verified: Backend models module directory exists"
+    else
+        log_warn "Backend models module directory not found (may be created later)"
+    fi
+
+    # Check system architecture
+    local arch=$(uname -m)
+    log_info "System architecture: $arch"
+
+    case "$arch" in
+        x86_64)
+            log_info "x86_64 architecture detected and supported"
+            ;;
+        aarch64|arm64)
+            log_info "ARM64 architecture detected - some optimizations may not be available"
+            ;;
+        *)
+            log_warn "Architecture $arch may have limited support"
+            ;;
+    esac
+
+    # Check for critical system tools
+    local required_tools=("wget" "curl" "git" "gcc" "make")
+    for tool in "${required_tools[@]}"; do
+        if command -v "$tool" >/dev/null 2>&1; then
+            log_info "Verified: $tool is available"
+        else
+            log_warn "Missing system tool: $tool (will be installed)"
+        fi
+    done
+
+    log_info "System verification completed successfully"
 }
 
 #=======================================================
-#               SYSTEM DEPENDENCIES
+#               COMPREHENSIVE SYSTEM DEPENDENCIES
 #=======================================================
 
 install_system_dependencies() {
-    log_step 2 "Installing System Dependencies"
+    log_step 2 "Installing Comprehensive System Dependencies"
 
-    # Update package lists
-    run_command "Updating package lists" apt-get update
+    # Update package lists with retries
+    log_info "Updating package lists..."
+    local update_attempts=0
+    local max_update_attempts=3
 
-    # Fix any broken packages
-    log_info "Fixing any broken packages..."
-    DEBIAN_FRONTEND=noninteractive apt-get -f install -y || true
+    while [ $update_attempts -lt $max_update_attempts ]; do
+        if apt-get update; then
+            log_info "Package lists updated successfully"
+            break
+        else
+            update_attempts=$((update_attempts + 1))
+            log_warn "Package update attempt $update_attempts failed, retrying..."
+            sleep 5
+        fi
+    done
 
-    # Essential system packages
-    log_info "Installing essential system packages..."
+    if [ $update_attempts -eq $max_update_attempts ]; then
+        fatal_error "Failed to update package lists after $max_update_attempts attempts"
+    fi
+
+    # Fix any broken packages with detailed output
+    log_info "Fixing any broken packages and dependencies..."
+    DEBIAN_FRONTEND=noninteractive apt-get -f install -y || {
+        log_warn "Package fix attempt had issues, continuing..."
+    }
+
+    # Install essential build and system packages
+    log_info "Installing essential build and system packages..."
+
     local essential_packages=(
         "build-essential"
         "software-properties-common"
@@ -239,72 +373,155 @@ install_system_dependencies() {
         "wget"
         "git"
         "unzip"
+        "zip"
         "pkg-config"
+        "gcc"
+        "g++"
+        "make"
+        "cmake"
+        "autoconf"
+        "automake"
+        "libtool"
     )
 
     for package in "${essential_packages[@]}"; do
-        install_package "$package" || fatal_error "Failed to install essential package: $package"
+        log_info "Installing essential package: $package"
+        if install_package "$package"; then
+            verify_package_installed "$package" || log_warn "Package verification failed: $package"
+        else
+            fatal_error "Failed to install critical essential package: $package"
+        fi
     done
 
-    # Audio processing libraries
-    log_info "Installing audio processing libraries..."
+    log_info "Essential packages installation completed"
+
+    # Install comprehensive audio processing libraries
+    log_info "Installing comprehensive audio processing libraries..."
+
     local audio_packages=(
         "ffmpeg"
         "libsndfile1"
         "libsndfile1-dev"
+        "libasound2"
+        "libasound2-dev"
     )
 
     for package in "${audio_packages[@]}"; do
-        install_package "$package" || log_warn "Optional audio package failed: $package"
+        log_info "Installing audio package: $package"
+        if install_package "$package"; then
+            verify_package_installed "$package" || log_warn "Audio package verification failed: $package"
+        else
+            log_error "Failed to install audio package: $package"
+            fatal_error "Critical audio package installation failed: $package"
+        fi
     done
 
-    # Optional audio libraries with fallbacks
-    log_info "Installing optional audio libraries..."
+    log_info "Core audio packages installation completed"
 
-    # ALSA development libraries
-    echo -e "${BLUE}Installing: ALSA development libraries${NC}"
-    install_package "libasound2-dev" || log_warn "ALSA dev libraries not available"
+    # Install advanced audio libraries with detailed fallback handling
+    log_info "Installing advanced audio libraries..."
 
-    # PortAudio libraries with fallback
-    echo -e "${BLUE}Installing: PortAudio libraries${NC}"
-    if ! install_package "libportaudio19-dev"; then
-        log_warn "Failed to install: PortAudio libraries"
-        log_warn "Trying alternative package for: PortAudio libraries"
-        install_package "portaudio19-dev" || log_warn "PortAudio alternative also failed"
+    # PortAudio with comprehensive fallback
+    log_info "Installing PortAudio development libraries..."
+    if install_package "libportaudio19-dev"; then
+        verify_package_installed "libportaudio19-dev"
+        log_info "PortAudio development libraries installed successfully"
+    else
+        log_warn "Primary PortAudio package failed, trying alternative..."
+        if install_package "portaudio19-dev"; then
+            verify_package_installed "portaudio19-dev"
+            log_info "Alternative PortAudio package installed successfully"
+        else
+            log_error "All PortAudio installation attempts failed"
+            fatal_error "PortAudio development libraries are required for audio processing"
+        fi
     fi
 
     # FFTW development libraries
-    echo -e "${BLUE}Installing: FFTW development libraries${NC}"
-    install_package "libfftw3-dev" || log_warn "FFTW dev libraries not available"
+    log_info "Installing FFTW development libraries..."
+    if install_package "libfftw3-dev"; then
+        verify_package_installed "libfftw3-dev"
+        log_info "FFTW development libraries installed successfully"
+    else
+        fatal_error "FFTW development libraries installation failed"
+    fi
 
-    # Sample rate conversion
-    echo -e "${BLUE}Installing: Sample rate conversion${NC}"
-    install_package "libsamplerate0-dev" || log_warn "Sample rate conversion not available"
+    # Sample rate conversion libraries
+    log_info "Installing sample rate conversion libraries..."
+    if install_package "libsamplerate0-dev"; then
+        verify_package_installed "libsamplerate0-dev"
+        log_info "Sample rate conversion libraries installed successfully"
+    else
+        fatal_error "Sample rate conversion libraries installation failed"
+    fi
 
-    # JACK development (with potential conflicts handling)
-    echo -e "${BLUE}Installing: JACK development${NC}"
-    install_package "libjack-jackd2-dev" || log_warn "JACK dev not available"
+    # JACK development libraries with conflict resolution
+    log_info "Installing JACK development libraries..."
+    # Remove any conflicting JACK packages first
+    apt-get remove -y libjack-dev 2>/dev/null || true
+    apt-get remove -y libjack0 2>/dev/null || true
 
-    # Additional codec support
+    if install_package "libjack-jackd2-dev"; then
+        verify_package_installed "libjack-jackd2-dev"
+        log_info "JACK development libraries installed successfully"
+    else
+        log_warn "JACK development libraries installation failed (optional for some features)"
+    fi
+
+    log_info "Advanced audio libraries installation completed"
+
+    # Install comprehensive codec support
+    log_info "Installing comprehensive codec support..."
+
     local codec_packages=(
         "libmp3lame-dev"
         "libopus-dev"
         "libvorbis-dev"
         "libflac-dev"
+        "libogg-dev"
+        "libmad0-dev"
     )
 
     for package in "${codec_packages[@]}"; do
-        install_package "$package" || log_warn "Optional codec package failed: $package"
+        log_info "Installing codec package: $package"
+        if install_package "$package"; then
+            verify_package_installed "$package" || log_warn "Codec package verification failed: $package"
+            log_info "Successfully installed codec support: $package"
+        else
+            log_warn "Failed to install codec package: $package (optional)"
+        fi
     done
 
-    # Development libraries
-    log_info "Installing development libraries..."
-    local dev_packages=(
+    log_info "Codec support installation completed"
+
+    # Install comprehensive Python development libraries
+    log_info "Installing comprehensive Python development environment..."
+
+    local python_dev_packages=(
         "python3-dev"
         "python3-pip"
         "python3-venv"
         "python3-setuptools"
         "python3-wheel"
+        "python3-distutils"
+    )
+
+    for package in "${python_dev_packages[@]}"; do
+        log_info "Installing Python development package: $package"
+        if install_package "$package"; then
+            verify_package_installed "$package" || log_warn "Python dev package verification failed: $package"
+            log_info "Successfully installed Python development package: $package"
+        else
+            fatal_error "Failed to install critical Python development package: $package"
+        fi
+    done
+
+    log_info "Python development environment installation completed"
+
+    # Install comprehensive system development libraries
+    log_info "Installing comprehensive system development libraries..."
+
+    local system_dev_packages=(
         "libssl-dev"
         "libffi-dev"
         "libbz2-dev"
@@ -314,790 +531,1082 @@ install_system_dependencies() {
         "libxml2-dev"
         "libxslt1-dev"
         "zlib1g-dev"
+        "libncurses5-dev"
+        "libgdbm-dev"
+        "libnss3-dev"
     )
 
-    for package in "${dev_packages[@]}"; do
-        install_package "$package" || log_warn "Development package failed: $package"
+    for package in "${system_dev_packages[@]}"; do
+        log_info "Installing system development package: $package"
+        if install_package "$package"; then
+            verify_package_installed "$package" || log_warn "System dev package verification failed: $package"
+            log_info "Successfully installed system development package: $package"
+        else
+            log_warn "Failed to install system development package: $package"
+        fi
     done
 
-    # Redis server
-    log_info "Installing Redis server..."
-    echo -e "${BLUE}Installing: Redis server${NC}"
-    install_package "redis-server" || fatal_error "Failed to install Redis server"
+    log_info "System development libraries installation completed"
 
-    log_info "System dependencies installed successfully"
+    # Install Redis server with comprehensive setup
+    log_info "Installing Redis server with comprehensive configuration..."
+
+    if install_package "redis-server"; then
+        verify_package_installed "redis-server"
+        log_info "Redis server package installed successfully"
+
+        # Install Redis tools
+        if install_package "redis-tools"; then
+            verify_package_installed "redis-tools"
+            log_info "Redis tools installed successfully"
+        else
+            log_warn "Redis tools installation failed (may already be included)"
+        fi
+
+        log_info "Redis installation completed successfully"
+    else
+        fatal_error "Redis server installation failed - required for task queue"
+    fi
+
+    # Verify all critical system dependencies
+    log_info "Verifying all critical system dependencies..."
+
+    local critical_packages=("build-essential" "python3-dev" "python3-pip" "ffmpeg" "redis-server")
+    for package in "${critical_packages[@]}"; do
+        if verify_package_installed "$package"; then
+            log_info "Critical package verification passed: $package"
+        else
+            fatal_error "Critical package verification failed: $package"
+        fi
+    done
+
+    log_info "System dependencies installation and verification completed successfully"
 }
 
 #=======================================================
-#               PYTHON ENVIRONMENT SETUP
+#               COMPREHENSIVE PYTHON ENVIRONMENT SETUP
 #=======================================================
 
 setup_python_environment() {
-    log_step 3 "Setting Up Python Environment"
+    log_step 3 "Comprehensive Python Environment Setup"
 
-    # Upgrade pip, setuptools, wheel
-    log_info "Upgrading pip, setuptools, wheel..."
+    # Verify Python installation details
+    log_info "Analyzing Python installation..."
+    python3 -c "
+import sys
+import sysconfig
+print(f'Python executable: {sys.executable}')
+print(f'Python version: {sys.version}')
+print(f'Python path: {sys.path}')
+print(f'Site packages: {sysconfig.get_paths()[\"purelib\"]}')
+"
 
-    echo -e "${BLUE}Running: Upgrading pip${NC}"
-    python3 -m pip install --upgrade pip || fatal_error "Failed to upgrade pip"
+    # Comprehensive pip upgrade with retries
+    log_info "Upgrading pip with comprehensive error handling..."
+    local pip_upgrade_attempts=0
+    local max_pip_attempts=3
 
-    echo -e "${BLUE}Running: Upgrading setuptools${NC}"
-    python3 -m pip install --upgrade setuptools || fatal_error "Failed to upgrade setuptools"
-
-    echo -e "${BLUE}Running: Upgrading wheel${NC}"
-    python3 -m pip install --upgrade wheel || fatal_error "Failed to upgrade wheel"
-
-    # Install build dependencies
-    log_info "Installing build dependencies..."
-    local build_deps=(
-        "build"
-        "cmake"
-        "ninja"
-        "pybind11[global]"
-        "cython"
-    )
-
-    for dep in "${build_deps[@]}"; do
-        pip_install "$dep" || log_warn "Build dependency failed: $dep"
+    while [ $pip_upgrade_attempts -lt $max_pip_attempts ]; do
+        echo -e "${BLUE}Running: Upgrading pip (attempt $((pip_upgrade_attempts + 1)))${NC}"
+        if python3 -m pip install --upgrade pip; then
+            log_info "Pip upgrade completed successfully"
+            break
+        else
+            pip_upgrade_attempts=$((pip_upgrade_attempts + 1))
+            log_warn "Pip upgrade attempt $pip_upgrade_attempts failed"
+            if [ $pip_upgrade_attempts -lt $max_pip_attempts ]; then
+                log_info "Retrying pip upgrade in 5 seconds..."
+                sleep 5
+            fi
+        fi
     done
 
-    log_info "Python environment setup complete"
+    if [ $pip_upgrade_attempts -eq $max_pip_attempts ]; then
+        fatal_error "Failed to upgrade pip after $max_pip_attempts attempts"
+    fi
+
+    # Verify pip installation and version
+    local pip_version=$(python3 -m pip --version)
+    log_info "Pip version after upgrade: $pip_version"
+
+    # Comprehensive setuptools upgrade
+    log_info "Upgrading setuptools with comprehensive error handling..."
+    echo -e "${BLUE}Running: Upgrading setuptools${NC}"
+    if python3 -m pip install --upgrade setuptools; then
+        local setuptools_version=$(python3 -c "import setuptools; print(setuptools.__version__)")
+        log_info "Setuptools upgraded successfully to version: $setuptools_version"
+    else
+        fatal_error "Failed to upgrade setuptools"
+    fi
+
+    # Comprehensive wheel upgrade
+    log_info "Upgrading wheel with comprehensive error handling..."
+    echo -e "${BLUE}Running: Upgrading wheel${NC}"
+    if python3 -m pip install --upgrade wheel; then
+        local wheel_version=$(python3 -c "import wheel; print(wheel.__version__)")
+        log_info "Wheel upgraded successfully to version: $wheel_version"
+    else
+        fatal_error "Failed to upgrade wheel"
+    fi
+
+    # Install comprehensive build dependencies with individual verification
+    log_info "Installing comprehensive build dependencies..."
+
+    # Build system
+    log_info "Installing build system package..."
+    echo -e "${BLUE}Running: Installing build${NC}"
+    if pip_install "build" "Build System"; then
+        verify_python_package "build" || log_warn "Build package verification failed"
+    else
+        fatal_error "Failed to install build system"
+    fi
+
+    # CMake
+    log_info "Installing CMake Python package..."
+    echo -e "${BLUE}Running: Installing cmake${NC}"
+    if pip_install "cmake" "CMake"; then
+        verify_python_package "cmake" || log_warn "CMake package verification failed"
+    else
+        log_warn "CMake Python package installation failed (system cmake may be sufficient)"
+    fi
+
+    # Ninja build system
+    log_info "Installing Ninja build system..."
+    echo -e "${BLUE}Running: Installing ninja${NC}"
+    if pip_install "ninja" "Ninja Build System"; then
+        verify_python_package "ninja" || log_warn "Ninja package verification failed"
+    else
+        log_warn "Ninja build system installation failed (optional)"
+    fi
+
+    # Pybind11 with global installation
+    log_info "Installing Pybind11 with global support..."
+    echo -e "${BLUE}Running: Installing pybind11[global]${NC}"
+    if pip_install "pybind11[global]" "Pybind11 with Global Support"; then
+        verify_python_package "pybind11" || log_warn "Pybind11 package verification failed"
+        log_info "Pybind11 with global support installed successfully"
+    else
+        log_warn "Pybind11 global installation failed, trying standard pybind11..."
+        if pip_install "pybind11" "Pybind11 Standard"; then
+            verify_python_package "pybind11" || log_warn "Pybind11 standard verification failed"
+        else
+            log_warn "Pybind11 installation failed (may affect some package builds)"
+        fi
+    fi
+
+    # Cython
+    log_info "Installing Cython compilation system..."
+    echo -e "${BLUE}Running: Installing cython${NC}"
+    if pip_install "cython" "Cython"; then
+        verify_python_package "cython" "Cython"
+        local cython_version=$(python3 -c "import Cython; print(Cython.__version__)")
+        log_info "Cython installed successfully, version: $cython_version"
+    else
+        log_warn "Cython installation failed (may affect some package compilation)"
+    fi
+
+    # Verify build environment
+    log_info "Verifying Python build environment..."
+
+    python3 -c "
+import sys
+import subprocess
+
+# Check pip functionality
+try:
+    import pip
+    print('✓ Pip module available')
+except ImportError:
+    print('✗ Pip module not available')
+
+# Check setuptools functionality
+try:
+    import setuptools
+    print(f'✓ Setuptools available: {setuptools.__version__}')
+except ImportError:
+    print('✗ Setuptools not available')
+
+# Check wheel functionality
+try:
+    import wheel
+    print(f'✓ Wheel available: {wheel.__version__}')
+except ImportError:
+    print('✗ Wheel not available')
+
+# Check compiler availability
+try:
+    import distutils.util
+    import distutils.ccompiler
+    compiler = distutils.ccompiler.new_compiler()
+    print('✓ C compiler available through distutils')
+except:
+    print('✗ C compiler not available through distutils')
+"
+
+    log_info "Python environment setup completed successfully"
 }
 
 #=======================================================
-#               DEPENDENCY CONFLICT RESOLUTION
+#               COMPREHENSIVE DEPENDENCY CONFLICT RESOLUTION
 #=======================================================
 
 resolve_dependency_conflicts() {
-    log_step 4 "Resolving Dependency Conflicts"
+    log_step 4 "Comprehensive Dependency Conflict Resolution"
 
-    log_info "Removing conflicting packages..."
+    log_info "Beginning comprehensive dependency conflict resolution..."
 
-    # List of potentially conflicting packages to remove
+    # Comprehensive list of packages that may cause conflicts
     local conflict_packages=(
         "intel-openmp"
         "mkl"
+        "mkl-service"
+        "mkl-random"
+        "mkl-fft"
         "numpy"
         "scipy"
         "scikit-learn"
+        "sklearn"
+        "pandas"
+        "matplotlib"
         "opencv-python"
         "opencv-contrib-python"
         "opencv-python-headless"
+        "opencv-contrib-python-headless"
         "tensorflow"
+        "tensorflow-cpu"
+        "tensorflow-gpu"
         "torch"
         "torchvision"
         "torchaudio"
+        "torchtext"
         "librosa"
         "soundfile"
+        "audioread"
+        "resampy"
         "music21"
+        "pretty-midi"
+        "mido"
+        "basic-pitch"
+        "mir-eval"
     )
 
+    log_info "Removing potentially conflicting packages..."
     for package in "${conflict_packages[@]}"; do
-        log_info "Removing conflicting package: $package"
-        python3 -m pip uninstall -y "$package" 2>/dev/null || true
+        log_info "Checking and removing conflicting package: $package"
+        if python3 -m pip show "$package" >/dev/null 2>&1; then
+            log_info "Found conflicting package $package, removing..."
+            python3 -m pip uninstall -y "$package" 2>/dev/null || {
+                log_warn "Failed to cleanly uninstall $package, forcing removal..."
+                python3 -m pip uninstall -y "$package" --break-system-packages 2>/dev/null || true
+            }
+            log_info "Removed conflicting package: $package"
+        else
+            log_info "Package $package not installed, skipping"
+        fi
     done
 
-    # Clean pip cache
-    log_info "Cleaning pip cache..."
-    python3 -m pip cache purge || true
+    # Comprehensive pip cache cleanup
+    log_info "Performing comprehensive pip cache cleanup..."
+    python3 -m pip cache purge || {
+        log_warn "Pip cache purge failed, trying manual cleanup..."
+        rm -rf ~/.cache/pip/* 2>/dev/null || true
+        rm -rf /tmp/pip-* 2>/dev/null || true
+    }
 
-    log_info "Dependency conflicts resolved"
+    # Clear any orphaned package metadata
+    log_info "Clearing orphaned package metadata..."
+    python3 -c "
+import sys
+import os
+import shutil
+import site
+
+# Clear pycache
+for path in sys.path:
+    if os.path.exists(path):
+        for root, dirs, files in os.walk(path):
+            for dir_name in dirs:
+                if dir_name == '__pycache__':
+                    pycache_path = os.path.join(root, dir_name)
+                    try:
+                        shutil.rmtree(pycache_path)
+                        print(f'Cleared pycache: {pycache_path}')
+                    except:
+                        pass
+
+print('Package metadata cleanup completed')
+"
+
+    # Verify clean state
+    log_info "Verifying clean dependency state..."
+
+    local verification_packages=("numpy" "scipy" "torch" "tensorflow")
+    for package in "${verification_packages[@]}"; do
+        if python3 -m pip show "$package" >/dev/null 2>&1; then
+            log_warn "Package $package still present after cleanup - this may indicate a problem"
+        else
+            log_info "Confirmed $package has been removed"
+        fi
+    done
+
+    log_info "Dependency conflict resolution completed successfully"
 }
 
 #=======================================================
-#               CORE ML FRAMEWORKS
+#               COMPREHENSIVE CORE ML FRAMEWORKS INSTALLATION
 #=======================================================
 
 install_core_ml_frameworks() {
-    log_step 5 "Installing Core ML Frameworks"
+    log_step 5 "Installing Comprehensive Core ML Frameworks"
 
-    # Install NumPy with compatible version
-    log_info "Installing NumPy (compatible version)..."
-    echo -e "${BLUE}Running: Installing NumPy${NC}"
-    pip_install "numpy<2.0.0,>=1.21.0" "NumPy" || fatal_error "Failed to install NumPy"
+    log_info "Beginning comprehensive ML framework installation with strict version control..."
 
-    # Install SciPy
-    log_info "Installing SciPy..."
+    # Install NumPy with specific version constraints and verification
+    log_info "Installing NumPy with comprehensive version control..."
+    echo -e "${BLUE}Running: Installing NumPy with version constraints${NC}"
+
+    local numpy_version="numpy<2.0.0,>=1.21.0"
+    if pip_install "$numpy_version" "NumPy with Version Constraints"; then
+        # Comprehensive NumPy verification
+        python3 -c "
+import numpy as np
+print(f'NumPy version: {np.__version__}')
+print(f'NumPy install path: {np.__file__}')
+print(f'NumPy configuration: {np.show_config()}')
+
+# Test basic NumPy functionality
+test_array = np.array([1, 2, 3, 4, 5])
+print(f'NumPy test array: {test_array}')
+print(f'NumPy test sum: {np.sum(test_array)}')
+print('✓ NumPy installation verified successfully')
+"
+        log_info "NumPy installation and verification completed successfully"
+    else
+        fatal_error "NumPy installation failed - this is critical for all ML operations"
+    fi
+
+    # Install SciPy with comprehensive verification
+    log_info "Installing SciPy with comprehensive verification..."
     echo -e "${BLUE}Running: Installing SciPy${NC}"
-    pip_install "scipy>=1.7.0" "SciPy" || fatal_error "Failed to install SciPy"
 
-    # Install scikit-learn
-    log_info "Installing scikit-learn..."
+    local scipy_version="scipy>=1.7.0"
+    if pip_install "$scipy_version" "SciPy"; then
+        # Comprehensive SciPy verification
+        python3 -c "
+import scipy
+import numpy as np
+from scipy import linalg
+
+print(f'SciPy version: {scipy.__version__}')
+print(f'SciPy install path: {scipy.__file__}')
+
+# Test basic SciPy functionality
+test_matrix = np.array([[1, 2], [3, 4]])
+det = linalg.det(test_matrix)
+print(f'SciPy test determinant: {det}')
+print('✓ SciPy installation verified successfully')
+"
+        log_info "SciPy installation and verification completed successfully"
+    else
+        fatal_error "SciPy installation failed - this is critical for scientific computing"
+    fi
+
+    # Install scikit-learn with comprehensive verification
+    log_info "Installing scikit-learn with comprehensive verification..."
     echo -e "${BLUE}Running: Installing scikit-learn${NC}"
-    pip_install "scikit-learn>=1.0.0" "scikit-learn" || fatal_error "Failed to install scikit-learn"
 
-    # Install PyTorch (CPU version to avoid CUDA conflicts)
-    log_info "Installing PyTorch (CPU version)..."
-    echo -e "${BLUE}Running: Installing PyTorch${NC}"
-    pip_install "--index-url https://download.pytorch.org/whl/cpu torch torchvision torchaudio" "PyTorch" || fatal_error "Failed to install PyTorch"
+    local sklearn_version="scikit-learn>=1.0.0"
+    if pip_install "$sklearn_version" "scikit-learn"; then
+        # Comprehensive scikit-learn verification
+        python3 -c "
+import sklearn
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
 
-    # Install TensorFlow
-    log_info "Installing TensorFlow..."
+print(f'scikit-learn version: {sklearn.__version__}')
+print(f'scikit-learn install path: {sklearn.__file__}')
+
+# Test basic sklearn functionality
+X, y = make_classification(n_samples=100, n_features=4, n_classes=2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+print(f'sklearn test data shape: {X_train.shape}')
+print('✓ scikit-learn installation verified successfully')
+"
+        log_info "scikit-learn installation and verification completed successfully"
+    else
+        fatal_error "scikit-learn installation failed - this is critical for ML operations"
+    fi
+
+    # Install PyTorch (CPU version) with comprehensive verification
+    log_info "Installing PyTorch CPU version with comprehensive verification..."
+    echo -e "${BLUE}Running: Installing PyTorch CPU version${NC}"
+
+    local pytorch_install="--index-url https://download.pytorch.org/whl/cpu torch torchvision torchaudio"
+    if pip_install "$pytorch_install" "PyTorch CPU Suite"; then
+        # Comprehensive PyTorch verification
+        python3 -c "
+import torch
+import torchvision
+import torchaudio
+
+print(f'PyTorch version: {torch.__version__}')
+print(f'PyTorch install path: {torch.__file__}')
+print(f'TorchVision version: {torchvision.__version__}')
+print(f'TorchAudio version: {torchaudio.__version__}')
+
+# Test CUDA availability (should be False for CPU version)
+print(f'CUDA available: {torch.cuda.is_available()}')
+print(f'CUDA device count: {torch.cuda.device_count()}')
+
+# Test basic PyTorch functionality
+test_tensor = torch.randn(2, 3)
+print(f'PyTorch test tensor: {test_tensor}')
+print(f'PyTorch test tensor sum: {torch.sum(test_tensor)}')
+
+# Test torchvision
+from torchvision import transforms
+transform = transforms.Compose([transforms.ToTensor()])
+print('✓ TorchVision transforms available')
+
+print('✓ PyTorch installation verified successfully')
+"
+        log_info "PyTorch installation and verification completed successfully"
+    else
+        fatal_error "PyTorch installation failed - this is critical for deep learning operations"
+    fi
+
+    # Install TensorFlow with comprehensive verification
+    log_info "Installing TensorFlow with comprehensive verification..."
     echo -e "${BLUE}Running: Installing TensorFlow${NC}"
-    pip_install "tensorflow>=2.13.0" "TensorFlow" || fatal_error "Failed to install TensorFlow"
 
-    log_info "Core ML frameworks installed successfully"
+    local tensorflow_version="tensorflow>=2.13.0"
+    if pip_install "$tensorflow_version" "TensorFlow"; then
+        # Comprehensive TensorFlow verification
+        python3 -c "
+import tensorflow as tf
+import numpy as np
+
+print(f'TensorFlow version: {tf.__version__}')
+print(f'TensorFlow install path: {tf.__file__}')
+
+# Check device configuration
+print('Available devices:')
+for device in tf.config.list_physical_devices():
+    print(f'  {device}')
+
+# Test basic TensorFlow functionality
+test_tensor = tf.constant([[1.0, 2.0], [3.0, 4.0]])
+print(f'TensorFlow test tensor: {test_tensor}')
+print(f'TensorFlow test sum: {tf.reduce_sum(test_tensor)}')
+
+# Test Keras functionality
+from tensorflow import keras
+print(f'Keras version: {keras.__version__}')
+
+print('✓ TensorFlow installation verified successfully')
+"
+        log_info "TensorFlow installation and verification completed successfully"
+    else
+        fatal_error "TensorFlow installation failed - this is critical for deep learning operations"
+    fi
+
+    # Final comprehensive ML framework verification
+    log_info "Performing final comprehensive ML framework verification..."
+
+    python3 -c "
+import sys
+import numpy as np
+import scipy
+import sklearn
+import torch
+import tensorflow as tf
+
+print('=== COMPREHENSIVE ML FRAMEWORK VERIFICATION ===')
+print(f'Python: {sys.version}')
+print(f'NumPy: {np.__version__}')
+print(f'SciPy: {scipy.__version__}')
+print(f'scikit-learn: {sklearn.__version__}')
+print(f'PyTorch: {torch.__version__}')
+print(f'TensorFlow: {tf.__version__}')
+
+print('\\n=== COMPATIBILITY TEST ===')
+# Test framework compatibility
+np_array = np.array([1, 2, 3, 4, 5])
+torch_tensor = torch.from_numpy(np_array)
+tf_tensor = tf.constant(np_array)
+
+print(f'NumPy array: {np_array}')
+print(f'PyTorch tensor: {torch_tensor}')
+print(f'TensorFlow tensor: {tf_tensor}')
+
+print('\\n✓ All ML frameworks installed and compatible')
+"
+
+    log_info "Core ML frameworks installation completed successfully"
 }
 
 #=======================================================
-#               AUDIO PROCESSING LIBRARIES
+#               COMPREHENSIVE AUDIO PROCESSING LIBRARIES
 #=======================================================
 
 install_audio_processing() {
-    log_step 6 "Installing Audio Processing Libraries"
+    log_step 6 "Installing Comprehensive Audio Processing Libraries"
 
-    # Install soundfile first
-    log_info "Installing soundfile..."
+    log_info "Beginning comprehensive audio processing libraries installation..."
+
+    # Install soundfile with comprehensive verification
+    log_info "Installing soundfile with comprehensive verification..."
     echo -e "${BLUE}Running: Installing soundfile${NC}"
-    pip_install "soundfile>=0.12.1" "soundfile" || fatal_error "Failed to install soundfile"
 
-    # Install audioread
-    log_info "Installing audioread..."
+    local soundfile_version="soundfile>=0.12.1"
+    if pip_install "$soundfile_version" "SoundFile"; then
+        # Comprehensive soundfile verification
+        python3 -c "
+import soundfile as sf
+import numpy as np
+
+print(f'SoundFile version: {sf.__version__}')
+print(f'SoundFile install path: {sf.__file__}')
+
+# Test soundfile functionality
+print('Available formats:')
+for format_name, format_info in sf.available_formats().items():
+    print(f'  {format_name}: {format_info}')
+
+# Test basic I/O capability
+test_data = np.sin(2 * np.pi * 440 * np.linspace(0, 1, 44100))
+print(f'Test audio data shape: {test_data.shape}')
+print('✓ SoundFile installation verified successfully')
+"
+        log_info "SoundFile installation and verification completed successfully"
+    else
+        fatal_error "SoundFile installation failed - this is critical for audio I/O"
+    fi
+
+    # Install audioread with verification
+    log_info "Installing audioread with verification..."
     echo -e "${BLUE}Running: Installing audioread${NC}"
-    pip_install "audioread>=3.0.0" "audioread" || fatal_error "Failed to install audioread"
 
-    # Install librosa
-    log_info "Installing librosa..."
+    local audioread_version="audioread>=3.0.0"
+    if pip_install "$audioread_version" "AudioRead"; then
+        # Verify audioread
+        python3 -c "
+import audioread
+print(f'AudioRead version: {audioread.__version__}')
+print(f'AudioRead install path: {audioread.__file__}')
+print('✓ AudioRead installation verified successfully')
+"
+        log_info "AudioRead installation and verification completed successfully"
+    else
+        fatal_error "AudioRead installation failed - this is critical for audio format support"
+    fi
+
+    # Install librosa with comprehensive verification
+    log_info "Installing librosa with comprehensive verification..."
     echo -e "${BLUE}Running: Installing librosa${NC}"
-    pip_install "librosa>=0.10.0" "librosa" || fatal_error "Failed to install librosa"
 
-    # Install pydub
-    log_info "Installing pydub..."
+    local librosa_version="librosa>=0.10.0"
+    if pip_install "$librosa_version" "Librosa"; then
+        # Comprehensive librosa verification
+        python3 -c "
+import librosa
+import numpy as np
+
+print(f'Librosa version: {librosa.__version__}')
+print(f'Librosa install path: {librosa.__file__}')
+
+# Test basic librosa functionality
+sr = 22050
+duration = 1.0
+t = np.linspace(0, duration, int(sr * duration))
+test_signal = np.sin(2 * np.pi * 440 * t)
+
+# Test spectral analysis
+stft = librosa.stft(test_signal)
+print(f'STFT shape: {stft.shape}')
+
+# Test feature extraction
+mfccs = librosa.feature.mfcc(y=test_signal, sr=sr, n_mfcc=13)
+print(f'MFCCs shape: {mfccs.shape}')
+
+print('✓ Librosa installation verified successfully')
+"
+        log_info "Librosa installation and verification completed successfully"
+    else
+        fatal_error "Librosa installation failed - this is critical for audio analysis"
+    fi
+
+    # Install pydub with verification
+    log_info "Installing pydub with verification..."
     echo -e "${BLUE}Running: Installing pydub${NC}"
-    pip_install "pydub>=0.25.1" "pydub" || fatal_error "Failed to install pydub"
 
-    # Install resampy
-    log_info "Installing resampy..."
+    local pydub_version="pydub>=0.25.1"
+    if pip_install "$pydub_version" "PyDub"; then
+        # Verify pydub
+        python3 -c "
+from pydub import AudioSegment
+import os
+
+print('PyDub installation path: pydub module loaded successfully')
+
+# Test pydub functionality with silent audio
+silent_audio = AudioSegment.silent(duration=1000)  # 1 second
+print(f'Test silent audio duration: {len(silent_audio)}ms')
+print(f'Test silent audio channels: {silent_audio.channels}')
+print(f'Test silent audio frame rate: {silent_audio.frame_rate}')
+print('✓ PyDub installation verified successfully')
+"
+        log_info "PyDub installation and verification completed successfully"
+    else
+        fatal_error "PyDub installation failed - this is critical for audio format handling"
+    fi
+
+    # Install resampy with verification
+    log_info "Installing resampy with verification..."
     echo -e "${BLUE}Running: Installing resampy${NC}"
-    pip_install "resampy>=0.4.0" "resampy" || fatal_error "Failed to install resampy"
+
+    local resampy_version="resampy>=0.4.0"
+    if pip_install "$resampy_version" "Resampy"; then
+        # Verify resampy
+        python3 -c "
+import resampy
+import numpy as np
+
+print(f'Resampy version: {resampy.__version__}')
+print(f'Resampy install path: {resampy.__file__}')
+
+# Test resampy functionality
+sr_orig = 22050
+sr_target = 16000
+test_signal = np.sin(2 * np.pi * 440 * np.linspace(0, 1, sr_orig))
+resampled = resampy.resample(test_signal, sr_orig, sr_target)
+print(f'Original signal length: {len(test_signal)}')
+print(f'Resampled signal length: {len(resampled)}')
+print('✓ Resampy installation verified successfully')
+"
+        log_info "Resampy installation and verification completed successfully"
+    else
+        fatal_error "Resampy installation failed - this is critical for sample rate conversion"
+    fi
 
     # Install audio evaluation libraries
     log_info "Installing audio evaluation libraries..."
 
-    echo -e "${BLUE}Running: Installing pesq${NC}"
-    pip_install "pesq" || log_warn "PESQ installation failed - optional"
+    # Install PESQ
+    echo -e "${BLUE}Running: Installing PESQ${NC}"
+    if pip_install "pesq" "PESQ Audio Quality Metric"; then
+        verify_python_package "pesq" || log_warn "PESQ verification failed"
+        log_info "PESQ (Perceptual Evaluation of Speech Quality) installed successfully"
+    else
+        log_warn "PESQ installation failed - this is optional for quality evaluation"
+    fi
 
-    echo -e "${BLUE}Running: Installing pystoi${NC}"
-    pip_install "pystoi" || log_warn "PySTOI installation failed - optional"
+    # Install PySTOI
+    echo -e "${BLUE}Running: Installing PySTOI${NC}"
+    if pip_install "pystoi" "PySTOI Audio Quality Metric"; then
+        verify_python_package "pystoi" || log_warn "PySTOI verification failed"
+        log_info "PySTOI (Short-Time Objective Intelligibility) installed successfully"
+    else
+        log_warn "PySTOI installation failed - this is optional for quality evaluation"
+    fi
 
-    log_info "Audio processing libraries installed successfully"
+    # Final audio processing verification
+    log_info "Performing final audio processing libraries verification..."
+
+    python3 -c "
+import soundfile as sf
+import audioread
+import librosa
+import pydub
+import resampy
+
+print('=== COMPREHENSIVE AUDIO PROCESSING VERIFICATION ===')
+print(f'SoundFile: {sf.__version__}')
+print(f'AudioRead: {audioread.__version__}')
+print(f'Librosa: {librosa.__version__}')
+print('PyDub: Available')
+print(f'Resampy: {resampy.__version__}')
+
+# Test audio processing pipeline
+import numpy as np
+sr = 22050
+test_audio = np.sin(2 * np.pi * 440 * np.linspace(0, 1, sr))
+
+# Test librosa analysis
+mfccs = librosa.feature.mfcc(y=test_audio, sr=sr)
+spectral_centroid = librosa.feature.spectral_centroid(y=test_audio, sr=sr)
+
+print(f'\\nTest Results:')
+print(f'Audio signal shape: {test_audio.shape}')
+print(f'MFCCs shape: {mfccs.shape}')
+print(f'Spectral centroid shape: {spectral_centroid.shape}')
+
+print('\\n✓ All audio processing libraries verified successfully')
+"
+
+    log_info "Audio processing libraries installation completed successfully"
 }
 
 #=======================================================
-#               MUSIC PROCESSING LIBRARIES
+#               COMPREHENSIVE MUSIC PROCESSING LIBRARIES
 #=======================================================
 
 install_music_processing() {
-    log_step 7 "Installing Music Processing Libraries"
+    log_step 7 "Installing Comprehensive Music Processing Libraries"
 
-    # Install pretty-midi
-    log_info "Installing pretty-midi..."
+    log_info "Beginning comprehensive music processing libraries installation..."
+
+    # Install pretty-midi with comprehensive verification
+    log_info "Installing pretty-midi with comprehensive verification..."
     echo -e "${BLUE}Running: Installing pretty-midi${NC}"
-    pip_install "pretty-midi>=0.2.9" "pretty-midi" || fatal_error "Failed to install pretty-midi"
 
-    # Install music21 (latest version)
-    log_info "Installing music21 (latest version)..."
-    echo -e "${BLUE}Running: Installing music21${NC}"
-    pip_install "music21>=9.1.0" "music21" || fatal_error "Failed to install music21"
+    local prettymidi_version="pretty-midi>=0.2.9"
+    if pip_install "$prettymidi_version" "Pretty-MIDI"; then
+        # Comprehensive pretty-midi verification
+        python3 -c "
+import pretty_midi
+import numpy as np
 
-    # Install mido
-    log_info "Installing mido..."
-    echo -e "${BLUE}Running: Installing mido${NC}"
-    pip_install "mido>=1.3.0" "mido" || fatal_error "Failed to install mido"
+print(f'Pretty-MIDI version: {pretty_midi.__version__}')
+print(f'Pretty-MIDI install path: {pretty_midi.__file__}')
 
-    # Install demucs
-    log_info "Installing demucs..."
-    echo -e "${BLUE}Running: Installing demucs${NC}"
-    pip_install "demucs" || fatal_error "Failed to install demucs"
+# Test pretty-midi functionality
+pm = pretty_midi.PrettyMIDI()
+instrument = pretty_midi.Instrument(program=1)  # Piano
+note = pretty_midi.Note(velocity=100, pitch=60, start=0, end=1)
+instrument.notes.append(note)
+pm.instruments.append(instrument)
 
-    # Install Basic Pitch with compatibility handling
-    log_info "Installing Basic Pitch (with compatibility handling)..."
-
-    # Install mir_eval first as a prerequisite
-    echo -e "${BLUE}Running: Installing mir_eval${NC}"
-    pip_install "mir_eval>=0.6" || fatal_error "Failed to install mir_eval"
-
-    # Handle resampy version conflict for Basic Pitch
-    python3 -m pip install "resampy<0.4.3,>=0.2.2" --force-reinstall || log_warn "Resampy version adjustment failed"
-
-    # Try to install Basic Pitch normally first
-    echo -e "${BLUE}Running: Installing Basic Pitch${NC}"
-    if ! pip_install "basic-pitch"; then
-        log_warn "Basic Pitch installation failed - will try alternative approach"
-
-        # Fallback: install with --no-deps and handle dependencies manually
-        python3 -m pip install basic-pitch --no-deps || fatal_error "Basic Pitch installation completely failed"
-        log_info "Basic Pitch installed with --no-deps"
+print(f'Test MIDI duration: {pm.get_end_time()}')
+print(f'Test MIDI instruments: {len(pm.instruments)}')
+print('✓ Pretty-MIDI installation verified successfully')
+"
+        log_info "Pretty-MIDI installation and verification completed successfully"
+    else
+        fatal_error "Pretty-MIDI installation failed - this is critical for MIDI processing"
     fi
 
-    log_info "Music processing libraries installation complete"
+    # Install music21 with comprehensive verification
+    log_info "Installing music21 (latest version) with comprehensive verification..."
+    echo -e "${BLUE}Running: Installing music21${NC}"
+
+    local music21_version="music21>=9.1.0"
+    if pip_install "$music21_version" "Music21"; then
+        # Comprehensive music21 verification
+        python3 -c "
+import music21
+from music21 import stream, note, pitch
+
+print(f'Music21 version: {music21.__version__}')
+print(f'Music21 install path: {music21.__file__}')
+
+# Test music21 functionality
+s = stream.Stream()
+n1 = note.Note('C4')
+n2 = note.Note('D4')
+s.append(n1)
+s.append(n2)
+
+print(f'Test stream length: {len(s)}')
+print(f'Test note pitch: {n1.pitch}')
+print('✓ Music21 installation verified successfully')
+"
+        log_info "Music21 installation and verification completed successfully"
+    else
+        fatal_error "Music21 installation failed - this is critical for music analysis"
+    fi
+
+    # Install mido with verification
+    log_info "Installing mido with verification..."
+    echo -e "${BLUE}Running: Installing mido${NC}"
+
+    local mido_version="mido>=1.3.0"
+    if pip_install "$mido_version" "Mido"; then
+        # Verify mido
+        python3 -c "
+import mido
+
+print(f'Mido version: {mido.__version__}')
+print(f'Mido install path: {mido.__file__}')
+
+# Test mido functionality
+msg = mido.Message('note_on', channel=0, note=60, velocity=64)
+print(f'Test MIDI message: {msg}')
+print('✓ Mido installation verified successfully')
+"
+        log_info "Mido installation and verification completed successfully"
+    else
+        fatal_error "Mido installation failed - this is critical for MIDI I/O"
+    fi
+
+    # Install demucs with verification
+    log_info "Installing demucs with verification..."
+    echo -e "${BLUE}Running: Installing demucs${NC}"
+
+    if pip_install "demucs" "Demucs Audio Separation"; then
+        # Verify demucs
+        python3 -c "
+import demucs
+from demucs import pretrained
+
+print(f'Demucs install path: {demucs.__file__}')
+print('Available Demucs models:')
+for model_name in pretrained.PRETRAINED_MODELS:
+    print(f'  - {model_name}')
+print('✓ Demucs installation verified successfully')
+"
+        log_info "Demucs installation and verification completed successfully"
+    else
+        fatal_error "Demucs installation failed - this is critical for audio separation"
+    fi
+
+    # Install Basic Pitch with comprehensive compatibility handling
+    log_info "Installing Basic Pitch with comprehensive compatibility handling..."
+
+    # Install mir_eval first as a critical prerequisite
+    log_info "Installing mir_eval as Basic Pitch prerequisite..."
+    echo -e "${BLUE}Running: Installing mir_eval${NC}"
+    if pip_install "mir_eval>=0.6" "MIR Eval"; then
+        # Verify mir_eval
+        python3 -c "
+import mir_eval
+print(f'MIR Eval version: {mir_eval.__version__}')
+print(f'MIR Eval install path: {mir_eval.__file__}')
+print('✓ MIR Eval installation verified successfully')
+"
+        log_info "MIR Eval installation and verification completed successfully"
+    else
+        fatal_error "MIR Eval installation failed - this is required for Basic Pitch"
+    fi
+
+    # Handle resampy version conflict for Basic Pitch compatibility
+    log_info "Adjusting resampy version for Basic Pitch compatibility..."
+    echo -e "${BLUE}Running: Adjusting resampy version${NC}"
+    if python3 -m pip install "resampy<0.4.3,>=0.2.2" --force-reinstall; then
+        # Verify resampy adjustment
+        python3 -c "
+import resampy
+print(f'Resampy version after adjustment: {resampy.__version__}')
+print('✓ Resampy version adjustment completed successfully')
+"
+        log_info "Resampy version adjusted for Basic Pitch compatibility"
+    else
+        log_warn "Resampy version adjustment failed - Basic Pitch may have compatibility issues"
+    fi
+
+    # Attempt Basic Pitch installation with multiple strategies
+    log_info "Attempting Basic Pitch installation with multiple strategies..."
+
+    # Strategy 1: Normal installation
+    echo -e "${BLUE}Running: Installing Basic Pitch (normal method)${NC}"
+    if pip_install "basic-pitch" "Basic Pitch"; then
+        # Verify Basic Pitch installation
+        python3 -c "
+import basic_pitch
+from basic_pitch.inference import predict
+print('Basic Pitch import successful')
+print(f'Basic Pitch install path: {basic_pitch.__file__}')
+print('✓ Basic Pitch installation verified successfully')
+"
+        log_info "Basic Pitch installed successfully using normal method"
+    else
+        log_warn "Basic Pitch normal installation failed, trying alternative approach..."
+
+        # Strategy 2: Install with --no-deps and handle dependencies manually
+        echo -e "${BLUE}Running: Installing Basic Pitch with --no-deps${NC}"
+        if python3 -m pip install basic-pitch --no-deps; then
+            log_info "Basic Pitch installed with --no-deps method"
+
+            # Verify basic import capability
+            python3 -c "
+try:
+    import basic_pitch
+    print('Basic Pitch --no-deps installation successful')
+    print(f'Basic Pitch install path: {basic_pitch.__file__}')
+    print('✓ Basic Pitch --no-deps installation verified')
+except ImportError as e:
+    print(f'Basic Pitch --no-deps import failed: {e}')
+    raise
+"
+        else
+            fatal_error "All Basic Pitch installation strategies failed"
+        fi
+    fi
+
+    # Final comprehensive music processing verification
+    log_info "Performing final comprehensive music processing verification..."
+
+    python3 -c "
+import pretty_midi
+import music21
+import mido
+import demucs
+import basic_pitch
+import mir_eval
+
+print('=== COMPREHENSIVE MUSIC PROCESSING VERIFICATION ===')
+print(f'Pretty-MIDI: {pretty_midi.__version__}')
+print(f'Music21: {music21.__version__}')
+print(f'Mido: {mido.__version__}')
+print('Demucs: Available')
+print('Basic Pitch: Available')
+print(f'MIR Eval: {mir_eval.__version__}')
+
+# Test music processing pipeline
+import numpy as np
+
+# Test MIDI creation
+pm = pretty_midi.PrettyMIDI()
+instrument = pretty_midi.Instrument(program=1)
+note = pretty_midi.Note(velocity=100, pitch=60, start=0, end=1)
+instrument.notes.append(note)
+pm.instruments.append(instrument)
+
+# Test music21
+s = music21.stream.Stream()
+n = music21.note.Note('C4')
+s.append(n)
+
+# Test mido
+msg = mido.Message('note_on', note=60, velocity=64)
+
+print(f'\\nTest Results:')
+print(f'MIDI file duration: {pm.get_end_time()}s')
+print(f'Music21 stream length: {len(s)}')
+print(f'Mido message: {msg}')
+
+print('\\n✓ All music processing libraries verified successfully')
+"
+
+    log_info "Music processing libraries installation completed successfully"
 }
 
 #=======================================================
-#               WEB FRAMEWORKS
+#               COMPREHENSIVE WEB FRAMEWORKS INSTALLATION
 #=======================================================
 
 install_web_frameworks() {
-    log_step 8 "Installing Web Frameworks"
+    log_step 8 "Installing Comprehensive Web Frameworks"
 
-    # Install FastAPI
-    log_info "Installing FastAPI..."
+    log_info "Beginning comprehensive web frameworks installation..."
+
+    # Install FastAPI with comprehensive verification
+    log_info "Installing FastAPI with comprehensive verification..."
     echo -e "${BLUE}Running: Installing FastAPI${NC}"
-    pip_install "fastapi>=0.104.0" "FastAPI" || fatal_error "Failed to install FastAPI"
 
-    # Install Uvicorn with standard extras
-    log_info "Installing Uvicorn with standard extras..."
-    echo -e "${BLUE}Running: Installing Uvicorn${NC}"
-    pip_install "uvicorn[standard]>=0.24.0" "Uvicorn" || fatal_error "Failed to install Uvicorn"
+    local fastapi_version="fastapi>=0.104.0"
+    if pip_install "$fastapi_version" "FastAPI"; then
+        # Comprehensive FastAPI verification
+        python3 -c "
+import fastapi
+from fastapi import FastAPI
 
-    # Install additional web dependencies
-    log_info "Installing additional web dependencies..."
+print(f'FastAPI version: {fastapi.__version__}')
+print(f'FastAPI install path: {fastapi.__file__}')
 
+# Test FastAPI app creation
+app = FastAPI(title='Test App')
+print('FastAPI app creation test: SUCCESS')
+print('✓ FastAPI installation verified successfully')
+"
+        log_info "FastAPI installation and verification completed successfully"
+    else
+        fatal_error "FastAPI installation failed - this is critical for web API"
+    fi
+
+    # Install Uvicorn with standard extras and verification
+    log_info "Installing Uvicorn with standard extras and verification..."
+    echo -e "${BLUE}Running: Installing Uvicorn[standard]${NC}"
+
+    local uvicorn_version="uvicorn[standard]>=0.24.0"
+    if pip_install "$uvicorn_version" "Uvicorn with Standard Extras"; then
+        # Comprehensive Uvicorn verification
+        python3 -c "
+import uvicorn
+print(f'Uvicorn version: {uvicorn.__version__}')
+print(f'Uvicorn install path: {uvicorn.__file__}')
+
+# Check for standard extras
+try:
+    import uvloop
+    print('✓ Uvloop available')
+except ImportError:
+    print('⚠ Uvloop not available')
+
+try:
+    import httptools
+    print('✓ HTTPTools available')
+except ImportError:
+    print('⚠ HTTPTools not available')
+
+try:
+    import watchfiles
+    print('✓ Watchfiles available')
+except ImportError:
+    print('⚠ Watchfiles not available')
+
+print('✓ Uvicorn installation verified successfully')
+"
+        log_info "Uvicorn installation and verification completed successfully"
+    else
+        fatal_error "Uvicorn installation failed - this is critical for web server"
+    fi
+
+    # Install comprehensive web dependencies
+    log_info "Installing comprehensive web dependencies..."
+
+    # Python-multipart for file uploads
+    log_info "Installing python-multipart for file upload support..."
     echo -e "${BLUE}Running: Installing python-multipart${NC}"
-    pip_install "python-multipart>=0.0.6" || fatal_error "Failed to install python-multipart"
+    if pip_install "python-multipart>=0.0.6" "Python Multipart"; then
+        verify_python_package "multipart" || log_warn "Python-multipart verification failed"
+        log_info "Python-multipart installed successfully"
+    else
+        fatal_error "Python-multipart installation failed - required for file uploads"
+    fi
 
+    # Jinja2 for templating
+    log_info "Installing Jinja2 for templating support..."
     echo -e "${BLUE}Running: Installing Jinja2${NC}"
-    pip_install "jinja2>=3.1.0" || fatal_error "Failed to install Jinja2"
+    if pip_install "jinja2>=3.1.0" "Jinja2"; then
+        python3 -c "
+import jinja2
+print(f'Jinja2 version: {jinja2.__version__}')
+print('✓ Jinja2 verification successful')
+"
+        log_info "Jinja2 installed and verified successfully"
+    else
+        fatal_error "Jinja2 installation failed - required for templating"
+    fi
 
+    # Aiofiles for async file operations
+    log_info "Installing aiofiles for async file operations..."
     echo -e "${BLUE}Running: Installing aiofiles${NC}"
-    pip_install "aiofiles>=23.1.0" || fatal_error "Failed to install aiofiles"
+    if pip_install "aiofiles>=23.1.0" "Aiofiles"; then
+        verify_python_package "aiofiles" || log_warn "Aiofiles verification failed"
+        log_info "Aiofiles installed successfully"
+    else
+        fatal_error "Aiofiles installation failed - required for async file handling"
+    fi
 
+    # Python-magic for file type detection
+    log_info "Installing python-magic for file type detection..."
     echo -e "${BLUE}Running: Installing python-magic${NC}"
-    pip_install "python-magic>=0.4.27" || fatal_error "Failed to install python-magic"
+    if pip_install "python-magic>=0.4.27" "Python Magic"; then
+        verify_python_package "magic" || log_warn "Python-magic verification failed"
+        log_info "Python-magic installed successfully"
+    else
+        log_warn "Python-magic installation failed - file type detection may be limited"
+    fi
 
-    # Install Pydantic
-    log_info "Installing Pydantic..."
+    # Install comprehensive Pydantic support
+    log_info "Installing comprehensive Pydantic support..."
+
+    # Pydantic core
     echo -e "${BLUE}Running: Installing pydantic${NC}"
-    pip_install "pydantic>=2.4.0" || fatal_error "Failed to install pydantic"
-
-    echo -e "${BLUE}Running: Installing pydantic-settings${NC}"
-    pip_install "pydantic-settings>=2.0.0" || fatal_error "Failed to install pydantic-settings"
-
-    log_info "Web frameworks installed successfully"
-}
-
-#=======================================================
-#               TASK QUEUE AND REDIS SETUP
-#=======================================================
-
-setup_task_queue() {
-    log_step 9 "Setting Up Task Queue and Redis"
-
-    # Install Celery with Redis
-    log_info "Installing Celery with Redis..."
-    echo -e "${BLUE}Running: Installing Celery${NC}"
-    pip_install "celery[redis]>=5.3.0" "Celery" || fatal_error "Failed to install Celery"
-
-    # Install Redis Python client
-    log_info "Installing Redis Python client..."
-    echo -e "${BLUE}Running: Installing redis-py${NC}"
-    pip_install "redis>=5.0.0" || fatal_error "Failed to install redis-py"
-
-    # Configure Redis server
-    log_info "Configuring Redis server..."
-
-    # Create Redis configuration
-    cat > "$CONFIG_DIR/redis.conf" << 'EOF'
-# Redis configuration for M3 Enhanced
-bind 0.0.0.0
-port 6379
-protected-mode no
-daemonize no
-supervised no
-pidfile /var/run/redis_6379.pid
-loglevel notice
-logfile ""
-databases 16
-save 900 1
-save 300 10
-save 60 10000
-stop-writes-on-bgsave-error yes
-rdbcompression yes
-rdbchecksum yes
-dbfilename dump.rdb
-dir ./
-maxmemory 256mb
-maxmemory-policy allkeys-lru
-appendonly yes
-appendfilename "appendonly.aof"
-appendfsync everysec
-no-appendfsync-on-rewrite no
-auto-aof-rewrite-percentage 100
-auto-aof-rewrite-min-size 64mb
-slowlog-log-slower-than 10000
-slowlog-max-len 128
-client-output-buffer-limit normal 0 0 0
-client-output-buffer-limit replica 256mb 64mb 60
-client-output-buffer-limit pubsub 32mb 8mb 60
-tcp-keepalive 300
-EOF
-
-    # Start Redis service
-    log_info "Starting Redis service..."
-
-    # Stop any existing Redis instances
-    systemctl stop redis-server 2>/dev/null || true
-    killall redis-server 2>/dev/null || true
-
-    # Start Redis with our configuration
-    systemctl start redis-server || {
-        log_warn "Systemctl start failed, trying manual start..."
-        redis-server "$CONFIG_DIR/redis.conf" &
-        sleep 3
-    }
-
-    # Test Redis connection
-    local redis_test_result=0
-    for i in {1..10}; do
-        if redis-cli ping >/dev/null 2>&1; then
-            redis_test_result=1
-            break
-        fi
-        sleep 1
-    done
-
-    if [ "$redis_test_result" -eq 1 ]; then
-        log_info "Redis started successfully"
-        log_info "Redis connection test successful"
-    else
-        fatal_error "Redis failed to start or accept connections"
-    fi
-
-    log_info "Task queue setup complete"
-}
-
-#=======================================================
-#               ADDITIONAL DEPENDENCIES
-#=======================================================
-
-install_additional_dependencies() {
-    log_step 10 "Installing Additional Dependencies"
-
-    local additional_deps=(
-        "requests>=2.31.0"
-        "python-dotenv>=1.0.0"
-        "click>=8.1.0"
-        "tqdm>=4.65.0"
-        "psutil>=5.9.0"
-        "matplotlib>=3.7.0"
-        "pillow>=10.0.0"
-    )
-
-    for dep in "${additional_deps[@]}"; do
-        log_info "Installing ${dep%%>=*}..."
-        pip_install "$dep" || fatal_error "Failed to install $dep"
-    done
-
-    log_info "Additional dependencies installation complete"
-}
-
-#=======================================================
-#               AI MODEL DOWNLOADS
-#=======================================================
-
-download_models() {
-    log_step 11 "Downloading AI Models"
-
-    # Download Demucs model
-    log_info "Downloading Demucs model..."
-    python3 -c "
-import torch
-import torchaudio
-from demucs import pretrained
-
-try:
-    model = pretrained.get_model('htdemucs')
-    print('Demucs model downloaded successfully')
-except Exception as e:
-    print(f'Demucs model download failed: {e}')
-    raise
-"
-
-    # Test Basic Pitch availability
-    log_info "Testing Basic Pitch availability..."
-    python3 -c "
-try:
-    import basic_pitch
-    print('Basic Pitch available')
-except ImportError as e:
-    print(f'Basic Pitch not available: {e}')
-    raise
-"
-
-    log_info "Basic Pitch is available"
-
-    log_info "Model download complete"
-}
-
-#=======================================================
-#               ENVIRONMENT CONFIGURATION
-#=======================================================
-
-configure_environment() {
-    log_step 12 "Configuring Environment"
-
-    log_info "Creating environment configuration..."
-
-    # Detect system capabilities
-    local gpu_available="false"
-    local device="cpu"
-    local workers=2
-    local batch_size=2
-
-    # Check for GPU support
-    if command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi >/dev/null 2>&1; then
-        gpu_available="true"
-        device="cuda"
-        workers=4
-        batch_size=8
-        log_info "GPU detected - enabling CUDA acceleration"
-    else
-        log_info "No GPU detected - using CPU mode"
-    fi
-
-    # Create .env file
-    cat > "$WORK_DIR/.env" << EOF
-# M3 Enhanced Configuration
-REDIS_URL=redis://localhost:6379
-MODELS_DIR=$MODELS_DIR
-TEMP_DIR=$TEMP_DIR
-UPLOADS_DIR=$UPLOADS_DIR
-RESULTS_DIR=$RESULTS_DIR
-MAX_WORKERS=$workers
-GPU_ENABLED=$gpu_available
-DEVICE=$device
-BATCH_SIZE=$batch_size
-API_HOST=0.0.0.0
-API_PORT=8000
-DEBUG=false
-DEFAULT_SEPARATOR=demucs
-DEFAULT_TRANSCRIBER=basic_pitch
-ENABLE_CLASSIFICATION=true
-LOG_LEVEL=INFO
-EOF
-
-    log_info "Environment configuration created"
-}
-
-#=======================================================
-#               SERVICE SCRIPTS
-#=======================================================
-
-create_service_scripts() {
-    log_step 13 "Creating Service Scripts"
-
-    log_info "Creating start script..."
-    cat > "$WORK_DIR/start.sh" << 'EOF'
-#!/bin/bash
-set -e
-
-WORK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$WORK_DIR"
-
-echo "Starting M3 Enhanced services..."
-
-# Load environment
-if [ -f ".env" ]; then
-    source .env
-fi
-
-# Start Redis if not running
-if ! redis-cli ping >/dev/null 2>&1; then
-    echo "Starting Redis server..."
-    redis-server config/redis.conf &
-    sleep 3
-fi
-
-# Start Celery worker in background
-echo "Starting Celery worker..."
-celery -A backend.celery_app worker --loglevel=info --pidfile=/tmp/celery.pid --detach
-
-# Start API server
-echo "Starting API server..."
-cd backend
-python -m uvicorn main:app --host 0.0.0.0 --port 8000 --workers 1 &
-API_PID=$!
-echo $API_PID > /tmp/api.pid
-
-echo "Services started successfully!"
-echo "API server: http://localhost:8000"
-echo "Health check: curl http://localhost:8000/health"
-echo ""
-echo "To stop services, run: ./stop.sh"
-EOF
-
-    chmod +x "$WORK_DIR/start.sh"
-
-    log_info "Creating stop script..."
-    cat > "$WORK_DIR/stop.sh" << 'EOF'
-#!/bin/bash
-set -e
-
-echo "Stopping M3 Enhanced services..."
-
-# Stop API server
-if [ -f /tmp/api.pid ]; then
-    API_PID=$(cat /tmp/api.pid)
-    if kill -0 "$API_PID" 2>/dev/null; then
-        echo "Stopping API server (PID: $API_PID)..."
-        kill "$API_PID"
-        rm -f /tmp/api.pid
-    fi
-fi
-
-# Stop Celery worker
-if [ -f /tmp/celery.pid ]; then
-    CELERY_PID=$(cat /tmp/celery.pid)
-    if kill -0 "$CELERY_PID" 2>/dev/null; then
-        echo "Stopping Celery worker (PID: $CELERY_PID)..."
-        kill "$CELERY_PID"
-        rm -f /tmp/celery.pid
-    fi
-fi
-
-# Stop any remaining processes
-pkill -f "uvicorn.*main:app" || true
-pkill -f "celery.*worker" || true
-
-echo "All services stopped"
-EOF
-
-    chmod +x "$WORK_DIR/stop.sh"
-
-    log_info "Creating status script..."
-    cat > "$WORK_DIR/status.sh" << 'EOF'
-#!/bin/bash
-
-echo "M3 Enhanced Service Status"
-echo "=========================="
-
-# Check Redis
-if redis-cli ping >/dev/null 2>&1; then
-    echo "✓ Redis: Running"
-else
-    echo "✗ Redis: Not running"
-fi
-
-# Check API server
-if [ -f /tmp/api.pid ]; then
-    API_PID=$(cat /tmp/api.pid)
-    if kill -0 "$API_PID" 2>/dev/null; then
-        echo "✓ API Server: Running (PID: $API_PID)"
-    else
-        echo "✗ API Server: Process not found"
-        rm -f /tmp/api.pid
-    fi
-else
-    echo "✗ API Server: Not running"
-fi
-
-# Check Celery worker
-if [ -f /tmp/celery.pid ]; then
-    CELERY_PID=$(cat /tmp/celery.pid)
-    if kill -0 "$CELERY_PID" 2>/dev/null; then
-        echo "✓ Celery Worker: Running (PID: $CELERY_PID)"
-    else
-        echo "✗ Celery Worker: Process not found"
-        rm -f /tmp/celery.pid
-    fi
-else
-    echo "✗ Celery Worker: Not running"
-fi
-
-# Check API health
-echo ""
-echo "Testing API health..."
-if curl -s http://localhost:8000/health >/dev/null 2>&1; then
-    echo "✓ API Health: OK"
-    curl -s http://localhost:8000/health | python3 -m json.tool
-else
-    echo "✗ API Health: Failed to connect"
-fi
-EOF
-
-    chmod +x "$WORK_DIR/status.sh"
-
-    log_info "Service scripts created successfully"
-}
-
-#=======================================================
-#               INSTALLATION VERIFICATION
-#=======================================================
-
-verify_installation() {
-    log_step 14 "Verifying Installation"
-
-    log_info "Testing Python imports..."
-
-    # Test core imports
-    python3 -c "
-import sys
-print(f'Python: {sys.version}')
-
-try:
-    import numpy as np
-    print(f'NumPy: {np.__version__}')
-except ImportError as e:
-    print(f'NumPy: FAILED - {e}')
-    sys.exit(1)
-
-try:
-    import torch
-    print(f'PyTorch: {torch.__version__}')
-except ImportError as e:
-    print(f'PyTorch: FAILED - {e}')
-    sys.exit(1)
-
-try:
-    import tensorflow as tf
-    print(f'TensorFlow: {tf.__version__}')
-except ImportError as e:
-    print(f'TensorFlow: FAILED - {e}')
-    sys.exit(1)
-
-print('Core imports: PASSED')
-"
-
-    # Test audio processing
-    python3 -c "
-try:
-    import librosa
-    import soundfile as sf
-    import pydub
-    print('Audio processing: PASSED')
-except ImportError as e:
-    print(f'Audio processing: FAILED - {e}')
-    raise
-"
-
-    # Test Basic Pitch availability
-    log_info "Testing Basic Pitch availability..."
-    python3 -c "
-try:
-    import basic_pitch
-    print('Basic Pitch: AVAILABLE')
-except ImportError as e:
-    print(f'Basic Pitch: NOT AVAILABLE - {e}')
-    raise
-"
-
-    log_info "Installation verification complete"
-}
-
-#=======================================================
-#               CLEANUP
-#=======================================================
-
-cleanup_installation() {
-    log_step 15 "Cleaning Up Installation"
-
-    log_info "Cleaning pip cache..."
-    python3 -m pip cache purge || true
-
-    log_info "Cleaning apt cache..."
-    apt-get autoremove -y || true
-    apt-get clean || true
-
-    log_info "Cleanup complete"
-}
-
-#=======================================================
-#               MAIN EXECUTION
-#=======================================================
-
-main() {
-    print_header
-
-    log_info "Starting M3 Enhanced setup process..."
-    log_info "Working directory: $WORK_DIR"
-    log_info "Timestamp: $TIMESTAMP"
-
-    # Execute all setup steps
-    verify_system
-    install_system_dependencies
-    setup_python_environment
-    resolve_dependency_conflicts
-    install_core_ml_frameworks
-    install_audio_processing
-    install_music_processing
-    install_web_frameworks
-    setup_task_queue
-    install_additional_dependencies
-    download_models
-    configure_environment
-    create_service_scripts
-    verify_installation
-    cleanup_installation
-
-    # Calculate setup time
-    local end_time=$(date +%s)
-    local duration=$((end_time - START_TIME))
-    local minutes=$((duration / 60))
-    local seconds=$((duration % 60))
-
-    # Detect runtime configuration
-    local gpu_text="CPU"
-    local device="cpu"
-    local workers=2
-    local batch_size=2
-
-    if command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi >/dev/null 2>&1; then
-        gpu_text="GPU"
-        device="cuda"
-        workers=4
-        batch_size=8
-    fi
-
-    # Display completion message
-    echo ""
-    echo "=============================================="
-    echo "    M3 ENHANCED SETUP COMPLETE"
-    echo "=============================================="
-    echo ""
-    echo "INSTALLATION SUMMARY:"
-    echo "  Setup Time: ${minutes}m ${seconds}s"
-    echo "  Runtime: $gpu_text"
-    echo "  Device: $device"
-    echo "  Workers: $workers"
-    echo "  Batch Size: $batch_size"
-    echo ""
-    echo "QUICK START:"
-    echo "  ./start.sh     # Start services"
-    echo "  ./status.sh    # Check status"
-    echo "  ./stop.sh      # Stop services"
-    echo ""
-    echo "ACCESS POINTS:"
-    echo "  API: http://localhost:8000"
-    echo "  Health: curl http://localhost:8000/health"
-    echo ""
-    echo "IMPORTANT FILES:"
-    echo "  Configuration: .env"
-    echo "  Setup Log: $SETUP_LOG"
-    echo "  Error Log: $ERROR_LOG"
-    echo "  Results: $RESULT_FILE"
-    echo ""
-    echo "FEATURES AVAILABLE:"
-    echo "  Audio Separation (Demucs)"
-    echo "  Music Transcription (Basic Pitch)"
-    echo "  MIDI Processing"
-    echo "  Web API Interface"
-    echo ""
-    echo "NEXT STEPS:"
-    echo "  1. Run: ./start.sh"
-    echo "  2. Test: curl http://localhost:8000/health"
-    echo "  3. Check logs: tail -f logs/api.log"
-    echo ""
-    echo "=============================================="
-    echo "   M3 Enhanced is ready!"
-    echo "=============================================="
-
-    echo ""
-    echo "=== SETUP COMPLETE ==="
-    echo "Result file: $RESULT_FILE"
-    echo "Setup log: $SETUP_LOG"
-    echo "Error log: $ERROR_LOG"
-    echo "======================="
-}
-
-# Execute main function
-main "$@"
+    if pip_install "pydantic>=2.4.0" "Pydantic"; then
+        python3 -c "
+import pydantic
+from pydantic import BaseModel
+
+print(
