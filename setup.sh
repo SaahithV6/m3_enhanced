@@ -1609,4 +1609,1661 @@ print('✓ Jinja2 verification successful')
 import pydantic
 from pydantic import BaseModel
 
-print(
+print(f'Pydantic version: {pydantic.__version__}')
+print('✓ Pydantic verification successful')
+
+# Test basic pydantic functionality
+class TestModel(BaseModel):
+    name: str
+    value: int
+
+test = TestModel(name='test', value=42)
+print(f'Pydantic test model: {test}')
+"
+        log_info "Pydantic installed and verified successfully"
+    else
+        fatal_error "Pydantic installation failed - required for data validation"
+    fi
+
+    # Pydantic settings
+    echo -e "${BLUE}Running: Installing pydantic-settings${NC}"
+    if pip_install "pydantic-settings>=2.0.0" "Pydantic Settings"; then
+        python3 -c "
+import pydantic_settings
+from pydantic_settings import BaseSettings
+
+print('Pydantic Settings available')
+print('✓ Pydantic Settings verification successful')
+"
+        log_info "Pydantic Settings installed and verified successfully"
+    else
+        fatal_error "Pydantic Settings installation failed - required for configuration"
+    fi
+
+    # Install task queue components
+    log_info "Installing task queue components..."
+
+    # Celery with Redis support
+    echo -e "${BLUE}Running: Installing Celery[redis]${NC}"
+    if pip_install "celery[redis]>=5.3.0" "Celery with Redis"; then
+        python3 -c "
+import celery
+from celery import Celery
+
+print(f'Celery version: {celery.__version__}')
+print('✓ Celery verification successful')
+
+# Test basic celery functionality
+app = Celery('test')
+print('Celery app creation test: SUCCESS')
+"
+        log_info "Celery installed and verified successfully"
+    else
+        fatal_error "Celery installation failed - required for background tasks"
+    fi
+
+    # Redis Python client
+    echo -e "${BLUE}Running: Installing redis-py${NC}"
+    if pip_install "redis>=5.0.0" "Redis Python Client"; then
+        python3 -c "
+import redis
+
+print(f'Redis-py version: {redis.__version__}')
+print('✓ Redis-py verification successful')
+"
+        log_info "Redis Python client installed and verified successfully"
+    else
+        fatal_error "Redis Python client installation failed - required for task queue"
+    fi
+
+    # Install additional utility packages
+    log_info "Installing additional utility packages..."
+
+    local utility_packages=(
+        "requests>=2.31.0:Requests HTTP Library"
+        "python-dotenv>=1.0.0:Python Dotenv"
+        "click>=8.1.0:Click CLI Framework"
+        "tqdm>=4.65.0:Progress Bars"
+        "psutil>=5.9.0:System Utilities"
+        "matplotlib>=3.7.0:Plotting Library"
+        "pillow>=10.0.0:Image Processing"
+    )
+
+    for package_info in "${utility_packages[@]}"; do
+        IFS=':' read -r package description <<< "$package_info"
+        log_info "Installing $description..."
+        echo -e "${BLUE}Running: Installing $description${NC}"
+        if pip_install "$package" "$description"; then
+            log_info "$description installed successfully"
+        else
+            log_warn "$description installation failed"
+        fi
+    done
+
+    # Final comprehensive web frameworks verification
+    log_info "Performing final comprehensive web frameworks verification..."
+
+    python3 -c "
+import fastapi
+import uvicorn
+import multipart
+import jinja2
+import aiofiles
+import pydantic
+import pydantic_settings
+import celery
+import redis
+import requests
+import click
+import tqdm
+import psutil
+import matplotlib
+import PIL
+
+print('=== COMPREHENSIVE WEB FRAMEWORKS VERIFICATION ===')
+print(f'FastAPI: {fastapi.__version__}')
+print(f'Uvicorn: {uvicorn.__version__}')
+print('Python-multipart: Available')
+print(f'Jinja2: {jinja2.__version__}')
+print('Aiofiles: Available')
+print(f'Pydantic: {pydantic.__version__}')
+print('Pydantic Settings: Available')
+print(f'Celery: {celery.__version__}')
+print(f'Redis-py: {redis.__version__}')
+print(f'Requests: {requests.__version__}')
+print(f'Click: {click.__version__}')
+print(f'TQDM: {tqdm.__version__}')
+print(f'PSUtil: {psutil.__version__}')
+print(f'Matplotlib: {matplotlib.__version__}')
+print(f'Pillow: {PIL.__version__}')
+
+# Test web framework integration
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI(title='Integration Test')
+
+class TestModel(BaseModel):
+    name: str
+
+@app.get('/')
+def test_endpoint():
+    return {'message': 'test'}
+
+print('\\nIntegration test: FastAPI + Pydantic SUCCESS')
+print('\\n✓ All web frameworks verified successfully')
+"
+
+    log_info "Web frameworks installation completed successfully"
+}
+
+#=======================================================
+#               COMPREHENSIVE REDIS SETUP
+#=======================================================
+
+setup_redis() {
+    log_step 9 "Comprehensive Redis Setup and Configuration"
+
+    log_info "Beginning comprehensive Redis setup..."
+
+    # Create comprehensive Redis configuration
+    log_info "Creating comprehensive Redis configuration..."
+
+    cat > "$CONFIG_DIR/redis.conf" << 'EOF'
+# Redis configuration for M3 Enhanced - Production Ready
+# Generated by M3 Enhanced setup script
+
+# Network Configuration
+bind 0.0.0.0
+port 6379
+tcp-backlog 511
+tcp-keepalive 300
+timeout 0
+
+# General Configuration
+daemonize no
+supervised no
+pidfile /var/run/redis_6379.pid
+loglevel notice
+logfile ""
+databases 16
+
+# Security
+protected-mode no
+# requirepass your_secure_password_here
+
+# Memory Management
+maxmemory 512mb
+maxmemory-policy allkeys-lru
+maxmemory-samples 5
+
+# Persistence - RDB Snapshots
+save 900 1
+save 300 10
+save 60 10000
+stop-writes-on-bgsave-error yes
+rdbcompression yes
+rdbchecksum yes
+dbfilename dump.rdb
+dir ./
+
+# Persistence - AOF (Append Only File)
+appendonly yes
+appendfilename "appendonly.aof"
+appendfsync everysec
+no-appendfsync-on-rewrite no
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+aof-load-truncated yes
+aof-use-rdb-preamble yes
+
+# Slow Log
+slowlog-log-slower-than 10000
+slowlog-max-len 128
+
+# Latency Monitoring
+latency-monitor-threshold 100
+
+# Client Management
+client-output-buffer-limit normal 0 0 0
+client-output-buffer-limit replica 256mb 64mb 60
+client-output-buffer-limit pubsub 32mb 8mb 60
+client-query-buffer-limit 1gb
+
+# Advanced Configuration
+hash-max-ziplist-entries 512
+hash-max-ziplist-value 64
+list-max-ziplist-size -2
+list-compress-depth 0
+set-max-intset-entries 512
+zset-max-ziplist-entries 128
+zset-max-ziplist-value 64
+hll-sparse-max-bytes 3000
+stream-node-max-bytes 4096
+stream-node-max-entries 100
+activerehashing yes
+hz 10
+dynamic-hz yes
+EOF
+
+    log_info "Redis configuration file created successfully"
+
+    # Comprehensive Redis service management
+    log_info "Setting up comprehensive Redis service management..."
+
+    # Stop any existing Redis instances with detailed cleanup
+    log_info "Stopping any existing Redis instances..."
+
+    # Stop systemd service
+    if systemctl is-active --quiet redis-server; then
+        log_info "Stopping Redis systemd service..."
+        systemctl stop redis-server || log_warn "Failed to stop Redis systemd service"
+    fi
+
+    if systemctl is-active --quiet redis; then
+        log_info "Stopping Redis systemd service (alternative name)..."
+        systemctl stop redis || log_warn "Failed to stop Redis service"
+    fi
+
+    # Kill any remaining Redis processes
+    log_info "Terminating any remaining Redis processes..."
+    pkill -f redis-server 2>/dev/null || true
+    sleep 2
+    pkill -9 -f redis-server 2>/dev/null || true
+
+    # Clean up Redis data files if needed
+    log_info "Cleaning up Redis data files..."
+    rm -f /var/lib/redis/dump.rdb 2>/dev/null || true
+    rm -f "$WORK_DIR/dump.rdb" 2>/dev/null || true
+    rm -f "$WORK_DIR/appendonly.aof" 2>/dev/null || true
+
+    # Start Redis with comprehensive error handling
+    log_info "Starting Redis server with comprehensive error handling..."
+
+    # Attempt 1: Start with systemctl
+    if systemctl start redis-server 2>/dev/null; then
+        log_info "Redis started successfully using systemctl"
+        sleep 3
+    else
+        log_warn "Systemctl start failed, attempting manual start..."
+
+        # Attempt 2: Manual start with custom configuration
+        log_info "Starting Redis manually with custom configuration..."
+        redis-server "$CONFIG_DIR/redis.conf" &
+        REDIS_PID=$!
+        echo $REDIS_PID > /tmp/redis.pid
+        sleep 5
+
+        # Verify manual start
+        if kill -0 $REDIS_PID 2>/dev/null; then
+            log_info "Redis started successfully manually (PID: $REDIS_PID)"
+        else
+            log_warn "Manual Redis start failed, trying default configuration..."
+
+            # Attempt 3: Start with default settings
+            redis-server --daemonize yes --port 6379 --bind 0.0.0.0 &
+            sleep 3
+        fi
+    fi
+
+    # Comprehensive Redis connection testing
+    log_info "Performing comprehensive Redis connection testing..."
+
+    local redis_test_result=0
+    local connection_attempts=0
+    local max_connection_attempts=15
+
+    while [ $connection_attempts -lt $max_connection_attempts ]; do
+        connection_attempts=$((connection_attempts + 1))
+        log_info "Redis connection test attempt $connection_attempts..."
+
+        if redis-cli ping >/dev/null 2>&1; then
+            redis_test_result=1
+            log_info "Redis connection test successful on attempt $connection_attempts"
+            break
+        else
+            log_warn "Redis connection attempt $connection_attempts failed"
+            if [ $connection_attempts -lt $max_connection_attempts ]; then
+                log_info "Waiting 2 seconds before next attempt..."
+                sleep 2
+            fi
+        fi
+    done
+
+    if [ "$redis_test_result" -eq 1 ]; then
+        log_info "Redis connection established successfully"
+
+        # Comprehensive Redis functionality testing
+        log_info "Performing Redis functionality tests..."
+
+        # Test basic operations
+        redis-cli set test_key "test_value" >/dev/null
+        local get_result=$(redis-cli get test_key)
+        redis-cli del test_key >/dev/null
+
+        if [ "$get_result" = "test_value" ]; then
+            log_info "Redis basic operations test: PASSED"
+        else
+            log_warn "Redis basic operations test: FAILED"
+        fi
+
+        # Test Redis info
+        local redis_info=$(redis-cli info server 2>/dev/null | head -10)
+        log_info "Redis server information:"
+        echo "$redis_info"
+
+        # Test Redis configuration
+        local redis_version=$(redis-cli info server | grep redis_version | cut -d: -f2 | tr -d '\r')
+        log_info "Redis version: $redis_version"
+
+        log_info "Redis setup and verification completed successfully"
+    else
+        fatal_error "Redis failed to start or accept connections after $max_connection_attempts attempts"
+    fi
+}
+
+#=======================================================
+#               COMPREHENSIVE MODEL DOWNLOADS
+#=======================================================
+
+download_models() {
+    log_step 10 "Comprehensive AI Model Downloads and Verification"
+
+    log_info "Beginning comprehensive AI model downloads..."
+
+    # Download and verify Demucs model with comprehensive error handling
+    log_info "Downloading and verifying Demucs model with comprehensive handling..."
+
+    python3 -c "
+import os
+import torch
+import torchaudio
+from demucs import pretrained
+
+print('Starting Demucs model download...')
+try:
+    # Download htdemucs model (default high-quality model)
+    model = pretrained.get_model('htdemucs')
+    print('✓ Demucs htdemucs model downloaded successfully')
+
+    # Verify model functionality
+    print('Verifying Demucs model functionality...')
+    device = 'cpu'  # Use CPU for compatibility
+    model = model.to(device)
+    model.eval()
+
+    # Test with dummy audio
+    dummy_audio = torch.randn(1, 2, 44100)  # 1 second stereo audio
+    with torch.no_grad():
+        separated = model(dummy_audio)
+
+    print(f'Demucs separation test - Input shape: {dummy_audio.shape}')
+    print(f'Demucs separation test - Output shape: {separated.shape}')
+    print('✓ Demucs model functionality verified successfully')
+
+except Exception as e:
+    print(f'❌ Demucs model download/verification failed: {e}')
+    import traceback
+    traceback.print_exc()
+    raise
+"
+
+    if [ $? -eq 0 ]; then
+        log_info "Demucs model download and verification completed successfully"
+    else
+        fatal_error "Demucs model download or verification failed"
+    fi
+
+    # Test and verify Basic Pitch availability with comprehensive checks
+    log_info "Testing and verifying Basic Pitch availability with comprehensive checks..."
+
+    python3 -c "
+import numpy as np
+
+print('Testing Basic Pitch availability and functionality...')
+try:
+    import basic_pitch
+    from basic_pitch.inference import predict
+    from basic_pitch import ICASSP_2022_MODEL_PATH
+
+    print('✓ Basic Pitch import successful')
+    print(f'Basic Pitch model path: {ICASSP_2022_MODEL_PATH}')
+
+    # Test Basic Pitch functionality with dummy audio
+    print('Testing Basic Pitch prediction functionality...')
+
+    # Create dummy audio (1 second at 22050 Hz)
+    sample_rate = 22050
+    duration = 1.0
+    dummy_audio = np.sin(2 * np.pi * 440 * np.linspace(0, duration, int(sample_rate * duration)))
+
+    # Test prediction (this will also trigger model download if needed)
+    model_output, midi_data, note_events = predict(dummy_audio)
+
+    print(f'Basic Pitch test - Audio shape: {dummy_audio.shape}')
+    print(f'Basic Pitch test - Model output shape: {model_output.shape}')
+    print(f'Basic Pitch test - MIDI data type: {type(midi_data)}')
+    print(f'Basic Pitch test - Note events shape: {note_events.shape}')
+    print('✓ Basic Pitch functionality verified successfully')
+
+except Exception as e:
+    print(f'❌ Basic Pitch test failed: {e}')
+    import traceback
+    traceback.print_exc()
+    raise
+"
+
+    if [ $? -eq 0 ]; then
+        log_info "Basic Pitch availability and functionality verified successfully"
+    else
+        fatal_error "Basic Pitch verification failed"
+    fi
+
+    # Verify model storage and accessibility
+    log_info "Verifying model storage and accessibility..."
+
+    # Check model directories and sizes
+    python3 -c "
+import os
+import torch
+from pathlib import Path
+
+print('Checking model storage locations...')
+
+# Check PyTorch model cache
+torch_cache = Path(torch.hub.get_dir())
+print(f'PyTorch cache directory: {torch_cache}')
+if torch_cache.exists():
+    cache_size = sum(f.stat().st_size for f in torch_cache.rglob('*') if f.is_file())
+    print(f'PyTorch cache size: {cache_size / (1024*1024):.1f} MB')
+
+# Check for downloaded models
+model_files = list(torch_cache.rglob('*.th')) if torch_cache.exists() else []
+if model_files:
+    print('Downloaded model files:')
+    for model_file in model_files:
+        size_mb = model_file.stat().st_size / (1024*1024)
+        print(f'  {model_file.name}: {size_mb:.1f} MB')
+else:
+    print('No .th model files found in cache')
+
+print('✓ Model storage verification completed')
+"
+
+    log_info "Model downloads and verification completed successfully"
+}
+
+#=======================================================
+#               COMPREHENSIVE ENVIRONMENT CONFIGURATION
+#=======================================================
+
+configure_environment() {
+    log_step 11 "Comprehensive Environment Configuration"
+
+    log_info "Creating comprehensive environment configuration..."
+
+    # Comprehensive system capability detection
+    log_info "Performing comprehensive system capability detection..."
+
+    local gpu_available="false"
+    local gpu_name="None"
+    local gpu_memory="0"
+    local device="cpu"
+    local workers=2
+    local batch_size=2
+
+    # Comprehensive GPU detection
+    if command -v nvidia-smi >/dev/null 2>&1; then
+        log_info "NVIDIA tools detected, checking GPU availability..."
+
+        if nvidia-smi >/dev/null 2>&1; then
+            gpu_available="true"
+            device="cuda"
+            workers=4
+            batch_size=8
+
+            # Get GPU details
+            gpu_name=$(nvidia-smi --query-gpu=gpu_name --format=csv,noheader,nounits | head -1)
+            gpu_memory=$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits | head -1)
+
+            log_info "GPU detected: $gpu_name"
+            log_info "GPU memory: ${gpu_memory}MB"
+            log_info "CUDA acceleration enabled"
+        else
+            log_info "NVIDIA tools present but no functional GPU detected"
+        fi
+    else
+        log_info "No NVIDIA tools detected - using CPU mode"
+    fi
+
+    # Detect optimal worker count based on system resources
+    local cpu_cores=$(nproc)
+    local ram_gb=$(free -g | awk 'NR==2{print $2}')
+
+    # Adjust workers based on available resources
+    if [ "$gpu_available" = "false" ]; then
+        # CPU mode - adjust based on cores and RAM
+        if [ "$cpu_cores" -ge 8 ] && [ "$ram_gb" -ge 16 ]; then
+            workers=4
+        elif [ "$cpu_cores" -ge 4 ] && [ "$ram_gb" -ge 8 ]; then
+            workers=2
+        else
+            workers=1
+        fi
+    fi
+
+    log_info "Detected system configuration:"
+    log_info "  CPU Cores: $cpu_cores"
+    log_info "  RAM: ${ram_gb}GB"
+    log_info "  GPU Available: $gpu_available"
+    log_info "  Optimal Workers: $workers"
+    log_info "  Batch Size: $batch_size"
+
+    # Create comprehensive .env configuration file
+    log_info "Creating comprehensive .env configuration file..."
+
+    cat > "$WORK_DIR/.env" << EOF
+# M3 Enhanced Configuration - Production Ready
+# Generated by M3 Enhanced setup script v${SCRIPT_VERSION}
+
+# System Information
+SETUP_VERSION=$SCRIPT_VERSION
+SETUP_DATE=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+# Database and Cache Configuration
+REDIS_URL=redis://localhost:6379
+REDIS_PASSWORD=
+REDIS_DB=0
+
+# Directory Configuration
+BASE_DIR=$WORK_DIR
+MODELS_DIR=$MODELS_DIR
+TEMP_DIR=$TEMP_DIR
+UPLOADS_DIR=$UPLOADS_DIR
+RESULTS_DIR=$RESULTS_DIR
+CONFIG_DIR=$CONFIG_DIR
+LOG_DIR=$LOG_DIR
+
+# Processing Configuration
+MAX_WORKERS=$workers
+GPU_ENABLED=$gpu_available
+GPU_NAME=$gpu_name
+GPU_MEMORY=$gpu_memory
+DEVICE=$device
+BATCH_SIZE=$batch_size
+CPU_CORES=$cpu_cores
+RAM_GB=$ram_gb
+
+# API Server Configuration
+API_HOST=0.0.0.0
+API_PORT=8000
+API_WORKERS=1
+DEBUG=false
+RELOAD=false
+
+# Model Configuration
+DEFAULT_SEPARATOR=demucs
+DEFAULT_TRANSCRIBER=basic_pitch
+ENABLE_CLASSIFICATION=true
+ENABLE_QUALITY_ANALYSIS=true
+ENABLE_TABLATURE_GENERATION=true
+
+# Audio Processing Settings
+AUDIO_SAMPLE_RATE=48000
+AUDIO_BIT_DEPTH=24
+MAX_AUDIO_DURATION=600
+MAX_FILE_SIZE_MB=100
+
+# Quality Thresholds
+MIN_SDR_THRESHOLD=10.0
+MIN_SIR_THRESHOLD=15.0
+MIN_SAR_THRESHOLD=10.0
+
+# Logging Configuration
+LOG_LEVEL=INFO
+LOG_FORMAT=detailed
+LOG_TO_FILE=true
+
+# Security Settings (adjust for production)
+CORS_ORIGINS=["*"]
+CORS_METHODS=["*"]
+CORS_HEADERS=["*"]
+CORS_CREDENTIALS=true
+
+# Feature Flags
+ENABLE_EXPERIMENTAL_FEATURES=false
+ENABLE_PERFORMANCE_MONITORING=true
+ENABLE_DETAILED_LOGGING=true
+
+# Timeouts and Limits
+REQUEST_TIMEOUT=300
+UPLOAD_TIMEOUT=120
+PROCESSING_TIMEOUT=3600
+CLEANUP_INTERVAL=86400
+
+# File Management
+AUTO_CLEANUP_ENABLED=true
+CLEANUP_AFTER_DAYS=7
+MAX_CONCURRENT_UPLOADS=5
+MAX_CONCURRENT_JOBS=$workers
+EOF
+
+    log_info "Environment configuration file created successfully"
+
+    # Verify configuration file
+    log_info "Verifying environment configuration..."
+
+    if [ -f "$WORK_DIR/.env" ]; then
+        local env_size=$(wc -l < "$WORK_DIR/.env")
+        log_info "Environment file created with $env_size configuration lines"
+
+        # Test environment loading
+        if source "$WORK_DIR/.env" 2>/dev/null; then
+            log_info "Environment configuration loads successfully"
+        else
+            log_warn "Environment configuration has syntax issues"
+        fi
+    else
+        fatal_error "Failed to create environment configuration file"
+    fi
+
+    log_info "Environment configuration completed successfully"
+}
+
+#=======================================================
+#               COMPREHENSIVE SERVICE SCRIPTS CREATION
+#=======================================================
+
+create_service_scripts() {
+    log_step 12 "Creating Comprehensive Service Management Scripts"
+
+    log_info "Creating comprehensive service management scripts..."
+
+    # Create comprehensive start script
+    log_info "Creating comprehensive start script..."
+
+    cat > "$WORK_DIR/start.sh" << 'EOF'
+#!/bin/bash
+set -e
+
+#=======================================================
+#         M3 Enhanced - Comprehensive Start Script
+#=======================================================
+
+WORK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$WORK_DIR"
+
+echo "🚀 Starting M3 Enhanced services..."
+echo "Working directory: $WORK_DIR"
+
+# Load environment configuration
+if [ -f ".env" ]; then
+    echo "📋 Loading environment configuration..."
+    export $(cat .env | grep -v '^#' | grep -v '^\s*$' | xargs)
+    echo "✓ Environment configuration loaded"
+else
+    echo "⚠️  Warning: .env file not found, using defaults"
+fi
+
+# Verify critical directories
+echo "📁 Verifying directory structure..."
+required_dirs=("backend/app" "frontend/static" "logs" "uploads" "results" "temp" "models")
+for dir in "${required_dirs[@]}"; do
+    if [ -d "$dir" ]; then
+        echo "✓ Directory exists: $dir"
+    else
+        echo "❌ Missing directory: $dir"
+        mkdir -p "$dir" 2>/dev/null || echo "⚠️  Could not create directory: $dir"
+    fi
+done
+
+# Verify critical files
+echo "📄 Verifying critical files..."
+critical_files=("backend/app/main.py" "frontend/static/index.html")
+for file in "${critical_files[@]}"; do
+    if [ -f "$file" ]; then
+        echo "✓ File exists: $file"
+    else
+        echo "❌ Missing critical file: $file"
+        echo "Setup may be incomplete or corrupted"
+        exit 1
+    fi
+done
+
+# Redis service management with comprehensive checks
+echo "🔴 Managing Redis service..."
+redis_running=false
+
+# Check if Redis is already running
+if redis-cli ping >/dev/null 2>&1; then
+    echo "✓ Redis is already running"
+    redis_running=true
+else
+    echo "⚙️  Starting Redis server..."
+
+    # Try systemctl first
+    if systemctl start redis-server 2>/dev/null; then
+        echo "✓ Redis started via systemctl"
+        sleep 3
+    elif [ -f "config/redis.conf" ]; then
+        echo "⚙️  Starting Redis with custom configuration..."
+        redis-server config/redis.conf &
+        sleep 3
+    else
+        echo "⚙️  Starting Redis with default configuration..."
+        redis-server --daemonize yes --port 6379 --bind 0.0.0.0 &
+        sleep 3
+    fi
+
+    # Verify Redis startup
+    local attempts=0
+    while [ $attempts -lt 10 ]; do
+        if redis-cli ping >/dev/null 2>&1; then
+            echo "✓ Redis connection established"
+            redis_running=true
+            break
+        fi
+        attempts=$((attempts + 1))
+        echo "⏳ Waiting for Redis... (attempt $attempts)"
+        sleep 2
+    done
+fi
+
+if [ "$redis_running" = "true" ]; then
+    # Test Redis functionality
+    redis_version=$(redis-cli info server | grep redis_version | cut -d: -f2 | tr -d '\r' 2>/dev/null || echo "unknown")
+    echo "✓ Redis version: $redis_version"
+
+    # Test basic operations
+    if redis-cli set test_startup "success" >/dev/null 2>&1 && \
+       [ "$(redis-cli get test_startup 2>/dev/null)" = "success" ]; then
+        redis-cli del test_startup >/dev/null 2>&1
+        echo "✓ Redis functionality test passed"
+    else
+        echo "⚠️  Redis functionality test failed"
+    fi
+else
+    echo "⚠️  Redis failed to start - continuing without task queue"
+fi
+
+# Python environment setup
+echo "🐍 Setting up Python environment..."
+export PYTHONPATH="$WORK_DIR:$WORK_DIR/backend"
+export PYTHONUNBUFFERED=1
+
+echo "✓ Python path configured: $PYTHONPATH"
+
+# Verify Python dependencies
+echo "📦 Verifying Python dependencies..."
+python3 -c "
+import sys
+critical_modules = [
+    'fastapi', 'uvicorn', 'numpy', 'torch',
+    'librosa', 'demucs', 'basic_pitch'
+]
+
+missing_modules = []
+for module in critical_modules:
+    try:
+        __import__(module)
+        print(f'✓ {module}')
+    except ImportError:
+        missing_modules.append(module)
+        print(f'❌ {module}')
+
+if missing_modules:
+    print(f'Missing critical modules: {missing_modules}')
+    sys.exit(1)
+else:
+    print('✓ All critical Python modules available')
+" || {
+    echo "❌ Critical Python dependencies missing"
+    echo "Please run setup.sh again to install dependencies"
+    exit 1
+}
+
+# Start Celery worker if configured
+if [ -f "backend/app/celery_app.py" ] && [ "$redis_running" = "true" ]; then
+    echo "👷 Starting Celery worker..."
+    cd backend
+    celery -A app.celery_app worker --loglevel=info --pidfile=/tmp/celery.pid --detach 2>/dev/null && \
+        echo "✓ Celery worker started" || echo "⚠️  Celery worker failed to start"
+    cd ..
+else
+    echo "ℹ️  Celery worker not configured or Redis unavailable"
+fi
+
+# Start FastAPI server
+echo "🌐 Starting M3 Enhanced API server..."
+
+# Verify FastAPI application exists
+if [ ! -f "backend/app/main.py" ]; then
+    echo "❌ FastAPI application not found at backend/app/main.py"
+    echo "Please ensure the repository structure is correct"
+    exit 1
+fi
+
+# Start API server with comprehensive configuration
+echo "⚙️  Starting FastAPI server..."
+python3 -m uvicorn app.main:app \
+    --host ${API_HOST:-0.0.0.0} \
+    --port ${API_PORT:-8000} \
+    --app-dir backend \
+    --access-log \
+    --log-level info &
+
+API_PID=$!
+echo $API_PID > /tmp/api.pid
+
+# Wait for API server startup
+echo "⏳ Waiting for API server to start..."
+sleep 8
+
+# Verify API server startup
+if kill -0 "$API_PID" 2>/dev/null; then
+    echo "✓ API server started successfully (PID: $API_PID)"
+
+    # Test API health endpoint
+    local health_attempts=0
+    local health_success=false
+
+    while [ $health_attempts -lt 10 ]; do
+        health_attempts=$((health_attempts + 1))
+        echo "🏥 Testing API health... (attempt $health_attempts)"
+
+        if curl -s http://localhost:${API_PORT:-8000}/health >/dev/null 2>&1; then
+            health_success=true
+            echo "✓ API health check passed"
+            break
+        fi
+
+        sleep 2
+    done
+
+    if [ "$health_success" = "false" ]; then
+        echo "⚠️  API health check failed - server may still be starting"
+    fi
+
+    # Display comprehensive startup summary
+    echo ""
+    echo "🎉 M3 Enhanced started successfully!"
+    echo ""
+    echo "🌐 ACCESS POINTS:"
+    echo "   • Web Interface: http://localhost:${API_PORT:-8000}"
+    echo "   • API Documentation: http://localhost:${API_PORT:-8000}/docs"
+    echo "   • Interactive API: http://localhost:${API_PORT:-8000}/redoc"
+    echo "   • Health Check: http://localhost:${API_PORT:-8000}/health"
+    echo ""
+    echo "📁 FRONTEND FILES:"
+    echo "   • Main Page: frontend/static/index.html"
+    echo "   • Styles: frontend/static/style.css"
+    echo "   • JavaScript: frontend/static/app.js"
+    echo ""
+    echo "🛠️  MANAGEMENT COMMANDS:"
+    echo "   • Check Status: ./status.sh"
+    echo "   • Stop Services: ./stop.sh"
+    echo "   • View Logs: tail -f logs/*.log"
+    echo ""
+    echo "⚙️  SYSTEM CONFIGURATION:"
+    echo "   • Device: ${DEVICE:-cpu}"
+    echo "   • Workers: ${MAX_WORKERS:-2}"
+    echo "   • GPU Enabled: ${GPU_ENABLED:-false}"
+    echo "   • Redis: $([[ $redis_running == true ]] && echo 'Connected' || echo 'Unavailable')"
+    echo ""
+    echo "🧪 QUICK TEST:"
+    echo "   curl http://localhost:${API_PORT:-8000}/health"
+    echo ""
+
+    # Final health check with output
+    if [ "$health_success" = "true" ]; then
+        echo "📊 API HEALTH STATUS:"
+        curl -s http://localhost:${API_PORT:-8000}/health | python3 -m json.tool 2>/dev/null || \
+            echo "Health endpoint available but response not JSON formatted"
+    fi
+
+else
+    echo "❌ API server failed to start"
+    rm -f /tmp/api.pid
+
+    # Show error information
+    echo ""
+    echo "🔍 TROUBLESHOOTING:"
+    echo "   • Check Python dependencies: python3 -c 'import fastapi, uvicorn'"
+    echo "   • Check file permissions: ls -la backend/app/main.py"
+    echo "   • Check logs: tail logs/*.log"
+    echo "   • Verify environment: cat .env"
+
+    exit 1
+fi
+EOF
+
+    chmod +x "$WORK_DIR/start.sh"
+    log_info "Comprehensive start script created successfully"
+
+    # Create comprehensive stop script
+    log_info "Creating comprehensive stop script..."
+
+    cat > "$WORK_DIR/stop.sh" << 'EOF'
+#!/bin/bash
+
+#=======================================================
+#         M3 Enhanced - Comprehensive Stop Script
+#=======================================================
+
+echo "🛑 Stopping M3 Enhanced services..."
+
+# Stop API server
+if [ -f /tmp/api.pid ]; then
+    API_PID=$(cat /tmp/api.pid)
+    if kill -0 "$API_PID" 2>/dev/null; then
+        echo "🌐 Stopping API server (PID: $API_PID)..."
+        kill "$API_PID"
+
+        # Wait for graceful shutdown
+        local wait_count=0
+        while kill -0 "$API_PID" 2>/dev/null && [ $wait_count -lt 10 ]; do
+            sleep 1
+            wait_count=$((wait_count + 1))
+        done
+
+        # Force kill if still running
+        if kill -0 "$API_PID" 2>/dev/null; then
+            echo "⚠️  Force killing API server..."
+            kill -9 "$API_PID" 2>/dev/null
+        fi
+
+        rm -f /tmp/api.pid
+        echo "✓ API server stopped"
+    else
+        echo "ℹ️  API server PID file found but process not running"
+        rm -f /tmp/api.pid
+    fi
+else
+    echo "ℹ️  API server PID file not found"
+fi
+
+# Stop Celery worker
+if [ -f /tmp/celery.pid ]; then
+    CELERY_PID=$(cat /tmp/celery.pid)
+    if kill -0 "$CELERY_PID" 2>/dev/null; then
+        echo "👷 Stopping Celery worker (PID: $CELERY_PID)..."
+        kill "$CELERY_PID"
+
+        # Wait for graceful shutdown
+        local wait_count=0
+        while kill -0 "$CELERY_PID" 2>/dev/null && [ $wait_count -lt 10 ]; do
+            sleep 1
+            wait_count=$((wait_count + 1))
+        done
+
+        # Force kill if still running
+        if kill -0 "$CELERY_PID" 2>/dev/null; then
+            echo "⚠️  Force killing Celery worker..."
+            kill -9 "$CELERY_PID" 2>/dev/null
+        fi
+
+        rm -f /tmp/celery.pid
+        echo "✓ Celery worker stopped"
+    else
+        echo "ℹ️  Celery PID file found but process not running"
+        rm -f /tmp/celery.pid
+    fi
+else
+    echo "ℹ️  Celery worker PID file not found"
+fi
+
+# Stop any remaining processes
+echo "🧹 Cleaning up remaining processes..."
+
+# Kill uvicorn processes
+local uvicorn_pids=$(pgrep -f "uvicorn.*app.main:app" 2>/dev/null || true)
+if [ -n "$uvicorn_pids" ]; then
+    echo "🌐 Stopping remaining uvicorn processes: $uvicorn_pids"
+    echo "$uvicorn_pids" | xargs kill 2>/dev/null || true
+    sleep 2
+    echo "$uvicorn_pids" | xargs kill -9 2>/dev/null || true
+fi
+
+# Kill celery processes
+local celery_pids=$(pgrep -f "celery.*worker" 2>/dev/null || true)
+if [ -n "$celery_pids" ]; then
+    echo "👷 Stopping remaining celery processes: $celery_pids"
+    echo "$celery_pids" | xargs kill 2>/dev/null || true
+    sleep 2
+    echo "$celery_pids" | xargs kill -9 2>/dev/null || true
+fi
+
+# Clean up PID files
+rm -f /tmp/api.pid /tmp/celery.pid
+
+echo "✓ All M3 Enhanced services stopped successfully"
+
+# Optional: Show remaining processes
+local remaining_processes=$(pgrep -f "uvicorn\|celery.*m3" 2>/dev/null || true)
+if [ -n "$remaining_processes" ]; then
+    echo "⚠️  Warning: Some related processes may still be running:"
+    ps aux | grep -E "uvicorn|celery" | grep -v grep || true
+fi
+
+echo "🏁 Shutdown complete"
+EOF
+
+    chmod +x "$WORK_DIR/stop.sh"
+    log_info "Comprehensive stop script created successfully"
+
+    # Create comprehensive status script
+    log_info "Creating comprehensive status script..."
+
+    cat > "$WORK_DIR/status.sh" << 'EOF'
+#!/bin/bash
+
+#=======================================================
+#         M3 Enhanced - Comprehensive Status Script
+#=======================================================
+
+echo "📊 M3 Enhanced Service Status"
+echo "=================================="
+
+# System Information
+echo ""
+echo "🖥️  SYSTEM INFORMATION:"
+echo "   Date: $(date)"
+echo "   Uptime: $(uptime -p 2>/dev/null || uptime)"
+echo "   Load: $(cat /proc/loadavg)"
+echo "   Memory: $(free -h | grep Mem | awk '{print $3"/"$2}')"
+
+# Environment Information
+if [ -f ".env" ]; then
+    echo ""
+    echo "⚙️  ENVIRONMENT CONFIGURATION:"
+    source .env 2>/dev/null || true
+    echo "   Setup Version: ${SETUP_VERSION:-unknown}"
+    echo "   Device: ${DEVICE:-unknown}"
+    echo "   GPU Enabled: ${GPU_ENABLED:-unknown}"
+    echo "   Max Workers: ${MAX_WORKERS:-unknown}"
+    echo "   API Port: ${API_PORT:-8000}"
+fi
+
+# Service Status Checks
+echo ""
+echo "🔧 SERVICE STATUS:"
+
+# Redis Status
+echo -n "   🔴 Redis: "
+if redis-cli ping >/dev/null 2>&1; then
+    redis_version=$(redis-cli info server 2>/dev/null | grep redis_version | cut -d: -f2 | tr -d '\r' || echo "unknown")
+    redis_memory=$(redis-cli info memory 2>/dev/null | grep used_memory_human | cut -d: -f2 | tr -d '\r' || echo "unknown")
+    echo "✅ Running (v$redis_version, ${redis_memory}B used)"
+
+    # Test Redis functionality
+    if redis-cli set status_test "ok" >/dev/null 2>&1 && \
+       [ "$(redis-cli get status_test 2>/dev/null)" = "ok" ]; then
+        redis-cli del status_test >/dev/null 2>&1
+        echo "      📊 Functionality: ✅ Working"
+    else
+        echo "      📊 Functionality: ❌ Read/Write Failed"
+    fi
+else
+    echo "❌ Not Running"
+fi
+
+# API Server Status
+echo -n "   🌐 API Server: "
+if [ -f /tmp/api.pid ]; then
+    API_PID=$(cat /tmp/api.pid)
+    if kill -0 "$API_PID" 2>/dev/null; then
+        echo "✅ Running (PID: $API_PID)"
+
+        # Check API health endpoint
+        if curl -s http://localhost:${API_PORT:-8000}/health >/dev/null 2>&1; then
+            echo "      🏥 Health Check: ✅ Healthy"
+        else
+            echo "      🏥 Health Check: ❌ Unhealthy"
+        fi
+    else
+        echo "❌ Process Not Found (stale PID file)"
+        rm -f /tmp/api.pid
+    fi
+else
+    echo "❌ Not Running (no PID file)"
+fi
+
+# Celery Worker Status
+echo -n "   👷 Celery Worker: "
+if [ -f /tmp/celery.pid ]; then
+    CELERY_PID=$(cat /tmp/celery.pid)
+    if kill -0 "$CELERY_PID" 2>/dev/null; then
+        echo "✅ Running (PID: $CELERY_PID)"
+    else
+        echo "❌ Process Not Found (stale PID file)"
+        rm -f /tmp/celery.pid
+    fi
+else
+    echo "❌ Not Running"
+fi
+
+# File System Status
+echo ""
+echo "📁 FILE SYSTEM STATUS:"
+
+critical_paths=(
+    "backend/app/main.py:FastAPI Application"
+    "frontend/static/index.html:Web Interface"
+    "frontend/static/style.css:Stylesheets"
+    "frontend/static/app.js:JavaScript"
+    ".env:Environment Config"
+)
+
+for path_info in "${critical_paths[@]}"; do
+    IFS=':' read -r path description <<< "$path_info"
+    echo -n "   📄 $description: "
+    if [ -f "$path" ]; then
+        size=$(du -h "$path" 2>/dev/null | cut -f1 || echo "?")
+        echo "✅ Present (${size}B)"
+    else
+        echo "❌ Missing"
+    fi
+done
+
+# Directory Status
+echo ""
+echo "📂 DIRECTORY STATUS:"
+
+required_dirs=("logs" "uploads" "results" "temp" "models" "config")
+for dir in "${required_dirs[@]}"; do
+    echo -n "   📁 $dir: "
+    if [ -d "$dir" ]; then
+        file_count=$(find "$dir" -type f 2>/dev/null | wc -l || echo "?")
+        dir_size=$(du -sh "$dir" 2>/dev/null | cut -f1 || echo "?")
+        echo "✅ Present ($file_count files, ${dir_size}B)"
+    else
+        echo "❌ Missing"
+    fi
+done
+
+# Network Status
+echo ""
+echo "🌐 NETWORK STATUS:"
+
+# Test API endpoints
+endpoints=(
+    "/:Main Page"
+    "/health:Health Check"
+    "/docs:API Documentation"
+)
+
+for endpoint_info in "${endpoints[@]}"; do
+    IFS=':' read -r endpoint description <<< "$endpoint_info"
+    echo -n "   🔗 $description: "
+
+    if curl -s -o /dev/null -w "%{http_code}" "http://localhost:${API_PORT:-8000}$endpoint" 2>/dev/null | grep -q "200\|404"; then
+        echo "✅ Accessible"
+    else
+        echo "❌ Not Accessible"
+    fi
+done
+
+# Python Environment Status
+echo ""
+echo "🐍 PYTHON ENVIRONMENT:"
+
+python3 -c "
+import sys
+print(f'   Python Version: {sys.version.split()[0]}')
+
+# Check critical modules
+critical_modules = {
+    'fastapi': 'FastAPI Framework',
+    'uvicorn': 'ASGI Server',
+    'numpy': 'NumPy Arrays',
+    'torch': 'PyTorch ML',
+    'librosa': 'Audio Analysis',
+    'demucs': 'Audio Separation',
+    'basic_pitch': 'Music Transcription'
+}
+
+for module, description in critical_modules.items():
+    try:
+        imported = __import__(module)
+        version = getattr(imported, '__version__', 'unknown')
+        print(f'   ✅ {description}: v{version}')
+    except ImportError:
+        print(f'   ❌ {description}: Not Available')
+"
+
+# API Health Check (if available)
+echo ""
+echo "🏥 API HEALTH CHECK:"
+if curl -s http://localhost:${API_PORT:-8000}/health >/dev/null 2>&1; then
+    echo "   Status: ✅ API Responding"
+    echo ""
+    echo "   Health Response:"
+    curl -s http://localhost:${API_PORT:-8000}/health | python3 -m json.tool 2>/dev/null | sed 's/^/      /' || \
+        echo "      Could not parse JSON response"
+else
+    echo "   Status: ❌ API Not Responding"
+fi
+
+# Access Information
+echo ""
+echo "🔗 ACCESS INFORMATION:"
+echo "   🌐 Web Interface: http://localhost:${API_PORT:-8000}"
+echo "   📚 API Documentation: http://localhost:${API_PORT:-8000}/docs"
+echo "   📖 ReDoc Documentation: http://localhost:${API_PORT:-8000}/redoc"
+echo "   🏥 Health Endpoint: http://localhost:${API_PORT:-8000}/health"
+
+# Quick Actions
+echo ""
+echo "⚡ QUICK ACTIONS:"
+echo "   Start Services: ./start.sh"
+echo "   Stop Services: ./stop.sh"
+echo "   View Logs: tail -f logs/*.log"
+echo "   Test Health: curl http://localhost:${API_PORT:-8000}/health"
+
+echo ""
+echo "=================================="
+EOF
+
+    chmod +x "$WORK_DIR/status.sh"
+    log_info "Comprehensive status script created successfully"
+
+    log_info "Service management scripts created successfully"
+}
+
+#=======================================================
+#               COMPREHENSIVE INSTALLATION VERIFICATION
+#=======================================================
+
+verify_installation() {
+    log_step 13 "Comprehensive Installation Verification"
+
+    log_info "Performing comprehensive installation verification..."
+
+    # Comprehensive Python environment verification
+    log_info "Verifying comprehensive Python environment..."
+
+    python3 -c "
+import sys
+import importlib
+
+print('=== COMPREHENSIVE PYTHON ENVIRONMENT VERIFICATION ===')
+print(f'Python Version: {sys.version}')
+print(f'Python Executable: {sys.executable}')
+print(f'Python Path: {sys.path}')
+
+# Core ML Framework Verification
+print('\\n=== CORE ML FRAMEWORKS ===')
+frameworks = {
+    'numpy': 'NumPy Arrays and Mathematics',
+    'scipy': 'Scientific Computing',
+    'sklearn': 'Machine Learning',
+    'torch': 'PyTorch Deep Learning',
+    'tensorflow': 'TensorFlow Deep Learning'
+}
+
+framework_status = {}
+for module, description in frameworks.items():
+    try:
+        imported = importlib.import_module(module)
+        version = getattr(imported, '__version__', 'unknown')
+        print(f'✅ {description}: v{version}')
+        framework_status[module] = True
+    except ImportError as e:
+        print(f'❌ {description}: FAILED - {e}')
+        framework_status[module] = False
+
+# Audio Processing Verification
+print('\\n=== AUDIO PROCESSING LIBRARIES ===')
+audio_libs = {
+    'soundfile': 'Audio I/O',
+    'audioread': 'Audio Format Support',
+    'librosa': 'Audio Analysis',
+    'pydub': 'Audio Manipulation',
+    'resampy': 'Sample Rate Conversion'
+}
+
+audio_status = {}
+for module, description in audio_libs.items():
+    try:
+        imported = importlib.import_module(module)
+        version = getattr(imported, '__version__', 'unknown')
+        print(f'✅ {description}: v{version}')
+        audio_status[module] = True
+    except ImportError as e:
+        print(f'❌ {description}: FAILED - {e}')
+        audio_status[module] = False
+
+# Music Processing Verification
+print('\\n=== MUSIC PROCESSING LIBRARIES ===')
+music_libs = {
+    'pretty_midi': 'MIDI Processing',
+    'music21': 'Music Analysis',
+    'mido': 'MIDI I/O',
+    'demucs': 'Audio Separation',
+    'basic_pitch': 'Music Transcription',
+    'mir_eval': 'Music Information Retrieval'
+}
+
+music_status = {}
+for module, description in music_libs.items():
+    try:
+        imported = importlib.import_module(module)
+        version = getattr(imported, '__version__', 'unknown')
+        print(f'✅ {description}: v{version}')
+        music_status[module] = True
+    except ImportError as e:
+        print(f'❌ {description}: FAILED - {e}')
+        music_status[module] = False
+
+# Web Framework Verification
+print('\\n=== WEB FRAMEWORKS ===')
+web_libs = {
+    'fastapi': 'FastAPI Web Framework',
+    'uvicorn': 'ASGI Server',
+    'pydantic': 'Data Validation',
+    'celery': 'Task Queue',
+    'redis': 'Redis Client'
+}
+
+web_status = {}
+for module, description in web_libs.items():
+    try:
+        imported = importlib.import_module(module)
+        version = getattr(imported, '__version__', 'unknown')
+        print(f'✅ {description}: v{version}')
+        web_status[module] = True
+    except ImportError as e:
+        print(f'❌ {description}: FAILED - {e}')
+        web_status[module] = False
+
+# Summary
+print('\\n=== VERIFICATION SUMMARY ===')
+all_frameworks = {**framework_status, **audio_status, **music_status, **web_status}
+passed = sum(1 for status in all_frameworks.values() if status)
+total = len(all_frameworks)
+success_rate = (passed / total) * 100
+
+print(f'Total Modules Tested: {total}')
+print(f'Successfully Imported: {passed}')
+print(f'Failed Imports: {total - passed}')
+print(f'Success Rate: {success_rate:.1f}%')
+
+if success_rate >= 90:
+    print('\\n✅ VERIFICATION STATUS: EXCELLENT')
+elif success_rate >= 75:
+    print('\\n⚠️  VERIFICATION STATUS: GOOD (some optional components missing)')
+elif success_rate >= 50:
+    print('\\n⚠️  VERIFICATION STATUS: PARTIAL (significant components missing)')
+else:
+    print('\\n❌ VERIFICATION STATUS: FAILED (too many critical components missing)')
+    sys.exit(1)
+"
+
+    if [ $? -ne 0 ]; then
+        fatal_error "Python environment verification failed"
+    fi
+
+    log_info "Python environment verification completed successfully"
+
+    # Comprehensive file structure verification
+    log_info "Performing comprehensive file structure verification..."
+
+    local critical_files=(
+        "$WORK_DIR/backend/app/main.py:FastAPI Application"
+        "$WORK_DIR/frontend/static/index.html:Frontend Main Page"
+        "$WORK_DIR/frontend/static/style.css:Frontend Stylesheet"
+        "$WORK_DIR/frontend/static/app.js:Frontend JavaScript"
+        "$WORK_DIR/.env:Environment Configuration"
+        "$WORK_DIR/start.sh:Start Script"
+        "$WORK_DIR/stop.sh:Stop Script"
+        "$WORK_DIR/status.sh:Status Script"
+    )
+
+    local file_verification_passed=true
+
+    for file_info in "${critical_files[@]}"; do
+        IFS=':' read -r file_path description <<< "$file_info"
+
+        if [ -f "$file_path" ]; then
+            local file_size=$(stat -c%s "$file_path" 2>/dev/null || echo 0)
+            log_info "✓ $description: exists (${file_size} bytes)"
+        else
+            log_error "✗ $description: MISSING - $file_path"
+            file_verification_passed=false
+        fi
+    done
+
+    if [ "$file_verification_passed" = "false" ]; then
+        fatal_error "Critical files are missing - installation is incomplete"
+    fi
+
+    # Verify directory structure
+    log_info "Verifying directory structure..."
+
+    local required_directories=(
+        "$LOG_DIR:Log Directory"
+        "$MODELS_DIR:Models Directory"
+        "$TEMP_DIR:Temporary Directory"
+        "$UPLOADS_DIR:Uploads Directory"
+        "$RESULTS_DIR:Results Directory"
+        "$CONFIG_DIR:Configuration Directory"
+    )
+
+    for dir_info in "${required_directories[@]}"; do
+        IFS=':' read -r dir_path description <<< "$dir_info"
+
+        if [ -d "$dir_path" ]; then
+            log_info "✓ $description: exists and accessible"
+        else
+            log_warn "✗ $description: missing - creating..."
+            mkdir -p "$dir_path" || fatal_error "Failed to create directory: $dir_path"
+        fi
+    done
+
+    # Comprehensive functionality testing
+    log_info "Performing comprehensive functionality testing..."
+
+    # Test audio processing pipeline
+    python3 -c "
+import numpy as np
+import librosa
+import soundfile as sf
+
+print('Testing audio processing pipeline...')
+
+# Generate test audio signal
+sample_rate = 22050
+duration = 1.0
+t = np.linspace(0, duration, int(sample_rate * duration))
+test_signal = 0.5 * np.sin(2 * np.pi * 440 * t)  # 440 Hz sine wave
+
+print(f'✓ Generated test signal: {test_signal.shape}')
+
+# Test librosa functionality
+stft = librosa.stft(test_signal)
+mfccs = librosa.feature.mfcc(y=test_signal, sr=sample_rate, n_mfcc=13)
+
+print(f'✓ STFT computation: {stft.shape}')
+print(f'✓ MFCC extraction: {mfccs.shape}')
+
+# Test basic pitch functionality
+try:
+    import basic_pitch
+    from basic_pitch.inference import predict
+
+    model_output, midi_data, note_events = predict(test_signal)
+    print(f'✓ Basic Pitch transcription: output_shape={model_output.shape}')
+except Exception as e:
+    print(f'⚠️  Basic Pitch test failed: {e}')
+
+print('Audio processing pipeline test completed')
+"
+
+    # Test ML frameworks integration
+    python3 -c "
+import numpy as np
+import torch
+import tensorflow as tf
+
+print('Testing ML frameworks integration...')
+
+# Test NumPy
+np_array = np.random.randn(10, 10)
+print(f'✓ NumPy array creation: {np_array.shape}')
+
+# Test PyTorch
+torch_tensor = torch.from_numpy(np_array).float()
+torch_result = torch.matmul(torch_tensor, torch_tensor.T)
+print(f'✓ PyTorch tensor operations: {torch_result.shape}')
+
+# Test TensorFlow
+tf_tensor = tf.constant(np_array, dtype=tf.float32)
+tf_result = tf.linalg.matmul(tf_tensor, tf_tensor, transpose_b=True)
+print(f'✓ TensorFlow tensor operations: {tf_result.shape}')
+
+print('ML frameworks integration test completed')
+"
+
+    log_info "Functionality testing completed successfully"
+
+    log_info "Comprehensive installation verification completed successfully"
+}
+
+#=======================================================
+#               COMPREHENSIVE CLEANUP
+#=======================================================
+
+cleanup_installation() {
+    log_step 14 "Comprehensive Installation Cleanup"
+
+    log_info "Performing comprehensive installation cleanup..."
+
+    # Comprehensive pip cache cleanup
+    log_info "Performing comprehensive pip cache cleanup..."
+
+    local cache_size_before=$(python3 -m pip cache info 2>/dev/null | grep "Cache size" | cut -d: -f2 | xargs || echo "unknown")
+    log_info "Pip cache size before cleanup: $cache_size_before"
+
+    python3 -m pip cache purge || {
+        log_warn "Pip cache purge failed, trying manual cleanup..."
+        rm -rf ~/.cache/pip/* 2>/dev/null || true
+        rm -rf /tmp/pip-* 2>/dev/null || true
+    }
+
+    local cache_size_after=$(python3 -m pip cache info 2>/dev/null | grep "Cache size" | cut -d: -f2 | xargs || echo "unknown")
+    log_info "Pip cache size after cleanup: $cache_size_after"
+
+    # System package cache cleanup
+    log_info "Performing system package cache cleanup..."
+
+    # Remove orphaned packages
+    log_info "Removing orphaned packages..."
+    apt-get autoremove -y 2>/dev/null || log_warn "Autoremove failed"
+
+    # Clean package cache
+    log_info "Cleaning package cache..."
+    apt-get clean 2>/dev/null || log_warn "Package clean failed"
+
+    # Clean temporary files
+    log_info "Cleaning temporary files..."
+
+    # Clean system temp files
+    find /tmp -name "pip-*" -type d -mtime +1 -exec rm -rf {} + 2>/dev/null || true
+    find /tmp -name "tmp*" -type d -empty -mtime +1 -delete 2>/dev/null || true
+
+    # Clean Python cache files
+    log_info "Cleaning Python cache files..."
+    find "$WORK_DIR" -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+    find "$WORK_DIR" -name "*.pyc" -delete 2>/dev/null || true
+    find "$WORK_DIR" -name "*.pyo" -delete 2>/dev/null || true
+
+    # Set proper permissions
+    log_info "Setting proper file permissions..."
+
+    # Make scripts executable
+    chmod +x "$WORK_DIR/start.sh" 2>/dev/null || log_warn "Failed to set start.sh permissions"
+    chmod +x "$WORK_DIR/stop.sh" 2>/dev/null || log_warn "Failed to set stop.sh permissions"
+    chmod +x "$WORK_DIR/status.sh" 2>/dev/null || log_warn "Failed to set status.sh permissions"
+
+    # Set directory permissions
+    chmod 755 "$WORK_DIR" 2>/dev/null || true
+    chmod -R 755 "$LOG_DIR" 2>/dev/null || true
+    chmod -R 755 "$UPLOADS_DIR" 2>/dev/null || true
+    chmod -R 755 "$RESULTS_DIR" 2>/dev/null || true
+    chmod -R 755 "$TEMP_DIR" 2>/dev/null || true
+
+    # Create initial log files with proper permissions
+    log_info "Creating initial log files..."
+    touch "$LOG_DIR/api.log" "$LOG_DIR/celery.log" "$LOG_DIR/system.log" 2>/dev/null || true
+    chmod 644 "$LOG_DIR"/*.log 2>/dev/null || true
+
+    # Final cleanup verification
+    log_info "Verifying cleanup completion..."
+
+    local temp_files=$(find /tmp -name "*pip*" -o -name "*m3*" -o -name "*demucs*" 2>/dev/null | wc -l || echo 0)
+    log_info "Remaining temporary files: $temp_files"
+
+    local cache_dirs=$(find ~/.cache -maxdepth 2 -name "*pip*" -type d 2>/dev/null | wc -l || echo 0)
+    log_info "Remaining cache directories: $cache_dirs"
+
+    log_info "Comprehensive cleanup completed successfully"
+}
+
+#=======================================================
+#               MAIN EXECUTION FUNCTION
+#=======================================================
+
+main() {
+    print_header
+
+    log_info "Starting M3 Enhanced comprehensive setup process..."
+    log_info "Script version: $SCRIPT_VERSION"
+    log_info "Working directory: $WORK_DIR"
+    log_info "Timestamp: $TIMESTAMP"
+    log_info "Process ID: $$"
+
+    # Execute all comprehensive setup steps
+    verify_system
+    install_system_dependencies
+    setup_python_environment
+    resolve_dependency_conflicts
+    install_core_ml_frameworks
+    install_audio_processing
+    install_music_processing
+    install_web_frameworks
+    setup_redis
+    download_models
+    configure_environment
+    create_service_scripts
+    verify_installation
+    cleanup_installation
+
+    # Calculate comprehensive setup time
+    local end_time=$(date +%s)
+    local duration=$((end_time - START_TIME))
+    local hours=$((duration / 3600))
+    local minutes=$(((duration % 3600) / 60))
+    local seconds=$((duration % 60))
+
+    # Comprehensive system configuration detection
+    local gpu_text="CPU"
+    local device="cpu"
+    local workers=2
+    local batch_size=2
+
+    if command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi >/dev/null 2>&1; then
+        gpu_text="GPU"
+        device="cuda"
+        workers=4
+        batch_size=8
+    fi
+
+    # Display comprehensive completion message
+    echo ""
+    echo "=============================================="
+    echo "    M3 ENHANCED COMPREHENSIVE SETUP COMPLETE"
+    echo "=============================================="
+    echo ""
+    echo "📊 INSTALLATION SUMMARY:"
+    echo "  ⏱️  Setup Time: ${hours}h ${minutes}m ${seconds}s"
+
