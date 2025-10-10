@@ -604,3 +604,6 @@ API: http://localhost:8000
 Logs: tail -f logs/api.log
 
 but this link went nowhere and said localhost refused to connect.
+ NOt only that ina  fix you did previously, it failed because of python version issues. Again, just make it work without workarounds and just works. Analyze the whole system and make a system that works.
+
+
