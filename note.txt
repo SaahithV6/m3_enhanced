@@ -1,500 +1,73 @@
 I need you to fully audit and rebuild the entire setup process for this project from scratch, especially the setup.sh file, ensuring every pipeline, system, and dependency is properly configured without skipping steps or relying on assumptions from previous attempts—even failed ones, as some got closer despite import issues. Do not use any logging systems that interfere with terminal output; all imports and commands must run raw in the terminal so I can clearly see what's going on. The script must stop if any vital system component fails—no silent failures or workarounds. You're allowed to change anything in the codebase to ensure functionality works exactly as programmed in the backend, as described in the README, but if you change requirements.txt, you must first perform a full code audit of the entire project to identify used and unused libraries, only removing packages if they are proven to be completely unused and improperly called. Use the most modern and stable versions of dependencies possible, and avoid partial or outdated installs (e.g., don’t use old versions like music21 8.x if newer ones are compatible). All system and Python dependencies should be installed and run entirely through setup.sh, which must be the only entry point for setting up and running the program. Do not delete any sections of code. Do not include any emojis in any part of the code or documentation. When making changes, append them clearly to fixlog.txt, creating timestamped detailed entries of the issue and why its a problem, and how its been fixed. See earlier entries in fixlog.txt for guidance. Save the complete terminal output from each run to a file called result.txt for further analysis. Each change iteration should be clearly numbered to ensure we don’t lose track of progress. Deliver all modified code as files in this session. Finally, the ideal length of setup.sh should be between 900 to 1500 lines, unless more are needed to properly manage all dependencies and ensure full system stability. Also make sure you are aware of the entire file tree because you've had problems in teh past with seeing which file goes where in teh file tree
 
-Below is the terminal output:
-
-Archive:  m3_enhanced.zip
-   creating: m3_enhanced/
-   creating: m3_enhanced/.git/
-   creating: m3_enhanced/.git/branches/
-  inflating: m3_enhanced/.git/description
-   creating: m3_enhanced/.git/hooks/
-  inflating: m3_enhanced/.git/hooks/applypatch-msg.sample
-  inflating: m3_enhanced/.git/hooks/commit-msg.sample
-  inflating: m3_enhanced/.git/hooks/fsmonitor-watchman.sample
-  inflating: m3_enhanced/.git/hooks/post-update.sample
-  inflating: m3_enhanced/.git/hooks/pre-applypatch.sample
-  inflating: m3_enhanced/.git/hooks/pre-commit.sample
-  inflating: m3_enhanced/.git/hooks/pre-merge-commit.sample
-  inflating: m3_enhanced/.git/hooks/pre-push.sample
-  inflating: m3_enhanced/.git/hooks/pre-rebase.sample
-  inflating: m3_enhanced/.git/hooks/pre-receive.sample
-  inflating: m3_enhanced/.git/hooks/prepare-commit-msg.sample
-  inflating: m3_enhanced/.git/hooks/push-to-checkout.sample
-  inflating: m3_enhanced/.git/hooks/sendemail-validate.sample
-  inflating: m3_enhanced/.git/hooks/update.sample
-   creating: m3_enhanced/.git/info/
-  inflating: m3_enhanced/.git/info/exclude
-   creating: m3_enhanced/.git/objects/
-   creating: m3_enhanced/.git/objects/pack/
-  inflating: m3_enhanced/.git/objects/pack/pack-c56faa93401ad16ef4d114edac8916d3e8ec55af.pack
-  inflating: m3_enhanced/.git/objects/pack/pack-c56faa93401ad16ef4d114edac8916d3e8ec55af.rev
-  inflating: m3_enhanced/.git/objects/pack/pack-c56faa93401ad16ef4d114edac8916d3e8ec55af.idx
-   creating: m3_enhanced/.git/objects/info/
-   creating: m3_enhanced/.git/objects/1f/
-  inflating: m3_enhanced/.git/objects/1f/c58b1341163ee8e3280769adcb265c4d25ba5f
-   creating: m3_enhanced/.git/objects/a0/
- extracting: m3_enhanced/.git/objects/a0/09d0ed82585ab465847f38bc3e78294e3249e4
-   creating: m3_enhanced/.git/objects/09/
-  inflating: m3_enhanced/.git/objects/09/c1bcd930c21d1777833279bc8f79225a6027b7
- extracting: m3_enhanced/.git/objects/09/c2c90719c71ccbb9a573b093c3b6d4cdaf6f16
-  inflating: m3_enhanced/.git/objects/09/0d68b29a4fcc20048d719d95bf0d264fab8580
-   creating: m3_enhanced/.git/objects/b4/
-  inflating: m3_enhanced/.git/objects/b4/20bd5abdd04d2213aa72f5bb0409c9a454320e
- extracting: m3_enhanced/.git/objects/b4/93e6364e7bcd573effaa3e559503e67dc57429
-  inflating: m3_enhanced/.git/objects/b4/f2e54a82e2920f384a7288a1582673b4acf357
-   creating: m3_enhanced/.git/objects/5f/
- extracting: m3_enhanced/.git/objects/5f/cf7e34c9684abdd50d5e7592ff966df845bdb3
-   creating: m3_enhanced/.git/objects/84/
-  inflating: m3_enhanced/.git/objects/84/fa2be30e35f4b4f74e0bd93bf2f20e8e322fa2
-   creating: m3_enhanced/.git/objects/44/
-  inflating: m3_enhanced/.git/objects/44/8e906a1821a07885bdefa9af7cec6067040cc1
- extracting: m3_enhanced/.git/objects/44/c23bc676dfac96632f061c48facc60feceea65
-   creating: m3_enhanced/.git/objects/54/
- extracting: m3_enhanced/.git/objects/54/db568b936249f86645542a858d1875fcacd1d6
-   creating: m3_enhanced/.git/objects/f0/
-  inflating: m3_enhanced/.git/objects/f0/3190cde5a7f959f34c6624bc63c7b9ad2eba02
-  inflating: m3_enhanced/.git/objects/f0/22ada9a7c5b0c14643086f7c068db0061a6dcf
-   creating: m3_enhanced/.git/objects/6d/
- extracting: m3_enhanced/.git/objects/6d/606da0738884164044084211d51794545a325a
-   creating: m3_enhanced/.git/objects/f8/
- extracting: m3_enhanced/.git/objects/f8/f7c6d72ec9ba255a1a1402081945bd1f226d89
-   creating: m3_enhanced/.git/objects/6e/
- extracting: m3_enhanced/.git/objects/6e/975d98e2daf4ca3f1e85378a1116a8344639a1
-   creating: m3_enhanced/.git/objects/0a/
- extracting: m3_enhanced/.git/objects/0a/0b27e912573a2bba5b2cc05ebf2e49ca51f3f5
-   creating: m3_enhanced/.git/objects/01/
-  inflating: m3_enhanced/.git/objects/01/cbb001ddcbb2199d75a8011a53821cf88898cb
-   creating: m3_enhanced/.git/objects/91/
- extracting: m3_enhanced/.git/objects/91/b848f5f000d945e33771b074a67edd707bba0a
-  inflating: m3_enhanced/.git/objects/91/d8618c8fff0b110135d8a48f79b692ad9f4582
- extracting: m3_enhanced/.git/objects/91/43d33f1523c5ff3fba047c511c0722430880a0
-   creating: m3_enhanced/.git/objects/3e/
-  inflating: m3_enhanced/.git/objects/3e/5e83e0ea3628a3e020c5d272ad37b7c6dd70ce
-   creating: m3_enhanced/.git/objects/dd/
-  inflating: m3_enhanced/.git/objects/dd/5b1c04e7bb0d6534cd2e6a3d30aa7375b31b59
-   creating: m3_enhanced/.git/objects/f3/
- extracting: m3_enhanced/.git/objects/f3/d89de8679a412986c44e5c8335366e7a10d91e
-   creating: m3_enhanced/.git/objects/29/
-  inflating: m3_enhanced/.git/objects/29/b6bcaa8a3fd42a77866ca098f7e72d906bdb71
- extracting: m3_enhanced/.git/objects/29/4eec1698990171ed9926be6e1f6da095dbb3ae
-   creating: m3_enhanced/.git/objects/d1/
-  inflating: m3_enhanced/.git/objects/d1/483bd040c958aabc5158fc8c603d4d284d5053
-   creating: m3_enhanced/.git/objects/7e/
-  inflating: m3_enhanced/.git/objects/7e/2d43fd98f731ca684af3c120b24396380bd79c
-   creating: m3_enhanced/.git/objects/4b/
- extracting: m3_enhanced/.git/objects/4b/489a783b3d5b1d19f8f8fb1501c61a88f431f1
- extracting: m3_enhanced/.git/objects/4b/e284c546d716d94fcecd8103a5d69bf66f5861
-   creating: m3_enhanced/.git/objects/51/
-  inflating: m3_enhanced/.git/objects/51/3d980354702b2712e3c4c5e35426811cabe15f
-  inflating: m3_enhanced/.git/objects/51/5fe57a621f19b437a600bcf09af67668acaca5
-   creating: m3_enhanced/.git/objects/ab/
-  inflating: m3_enhanced/.git/objects/ab/dedcdbeaef6dd867451e0c4a1370e3f2b26c79
- extracting: m3_enhanced/.git/objects/ab/d680bb8c814ee5881658372d371a6e942ffb68
-   creating: m3_enhanced/.git/objects/a7/
- extracting: m3_enhanced/.git/objects/a7/c3394abee1dd65711551d7f2c349be2a4ad053
- extracting: m3_enhanced/.git/objects/a7/064a9c4fa882c8ff744c2a5b2fb68865e3a269
-   creating: m3_enhanced/.git/objects/f5/
-  inflating: m3_enhanced/.git/objects/f5/96953734846fece0c901a2ad778ddf44851f5e
- extracting: m3_enhanced/.git/objects/f5/91b301ce9ff308ffaa0107ffae95b1cd141f06
- extracting: m3_enhanced/.git/objects/f5/6df45723ae97edd0124a0691b150d186772474
-   creating: m3_enhanced/.git/objects/f7/
-  inflating: m3_enhanced/.git/objects/f7/0422c8d9c649d0f9932b2ee1ac4f6d9573c2c2
-  inflating: m3_enhanced/.git/objects/f7/b8d10d682beb92dcd89b6baff6daa323bad54e
- extracting: m3_enhanced/.git/objects/f7/10ca0cf8823aa8f0d2a12adb6728df13f47c27
-  inflating: m3_enhanced/.git/objects/f7/03425c1fd1cfeb5fd1fa9154bad0cbe28d4efb
- extracting: m3_enhanced/.git/objects/f7/c22242f2637eb5335c506e1516be47c9f1f38f
-  inflating: m3_enhanced/.git/objects/f7/5a6ed70838065ac028cd7b74e1c8c0c228d58a
-   creating: m3_enhanced/.git/objects/d9/
- extracting: m3_enhanced/.git/objects/d9/ca96eed7a1c7a4e326a495ec2d8173d2c41709
- extracting: m3_enhanced/.git/objects/d9/cee4e7c3fa2fc8d40f2612a4842baf22e8206a
-   creating: m3_enhanced/.git/objects/9b/
-  inflating: m3_enhanced/.git/objects/9b/0b530968be25eb07f6a8636dc24fc8df0f14da
-   creating: m3_enhanced/.git/objects/c8/
-  inflating: m3_enhanced/.git/objects/c8/bd4b4cabd39c8f12c8e8dc06e00b98ab629376
- extracting: m3_enhanced/.git/objects/c8/a791b6d435564de2466ed0ff4ba8e903cdea52
- extracting: m3_enhanced/.git/objects/c8/da7d0275908fe07e733eb0310628890faa05cb
-  inflating: m3_enhanced/.git/objects/c8/063c589e3be6c60955db0ff964437dc607510a
-   creating: m3_enhanced/.git/objects/e9/
- extracting: m3_enhanced/.git/objects/e9/abefa7e43428d69bae7aaa769f350119e0cdb1
-   creating: m3_enhanced/.git/objects/ef/
-  inflating: m3_enhanced/.git/objects/ef/4825208fad36d80d8ac9431fb6e6e6645bbb6f
-   creating: m3_enhanced/.git/objects/45/
-  inflating: m3_enhanced/.git/objects/45/459f052b3f612de7e1a4cb3d0dca4a0b0dc52d
-   creating: m3_enhanced/.git/objects/8a/
-  inflating: m3_enhanced/.git/objects/8a/b34c50c8d7860f8a6c5e49e3f42ef81cc53194
-  inflating: m3_enhanced/.git/objects/8a/9d2e3b86750492e7e59dec0e02455a322c247d
-   creating: m3_enhanced/.git/objects/11/
- extracting: m3_enhanced/.git/objects/11/a5c5b4c052e9690bc225a1bcef15ba47d35e2d
-   creating: m3_enhanced/.git/objects/97/
-  inflating: m3_enhanced/.git/objects/97/bcf9c36780ad4a1085c837601729b9141ce0b2
-   creating: m3_enhanced/.git/objects/73/
-  inflating: m3_enhanced/.git/objects/73/369c7decac6cd050d9e13fb4da6ff49155a5f2
-   creating: m3_enhanced/.git/objects/38/
- extracting: m3_enhanced/.git/objects/38/1279a472c85e76855f8dfe68d1ffc775ef1074
-  inflating: m3_enhanced/.git/objects/38/25d73e1a337f7d3e60a58b6f61a09eab20e850
-   creating: m3_enhanced/.git/objects/ec/
-  inflating: m3_enhanced/.git/objects/ec/f5e4601ab1d79d7888c83b5b75f8d6f6ba39fa
-   creating: m3_enhanced/.git/objects/64/
-  inflating: m3_enhanced/.git/objects/64/9d92da39bbf92aeadc2fa368d03c8e925aec87
-  inflating: m3_enhanced/.git/objects/64/b9cda8e8ebe2d7255dd627488e4a84ff64154a
-   creating: m3_enhanced/.git/objects/fa/
- extracting: m3_enhanced/.git/objects/fa/62e4b353da7e36c87a01f01f07689d05c9763f
-  inflating: m3_enhanced/.git/objects/fa/20f3e55e5d87ce7c3cc42582a94ea403eee261
-  inflating: m3_enhanced/.git/objects/fa/e9d265666145ce7f2c7ce412d06cf9c4d694d9
-   creating: m3_enhanced/.git/objects/36/
- extracting: m3_enhanced/.git/objects/36/48ecbbc7ece54f9da4bf8c3d2fc8aba8f79036
-  inflating: m3_enhanced/.git/objects/36/28674412228add337c76c076008cb8e33f3e45
-   creating: m3_enhanced/.git/objects/c9/
- extracting: m3_enhanced/.git/objects/c9/8c3a5b3dcbbd6dabc32f81a9efa487b854936a
-   creating: m3_enhanced/.git/objects/61/
- extracting: m3_enhanced/.git/objects/61/6d2d98233fd926b0416c7b31fdef47bae5ff83
-   creating: m3_enhanced/.git/objects/89/
- extracting: m3_enhanced/.git/objects/89/ddd5ad10b9471bb3116e4af654af7eef96e7d1
-   creating: m3_enhanced/.git/objects/98/
- extracting: m3_enhanced/.git/objects/98/4d12c19598436952d5b19a7e74a22a4a521d51
-   creating: m3_enhanced/.git/objects/2b/
-  inflating: m3_enhanced/.git/objects/2b/c5a89dc5917c916c1b1dbf1306c8bfa252dc9c
-  inflating: m3_enhanced/.git/objects/2b/134dce6abe6f1ffa80f09c2aebcc041f27b1e1
-  inflating: m3_enhanced/.git/objects/2b/fccf1ff66021a0439f31cc95966da2137da83f
-   creating: m3_enhanced/.git/objects/db/
-  inflating: m3_enhanced/.git/objects/db/52b7d643c7c73e41b3d2df1fd8c64506c8f33b
-   creating: m3_enhanced/.git/objects/18/
-  inflating: m3_enhanced/.git/objects/18/f83e7915a413edfb2261804c067f7ebb207aba
-   creating: m3_enhanced/.git/objects/59/
- extracting: m3_enhanced/.git/objects/59/ab50c9f25ecf0e2361573097a5f5d44c1334fd
-   creating: m3_enhanced/.git/objects/f6/
-  inflating: m3_enhanced/.git/objects/f6/b66c1a7ef997e9958dc375c349ce8c57e817c9
-   creating: m3_enhanced/.git/objects/12/
-  inflating: m3_enhanced/.git/objects/12/7eea2e7df6002b4b019fd7fb22bd8832ebb67e
-   creating: m3_enhanced/.git/objects/af/
- extracting: m3_enhanced/.git/objects/af/6c8e06bd1842d3b4d509ca33c95a88ecc20de4
-  inflating: m3_enhanced/.git/objects/af/e3dbca819173972ffead131d8a68fda39a72b0
-   creating: m3_enhanced/.git/objects/9c/
-  inflating: m3_enhanced/.git/objects/9c/22e7b61542695ea37134f37a57b727b985fe8b
-   creating: m3_enhanced/.git/objects/23/
- extracting: m3_enhanced/.git/objects/23/93b67c27a888a8375a460189d5debd12653e14
-   creating: m3_enhanced/.git/objects/3b/
-  inflating: m3_enhanced/.git/objects/3b/114aea6998c75d5a6ecefffe23b68c07d69def
-   creating: m3_enhanced/.git/objects/3d/
-  inflating: m3_enhanced/.git/objects/3d/61f8e8da19937711d0961f98c59bbfe29b6341
-   creating: m3_enhanced/.git/objects/e4/
-  inflating: m3_enhanced/.git/objects/e4/2b983446e26684428bec48d819c35ff5b83698
-   creating: m3_enhanced/.git/objects/08/
- extracting: m3_enhanced/.git/objects/08/0f950f531cc0fab077f02cfab7c74faefda07b
-   creating: m3_enhanced/.git/objects/96/
-  inflating: m3_enhanced/.git/objects/96/afdef163375bcb527b425419dd18b94455497f
-   creating: m3_enhanced/.git/objects/06/
-  inflating: m3_enhanced/.git/objects/06/51822cce0906a67bdcbcf2407e8fc1ed2a5c49
-   creating: m3_enhanced/.git/objects/8d/
-  inflating: m3_enhanced/.git/objects/8d/8cc268927643af62212a13e16cf11013aa4f7e
-   creating: m3_enhanced/.git/objects/42/
-  inflating: m3_enhanced/.git/objects/42/9eb3388863f3c5e469253e52f23930288ddb0e
-   creating: m3_enhanced/.git/objects/3a/
- extracting: m3_enhanced/.git/objects/3a/2b32e1fc6f17d17fcb9cc4dbdd2ab92e05f9a6
-   creating: m3_enhanced/.git/objects/d0/
-  inflating: m3_enhanced/.git/objects/d0/68534e8d6446578eae261fb3d642a7af075654
-   creating: m3_enhanced/.git/objects/7d/
- extracting: m3_enhanced/.git/objects/7d/1f00660e7f9cefa400e40f662497ffadcd6c0e
- extracting: m3_enhanced/.git/objects/7d/4369f907de8a80c12ff5c90981f562635daab8
-   creating: m3_enhanced/.git/objects/f1/
-  inflating: m3_enhanced/.git/objects/f1/1179c837de4d1253be92f6458757b8522a4f9a
-   creating: m3_enhanced/.git/objects/d4/
- extracting: m3_enhanced/.git/objects/d4/ca6f7089f945f6e472f9ff85dc0888a33ef501
-  inflating: m3_enhanced/.git/objects/d4/8049dd293a2809c73cebe2bfcacd4f73ffd989
-   creating: m3_enhanced/.git/objects/2c/
-  inflating: m3_enhanced/.git/objects/2c/b8746f2c8f73c8e085b8b0708d40ef9637b77b
-   creating: m3_enhanced/.git/objects/72/
- extracting: m3_enhanced/.git/objects/72/b09cea593125d91441571dda3377b48312edf2
-   creating: m3_enhanced/.git/objects/8f/
-  inflating: m3_enhanced/.git/objects/8f/dfff5e25bc7d26a4f9921c4e68d335d14fa8f3
- extracting: m3_enhanced/.git/objects/8f/7dc57f0d1803a4d27c137a92c210ea0c6228b4
-   creating: m3_enhanced/.git/objects/6b/
-  inflating: m3_enhanced/.git/objects/6b/2fb56d9fbf0794ba1be0f39cb508c72b607a55
-   creating: m3_enhanced/.git/objects/1a/
- extracting: m3_enhanced/.git/objects/1a/e9695b705ea66baa76514b4ba4972f0fd1fb3e
-   creating: m3_enhanced/.git/objects/70/
- extracting: m3_enhanced/.git/objects/70/e37822aed8258a56a1cc59656fcdcb085edb0a
-   creating: m3_enhanced/.git/objects/1d/
-  inflating: m3_enhanced/.git/objects/1d/9277e14eeb1ac8e2eea103b1865e13f13182e0
-  inflating: m3_enhanced/.git/objects/1d/da4bbfd3f00ea50d90fd25d61b7cf7b3fc40ef
-  inflating: m3_enhanced/.git/objects/1d/aab0ded08715bedfd42d479da6743d8a7b7e19
-   creating: m3_enhanced/.git/objects/6f/
- extracting: m3_enhanced/.git/objects/6f/0949123e33689770339d9724a124c991c99f3f
-  inflating: m3_enhanced/.git/objects/6f/b962d94c6f49bdc28e05972318c5e369b9339f
-   creating: m3_enhanced/.git/objects/65/
-  inflating: m3_enhanced/.git/objects/65/00259f6bb6ed509ee90fbf294af23fe6adbd0a
-   creating: m3_enhanced/.git/objects/83/
-  inflating: m3_enhanced/.git/objects/83/0bb5646717f5a8118075eebe351c7e3b6a3fb4
-   creating: m3_enhanced/.git/objects/95/
- extracting: m3_enhanced/.git/objects/95/5ce34aafd35ccbd373163e7f0c50f915a5e432
-  inflating: m3_enhanced/.git/objects/95/b8f2ad169008812c6c5179563f318aafe851eb
- extracting: m3_enhanced/.git/objects/95/0ef1baf39ccde0c7e12b5f5291aa036bb91d61
-   creating: m3_enhanced/.git/objects/a6/
-  inflating: m3_enhanced/.git/objects/a6/37a855db283c810a526c9e324009b3125b9a55
-  inflating: m3_enhanced/.git/objects/a6/b5c1c65e90f191e032825c0f626f098f008f34
-   creating: m3_enhanced/.git/objects/c4/
-  inflating: m3_enhanced/.git/objects/c4/277443fe2351e67c30738ee6f914d0615f7940
-   creating: m3_enhanced/.git/objects/93/
-  inflating: m3_enhanced/.git/objects/93/a6c1febaa2bed026b0fd7144472e7490add1ea
-   creating: m3_enhanced/.git/objects/33/
- extracting: m3_enhanced/.git/objects/33/a1bf442f3038a7f2ba4556860e6b279a65c583
-   creating: m3_enhanced/.git/objects/d8/
- extracting: m3_enhanced/.git/objects/d8/7badac1077261522125f727193f649e24484c3
-  inflating: m3_enhanced/.git/objects/d8/8b42b6acd9948580ef85baf020e0eb711f6127
-   creating: m3_enhanced/.git/objects/bd/
-  inflating: m3_enhanced/.git/objects/bd/4136458bb62d5cc4459b0eb6720aa69868ebcc
-   creating: m3_enhanced/.git/objects/b5/
- extracting: m3_enhanced/.git/objects/b5/7f5c68ff35679bd8d183387a5a93e48142007f
-   creating: m3_enhanced/.git/objects/c2/
- extracting: m3_enhanced/.git/objects/c2/65d9008c3decd7fedd4dc9212744f61fc9afee
-   creating: m3_enhanced/.git/objects/00/
-  inflating: m3_enhanced/.git/objects/00/a32a46185eae5e8a8531077b15e9aabea39247
-  inflating: m3_enhanced/.git/objects/00/0bee6f2c55d373d903f94e14b908bef65607c1
-   creating: m3_enhanced/.git/objects/ba/
-  inflating: m3_enhanced/.git/objects/ba/4f5eea305086df732184449f24b4e87abdedb7
-   creating: m3_enhanced/.git/objects/5c/
- extracting: m3_enhanced/.git/objects/5c/93103eac6b4eaf4d70a47df7bfc0f79d95a82a
-   creating: m3_enhanced/.git/objects/b9/
- extracting: m3_enhanced/.git/objects/b9/04d4aed0ef4e1a1b64952b67e2da8e3afbb5e0
-   creating: m3_enhanced/.git/objects/b1/
-  inflating: m3_enhanced/.git/objects/b1/e13c8db3bbdb046da255f37d5a3c8d3a379c16
-   creating: m3_enhanced/.git/objects/0e/
-  inflating: m3_enhanced/.git/objects/0e/002e279afa509f0a60ed8b5ac8babccd4275cf
-   creating: m3_enhanced/.git/objects/aa/
- extracting: m3_enhanced/.git/objects/aa/48467b38053ff21ff446ba0c769e71a7849b63
-   creating: m3_enhanced/.git/objects/ac/
- extracting: m3_enhanced/.git/objects/ac/526490d4ef09ff4f2364e9f70c6207977a5d6e
-  inflating: m3_enhanced/.git/objects/ac/6107557e4cb6d1e2d420e2ea7f6a4846fca60f
- extracting: m3_enhanced/.git/objects/ac/65df26bba3b4fc9fea2b5f16a65e1b33ca5fd1
-   creating: m3_enhanced/.git/objects/39/
-  inflating: m3_enhanced/.git/objects/39/c4351ee73fbfd14efbafa465c073e35df495a2
-   creating: m3_enhanced/.git/objects/9d/
- extracting: m3_enhanced/.git/objects/9d/fa661ebd10e3a89b395e9077508570dd51d8c5
-   creating: m3_enhanced/.git/objects/86/
- extracting: m3_enhanced/.git/objects/86/03f2b177b100054accd1a7e20f6a22162b1bf8
-  inflating: m3_enhanced/.git/objects/86/4167924a64edf21eb43b2c75fe62cb0805a64e
-   creating: m3_enhanced/.git/objects/17/
- extracting: m3_enhanced/.git/objects/17/be38ff003479d1e12323db6533aba68f0360ff
-   creating: m3_enhanced/.git/objects/8b/
-  inflating: m3_enhanced/.git/objects/8b/2b94ca03aa96a7b72b4a1564c88175352ec78d
-   creating: m3_enhanced/.git/objects/a4/
-  inflating: m3_enhanced/.git/objects/a4/1cb219c668f80d0ca5daa3ee59854e450b33c2
-   creating: m3_enhanced/.git/objects/c1/
-  inflating: m3_enhanced/.git/objects/c1/bcbf0f542bd0e7386b6835481820b9c021bc9d
-   creating: m3_enhanced/.git/objects/e1/
-  inflating: m3_enhanced/.git/objects/e1/ade5f51c38e0bc00024d43350d8ca2894af3ba
-   creating: m3_enhanced/.git/objects/5e/
-  inflating: m3_enhanced/.git/objects/5e/f8997cf7e539ee7fc3433c1ecb1dc0c24fefeb
-   creating: m3_enhanced/.git/objects/37/
- extracting: m3_enhanced/.git/objects/37/779f01e223d07b81c34f67fabdb89a1270845e
-   creating: m3_enhanced/.git/objects/0f/
- extracting: m3_enhanced/.git/objects/0f/8dd022197416952a3e95134182ddd06b498105
-   creating: m3_enhanced/.git/objects/ce/
-  inflating: m3_enhanced/.git/objects/ce/8821e947f5f92528855955d3972fc15947f6b1
- extracting: m3_enhanced/.git/objects/ce/31b7d8b734207d50a2c4bc29470af2e20a5152
-   creating: m3_enhanced/.git/objects/13/
-  inflating: m3_enhanced/.git/objects/13/9923f2686020d524977df766c33e825ee5daf3
-   creating: m3_enhanced/.git/objects/0c/
-  inflating: m3_enhanced/.git/objects/0c/285f8f32b24a020295cebb469eef28bface85e
-   creating: m3_enhanced/.git/objects/32/
- extracting: m3_enhanced/.git/objects/32/d5658244dd72663340c77bbeb35ac90e2dd447
-   creating: m3_enhanced/.git/objects/04/
- extracting: m3_enhanced/.git/objects/04/8a5672550b7949ba0e974c8223b4a83e8d2c1f
-   creating: m3_enhanced/.git/objects/20/
- extracting: m3_enhanced/.git/objects/20/d5a6fe894d4b853f03ca5083aff0c8182a6f24
-   creating: m3_enhanced/.git/objects/03/
-  inflating: m3_enhanced/.git/objects/03/7dc6ade33be4dd8a5af6d5ef90c82766398ccd
-   creating: m3_enhanced/.git/objects/e3/
- extracting: m3_enhanced/.git/objects/e3/1d39154ea19a2c9dbe60c963aa7d80ec3c4db0
-   creating: m3_enhanced/.git/objects/1c/
-  inflating: m3_enhanced/.git/objects/1c/38656eedfcd169710687d7cdd75553b0c5275d
-   creating: m3_enhanced/.git/objects/10/
-  inflating: m3_enhanced/.git/objects/10/db398438f1078165739b7120b04537d468a87a
-   creating: m3_enhanced/.git/objects/c0/
-  inflating: m3_enhanced/.git/objects/c0/c928134e54d5550a938316f814c639244e976b
-   creating: m3_enhanced/.git/objects/c5/
- extracting: m3_enhanced/.git/objects/c5/175f19e8c63b895aca7c0be22f840ab1fa7b0f
-   creating: m3_enhanced/.git/objects/4d/
-  inflating: m3_enhanced/.git/objects/4d/451bee479bb35638d9a99a2766c3c0ed5e5369
-   creating: m3_enhanced/.git/objects/34/
- extracting: m3_enhanced/.git/objects/34/9c28b786e23b47e424ac7db1cd1fea00d1783c
-   creating: m3_enhanced/.git/refs/
-   creating: m3_enhanced/.git/refs/heads/
- extracting: m3_enhanced/.git/refs/heads/working
-   creating: m3_enhanced/.git/refs/tags/
-   creating: m3_enhanced/.git/refs/remotes/
-   creating: m3_enhanced/.git/refs/remotes/origin/
- extracting: m3_enhanced/.git/refs/remotes/origin/working
- extracting: m3_enhanced/.git/refs/remotes/origin/HEAD
-   creating: m3_enhanced/.git/logs/
-   creating: m3_enhanced/.git/logs/refs/
-   creating: m3_enhanced/.git/logs/refs/remotes/
-   creating: m3_enhanced/.git/logs/refs/remotes/origin/
-  inflating: m3_enhanced/.git/logs/refs/remotes/origin/HEAD
-  inflating: m3_enhanced/.git/logs/refs/remotes/origin/working
-   creating: m3_enhanced/.git/logs/refs/heads/
-  inflating: m3_enhanced/.git/logs/refs/heads/working
-  inflating: m3_enhanced/.git/logs/HEAD
-  inflating: m3_enhanced/.git/FETCH_HEAD
- extracting: m3_enhanced/.git/ORIG_HEAD
- extracting: m3_enhanced/.git/COMMIT_EDITMSG
- extracting: m3_enhanced/.git/HEAD
-  inflating: m3_enhanced/.git/packed-refs
-  inflating: m3_enhanced/.git/config
-  inflating: m3_enhanced/.git/index
-  inflating: m3_enhanced/.env.example
-  inflating: m3_enhanced/.gitattributes
-  inflating: m3_enhanced/LICENSE
-   creating: m3_enhanced/backend/
-   creating: m3_enhanced/backend/app/
-   creating: m3_enhanced/backend/app/core/
-  inflating: m3_enhanced/backend/app/core/config.py
- extracting: m3_enhanced/backend/app/core/init.py
-  inflating: m3_enhanced/backend/app/core/job_scheduler.py
-  inflating: m3_enhanced/backend/app/core/quality_metrics.py
- extracting: m3_enhanced/backend/app/init.py
-  inflating: m3_enhanced/backend/app/main.py
-   creating: m3_enhanced/backend/app/models/
- extracting: m3_enhanced/backend/app/models/init.py
-  inflating: m3_enhanced/backend/app/models/model_configs.py
-  inflating: m3_enhanced/backend/app/models/model_manager.py
-   creating: m3_enhanced/backend/app/postprocessing/
- extracting: m3_enhanced/backend/app/postprocessing/init.py
-  inflating: m3_enhanced/backend/app/postprocessing/output_formatter.py
-  inflating: m3_enhanced/backend/app/postprocessing/sheet_renderer.py
-  inflating: m3_enhanced/backend/app/postprocessing/tablature_generator.py
-   creating: m3_enhanced/backend/app/preprocessing/
-  inflating: m3_enhanced/backend/app/preprocessing/audio_enhancer.py
-  inflating: m3_enhanced/backend/app/preprocessing/format_converter.py
- extracting: m3_enhanced/backend/app/preprocessing/init.py
-  inflating: m3_enhanced/backend/app/preprocessing/noise_reducer.py
-   creating: m3_enhanced/backend/app/processors/
- extracting: m3_enhanced/backend/app/processors/init.py
-  inflating: m3_enhanced/backend/app/processors/instrument_classifier.py
-  inflating: m3_enhanced/backend/app/processors/lead_rhythm_analyzer.py
-  inflating: m3_enhanced/backend/app/processors/multipass_separator.py
-  inflating: m3_enhanced/backend/app/processors/transcription_engine.py
-   creating: m3_enhanced/backend/app/utils/
-  inflating: m3_enhanced/backend/app/utils/audio_utils.py
-  inflating: m3_enhanced/backend/app/utils/file_manager.py
- extracting: m3_enhanced/backend/app/utils/init.py
-  inflating: m3_enhanced/backend/app/utils/midi_utils.py
-   creating: m3_enhanced/backend/docker/
-  inflating: m3_enhanced/backend/docker/Dockerfile
-  inflating: m3_enhanced/backend/docker/docker-compose.yml
-  inflating: m3_enhanced/backend/docker/gpu.Dockerfile
-   creating: m3_enhanced/backend/scripts/
-  inflating: m3_enhanced/backend/scripts/benchmark_models.py
-  inflating: m3_enhanced/backend/scripts/colab_setup.py
-  inflating: m3_enhanced/backend/scripts/download_models.py
-  inflating: m3_enhanced/backend/requirements.txt
-  inflating: m3_enhanced/colab_setup.py
-   creating: m3_enhanced/config/
-  inflating: m3_enhanced/config/celery.conf
-  inflating: m3_enhanced/config/nginx.conf
-  inflating: m3_enhanced/config/redis.conf
-  inflating: m3_enhanced/docker-compose.yml
-   creating: m3_enhanced/docs/
-  inflating: m3_enhanced/docs/API.md
-  inflating: m3_enhanced/docs/PIPELINE.md
-  inflating: m3_enhanced/docs/SETUP.md
-  inflating: m3_enhanced/filesystem_structure.txt
-   creating: m3_enhanced/frontend/
-   creating: m3_enhanced/frontend/static/
-  inflating: m3_enhanced/frontend/static/app.js
-  inflating: m3_enhanced/frontend/static/index.html
-  inflating: m3_enhanced/frontend/static/style.css
-  inflating: m3_enhanced/requirements-dev.txt
-   creating: m3_enhanced/tests/
- extracting: m3_enhanced/tests/init.py
-  inflating: m3_enhanced/tests/test_full_pipeline.py
-  inflating: m3_enhanced/tests/test_separation.py
-  inflating: m3_enhanced/tests/test_transcription.py
-  inflating: m3_enhanced/README.md
-  inflating: m3_enhanced/note.txt
-  inflating: m3_enhanced/setup.sh
-  inflating: m3_enhanced/fixlog.txt
-  inflating: m3_enhanced/Text File.txt
 
 =======================================================
          M3 Enhanced - SONIC ACCURACY PRODUCTION Setup
-              Zero-Compromise Audio Fidelity v6.0
+              Zero-Compromise Audio Fidelity v7.0
 =======================================================
 
-[INFO] Starting M3 Enhanced sonic accuracy setup...
-[INFO] Version: 6.0.0
-[INFO] Zero-compromise audio fidelity mode enabled
-[STEP 1] Sonic Accuracy System Verification
-[INFO] Python 3.12 verified for sonic accuracy (compatible range: 3.10-3.12)
-[INFO] System verification completed - ready for sonic accuracy setup
-[STEP 2] Installing Precise System Dependencies for Sonic Accuracy
-Get:1 https://cloud.r-project.org/bin/linux/ubuntu jammy-cran40/ InRelease [3,632 B]
-Hit:2 https://cli.github.com/packages stable InRelease
-Get:3 http://security.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
-Hit:4 http://archive.ubuntu.com/ubuntu jammy InRelease
-Get:5 https://r2u.stat.illinois.edu/ubuntu jammy InRelease [6,555 B]
-Get:6 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
-Get:7 https://r2u.stat.illinois.edu/ubuntu jammy/main all Packages [9,338 kB]
-Get:8 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [3,425 kB]
-Hit:9 https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy InRelease
-Get:10 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
-Hit:11 https://ppa.launchpadcontent.net/ubuntugis/ppa/ubuntu jammy InRelease
-Get:12 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [3,750 kB]
-Get:13 https://r2u.stat.illinois.edu/ubuntu jammy/main amd64 Packages [2,808 kB]
-Get:14 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1,276 kB]
-Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1,584 kB]
-Fetched 22.6 MB in 2s (10.8 MB/s)
-Reading package lists...
-W: Skipping acquire of configured file 'main/source/Sources' as repository 'https://r2u.stat.illinois.edu/ubuntu jammy InRelease' does not seem to provide it (sources.list entry misspelt?)
-[INFO] Installing critical audio package: build-essential
-Reading package lists...
-Building dependency tree...
-Reading state information...
-build-essential is already the newest version (12.9ubuntu3).
-0 upgraded, 0 newly installed, 0 to remove and 6 not upgraded.
-[INFO] Installing critical audio package: ffmpeg
-Reading package lists...
-Building dependency tree...
-Reading state information...
-ffmpeg is already the newest version (7:4.4.2-0ubuntu0.22.04.1).
-0 upgraded, 0 newly installed, 0 to remove and 6 not upgraded.
-[INFO] Installing critical audio package: libsndfile1-dev
-Reading package lists...
-Building dependency tree...
-Reading state information...
-libsndfile1-dev is already the newest version (1.0.31-2ubuntu0.2).
-0 upgraded, 0 newly installed, 0 to remove and 6 not upgraded.
-[INFO] Installing critical audio package: libasound2-dev
-Reading package lists...
-Building dependency tree...
-Reading state information...
-libasound2-dev is already the newest version (1.2.6.1-1ubuntu1).
-0 upgraded, 0 newly installed, 0 to remove and 6 not upgraded.
-[INFO] Installing critical audio package: libportaudio19-dev
-Reading package lists...
-Building dependency tree...
-Reading state information...
-Package libportaudio19-dev is not available, but is referred to by another package.
-This may mean that the package is missing, has been obsoleted, or
-is only available from another source
-However the following packages replace it:
-  portaudio19-dev
+[0;32m[INFO] Starting M3 Enhanced sonic accuracy setup...[0m
+[0;32m[INFO] Version: 7.0.0[0m
+[0;32m[INFO] Zero-compromise audio fidelity mode enabled[0m
+[0;36m[STEP 1] Sonic Accuracy System Verification[0m
+[1;33m[WARNING] Running as root is not recommended. Consider using a regular user account.[0m
+[0;32m[INFO] Python 3.10 verified for sonic accuracy (compatible range: 3.10-3.12)[0m
+[0;32m[INFO] Disk space check passed: 206GB available (50GB required)[0m
+[0;32m[INFO] Memory check passed: 47GB available (16GB required)[0m
+[0;32m[INFO] System verification completed - ready for sonic accuracy setup[0m
+[0;36m[STEP 2] Installing Precise System Dependencies for Sonic Accuracy[0m
+[0;32m[INFO] Installing critical audio package: build-essential[0m
+[0;32m[INFO] Successfully installed: build-essential (Compilation tools for native extensions)[0m
+[0;32m[INFO] Installing critical audio package: ffmpeg[0m
+[0;32m[INFO] Successfully installed: ffmpeg (FFmpeg multimedia framework)[0m
+[0;32m[INFO] Installing critical audio package: libsndfile1-dev[0m
+[0;32m[INFO] Successfully installed: libsndfile1-dev (Sound file library development files)[0m
+[0;32m[INFO] Installing critical audio package: libasound2-dev[0m
+[0;32m[INFO] Successfully installed: libasound2-dev (ALSA sound library development files)[0m
+[0;32m[INFO] Installing critical audio package: portaudio19-dev[0m
+[0;32m[INFO] Successfully installed: portaudio19-dev (PortAudio development files (FIXED: was libportaudio19-dev))[0m
+[0;32m[INFO] Installing critical audio package: libfftw3-dev[0m
+[0;32m[INFO] Successfully installed: libfftw3-dev (FFTW3 library for fast Fourier transforms)[0m
+[0;32m[INFO] Installing critical audio package: libsamplerate0-dev[0m
+[0;32m[INFO] Successfully installed: libsamplerate0-dev (Sample rate conversion library)[0m
+[0;32m[INFO] Installing critical audio package: libflac-dev[0m
+[0;32m[INFO] Successfully installed: libflac-dev (FLAC audio codec development files)[0m
+[0;32m[INFO] Installing critical audio package: libvorbis-dev[0m
+[0;32m[INFO] Successfully installed: libvorbis-dev (Vorbis audio codec development files)[0m
+[0;32m[INFO] Installing critical audio package: libmp3lame-dev[0m
+[0;32m[INFO] Successfully installed: libmp3lame-dev (LAME MP3 encoder development files)[0m
+[0;32m[INFO] Installing critical audio package: libopus-dev[0m
+[0;32m[INFO] Successfully installed: libopus-dev (Opus audio codec development files)[0m
+[0;32m[INFO] Installing critical audio package: pkg-config[0m
+[0;32m[INFO] Successfully installed: pkg-config (Package configuration tool)[0m
+[0;32m[INFO] Installing critical audio package: cmake[0m
+[0;32m[INFO] Successfully installed: cmake (Build system generator)[0m
+[0;32m[INFO] Installing critical audio package: git[0m
+[0;32m[INFO] Successfully installed: git (Version control system)[0m
+[0;32m[INFO] Installing critical audio package: curl[0m
+[0;32m[INFO] Successfully installed: curl (HTTP client tool)[0m
+[0;32m[INFO] Installing critical audio package: wget[0m
+[0;32m[INFO] Successfully installed: wget (File download tool)[0m
+[0;32m[INFO] Installing critical audio package: unzip[0m
+[0;32m[INFO] Successfully installed: unzip (Archive extraction tool)[0m
+[0;32m[INFO] Installing critical audio package: redis-server[0m
+[0;32m[INFO] Successfully installed: redis-server (Redis in-memory data store)[0m
+[0;32m[INFO] Installing critical audio package: supervisor[0m
+[0;32m[INFO] Successfully installed: supervisor (Process management system)[0m
+[0;32m[INFO] System dependencies installation completed[0m
+[0;36m[STEP 3] Setting Up Python Environment[0m
+[0;32m[INFO] Using Python 3.10 (python3.10)[0m
+[0;32m[INFO] Creating fresh virtual environment[0m
+The virtual environment was not created successfully because ensurepip is not
+available.  On Debian/Ubuntu systems, you need to install the python3-venv
+package using the following command.
 
-E: Package 'libportaudio19-dev' has no installation candidate
-[ERROR] Failed to install critical package: libportaudio19-dev
-[FATAL] Setup failed: Failed to install critical package: libportaudio19-dev
-Check logs: /home/m3_enhanced/logs/setup_20251010_071018.log and /home/m3_enhanced/logs/setup_errors_20251010_071018.log
----------------------------------------------------------------------------
-CalledProcessError                        Traceback (most recent call last)
-/tmp/ipython-input-4147707630.py in <cell line: 0>()
-----> 1 get_ipython().run_cell_magic('bash', '', 'cd /home\nunzip m3_enhanced\ncd m3_enhanced\nchmod +x setup.sh\n./setup.sh\n')
+    apt install python3.10-venv
 
-5 frames
-/usr/local/lib/python3.12/dist-packages/IPython/core/magics/script.py in shebang(self, line, cell)
-    243             sys.stderr.flush()
-    244         if args.raise_error and p.returncode!=0:
---> 245             raise CalledProcessError(p.returncode, cell, output=out, stderr=err)
-    246
-    247     def _run_script(self, p, cell, to_close):
+You may need to use sudo with that command.  After installing the python3-venv
+package, recreate your virtual environment.
 
-CalledProcessError: Command 'b'cd /home\nunzip m3_enhanced\ncd m3_enhanced\nchmod +x setup.sh\n./setup.sh\n'' returned non-zero exit status 1.
+Failing command: /home/m3_enhanced/venv/bin/python3.10
+
+[0;31m[1m[FATAL] Failed to create virtual environment[0m
+Check logs: /home/m3_enhanced/logs/setup_20251010_072220.log and /home/m3_enhanced/logs/setup_errors_20251010_072220.log
