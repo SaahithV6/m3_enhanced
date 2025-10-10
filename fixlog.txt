@@ -122,3 +122,84 @@
 **Enhancement**: Comprehensive cleanup with proper permissions
 **Implementation**: Cache cleanup, temporary file removal, permission setting
 **Reason**: Clean system state and proper security configuration
+
+### Fix #10: Lines 150-400 - Ubuntu Package Compatibility and Error Handling
+**Date**: 2025-10-10
+**Issue**: Package installation failures due to incorrect Ubuntu package names and dependency conflicts
+**Solution**: Enhanced package installation with correct Ubuntu names and fallback options
+
+#### UBUNTU COMPATIBILITY FIXES:
+
+### Lines 150-220: Enhanced Package Installation Functions
+**Change**: Added install_package_safe() and install_with_fallback() functions
+**Implementation**: Safe package installation with error handling and alternative package options
+**Reason**: Handle Ubuntu-specific package naming and availability issues gracefully
+
+### Lines 280-320: Corrected Audio Package Names
+**Change**: Fixed libportaudio-dev to libportaudio19-dev for Ubuntu compatibility
+**Original**: `libportaudio-dev` (not available on Ubuntu 22.04)
+**Fixed**: `libportaudio19-dev` as primary, with fallbacks to `portaudio19-dev` and `libportaudio2`
+**Reason**: Ubuntu uses different naming for PortAudio development packages
+
+### Lines 300-350: Enhanced Audio Package Installation Strategy
+**Change**: Split audio packages into critical and optional categories
+**Implementation**: Critical packages (ffmpeg, libsndfile1, libsndfile1-dev) must succeed or setup fails
+**Implementation**: Optional packages use fallback system and continue on failure
+**Reason**: Ensure essential audio functionality while being flexible with optional components
+
+### Lines 260-300: Dependency Conflict Resolution
+**Change**: Added package fixing and better conflict handling
+**Implementation**: Run `apt-get -f install` before package installation to fix broken dependencies
+**Implementation**: Handle pkg-config conflicts that appeared in terminal output
+**Reason**: Address the pkg-config dependency conflicts shown in the user's terminal output
+
+#### PACKAGE NAME CORRECTIONS:
+
+### PortAudio Libraries (Lines 330-335)
+**Issue**: `libportaudio-dev` package not found
+**Fix**: Use `libportaudio19-dev` as primary, with `portaudio19-dev` and `libportaudio2` fallbacks
+**Reason**: Ubuntu 22.04 uses version-specific package naming for PortAudio
+
+### ALSA Libraries (Lines 325-330)
+**Enhancement**: Added fallback from `libasound2-dev` to `libasound-dev`
+**Implementation**: Primary package `libasound2-dev` with fallback options
+**Reason**: Different Ubuntu versions may use different ALSA package names
+
+### JACK Libraries (Lines 335-340)
+**Enhancement**: Added fallbacks for JACK development packages
+**Implementation**: `libjack-jackd2-dev` -> `libjack-dev` -> `jackd2`
+**Reason**: Multiple JACK implementations available, ensure compatibility
+
+#### ERROR HANDLING IMPROVEMENTS:
+
+### Lines 220-260: Non-Fatal Package Installation
+**Enhancement**: Continue setup even if some optional packages fail
+**Implementation**: Separate critical and optional packages, warn on optional failures
+**Reason**: Prevent setup failure due to missing non-essential packages
+
+### Lines 340-380: Package Installation Logging
+**Enhancement**: Detailed logging of package installation successes and failures
+**Implementation**: Log each package installation attempt with clear success/failure messages
+**Reason**: Better debugging of package installation issues
+
+### Lines 380-420: Development Package Resilience
+**Enhancement**: Handle development package failures gracefully
+**Implementation**: Track failed development packages but continue installation
+**Reason**: Some development packages may not be available but aren't critical for basic functionality
+
+#### REDIS INSTALLATION IMPROVEMENTS:
+
+### Lines 420-480: Enhanced Redis Installation Strategy
+**Change**: Added fallback Redis installation methods
+**Implementation**: Try system Redis first, then alternative Redis repository, then warn and continue
+**Reason**: Ensure Redis availability for task queue functionality while not blocking setup
+
+### Lines 480-520: Package Availability Checking
+**Enhancement**: Check package availability before installation attempt
+**Implementation**: Use apt-cache show to verify package exists before installing
+**Reason**: Avoid installation errors for packages that don't exist in the repository
+
+### Lines 520-560: Enhanced Service Configuration
+**Enhancement**: More robust Redis configuration and startup
+**Implementation**: Better Redis config file creation and service management
+**Reason**: Ensure Redis starts properly and is accessible for the application
