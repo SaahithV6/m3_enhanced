@@ -1,558 +1,552 @@
 #!/bin/bash
 
-# === M3 Enhanced Setup Script - Production Ready ===
-# Fix #10: Complete error handling fix and dependency resolution
-# Eliminates infinite recursion and ensures robust installation
+#=======================================================
+#         M3 Enhanced - COMPLETELY REBUILT Setup Script
+#              Production-Ready Deployment v4.0
+#=======================================================
 
-set -e
-set -u
-set -o pipefail
+# ITERATION #4: Complete system rebuild with modern dependency management
+# No logging interference - raw terminal output for debugging
+# Comprehensive error handling with hard stops on vital failures
 
-# === Global Configuration ===
-readonly SCRIPT_VERSION="3.0.0"
-readonly SCRIPT_NAME="M3 Enhanced Setup"
-readonly START_TIME=$(date +%s)
+set -euo pipefail
+
+# Global Configuration
+readonly SCRIPT_VERSION="4.0.0"
 readonly WORK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly MIN_DISK_SPACE_GB=20
-readonly MIN_RAM_GB=8
-readonly RECOMMENDED_RAM_GB=16
-
-# === Logging Infrastructure ===
-readonly LOG_DIR="$WORK_DIR/logs"
+readonly START_TIME=$(date +%s)
 readonly TIMESTAMP=$(date +'%Y%m%d_%H%M%S')
-readonly LOG_FILE="$LOG_DIR/setup_${TIMESTAMP}.log"
-readonly ERROR_LOG="$LOG_DIR/setup_errors_${TIMESTAMP}.log"
+
+# System Requirements
+readonly MIN_DISK_GB=25
+readonly MIN_RAM_GB=8
+readonly PYTHON_MIN_VERSION="3.8"
+readonly PYTHON_MAX_VERSION="3.12"
+
+# Directories
+readonly LOG_DIR="$WORK_DIR/logs"
+readonly MODELS_DIR="$WORK_DIR/models"
+readonly TEMP_DIR="$WORK_DIR/temp"
+readonly UPLOADS_DIR="$WORK_DIR/uploads"
+readonly RESULTS_DIR="$WORK_DIR/results"
+readonly CONFIG_DIR="$WORK_DIR/config"
+
+# Log files
 readonly RESULT_FILE="$WORK_DIR/result.txt"
+readonly SETUP_LOG="$LOG_DIR/setup_${TIMESTAMP}.log"
+readonly ERROR_LOG="$LOG_DIR/setup_errors_${TIMESTAMP}.log"
 
-# Error handling state
-ERROR_CLEANUP_RUNNING=false
+# Color codes for terminal output
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly BLUE='\033[0;34m'
+readonly CYAN='\033[0;36m'
+readonly BOLD='\033[1m'
+readonly NC='\033[0m'
 
-# Create directories
-mkdir -p "$LOG_DIR" || exit 1
+# Initialize directories and logging
+mkdir -p "$LOG_DIR" "$MODELS_DIR" "$TEMP_DIR" "$UPLOADS_DIR" "$RESULTS_DIR" "$CONFIG_DIR"
 
-# Initialize logging
-exec 3>&1 4>&2
-exec 1> >(tee -a "$RESULT_FILE")
+# Direct terminal output to result file while preserving console display
+exec > >(tee -a "$RESULT_FILE")
 exec 2>&1
 
-# === Color Configuration ===
-if [[ -t 3 ]]; then
-    readonly RED='\033[0;31m'
-    readonly GREEN='\033[0;32m'
-    readonly YELLOW='\033[1;33m'
-    readonly BLUE='\033[0;34m'
-    readonly CYAN='\033[0;36m'
-    readonly BOLD='\033[1m'
-    readonly NC='\033[0m'
-else
-    readonly RED='' GREEN='' YELLOW='' BLUE='' CYAN='' BOLD='' NC=''
-fi
+#=======================================================
+#                    UTILITY FUNCTIONS
+#=======================================================
 
-# === Enhanced Logging Functions ===
-log_to_file() {
-    local level="$1"
-    local message="$2"
-    local timestamp="[$(date '+%Y-%m-%d %H:%M:%S')]"
-    echo "$timestamp [$level] $message" >> "$LOG_FILE"
-    if [[ "$level" == "ERROR" ]]; then
-        echo "$timestamp $message" >> "$ERROR_LOG"
-    fi
-}
-
-log_info() {
-    local message="$1"
-    echo -e "${GREEN}[$(date '+%Y-%m-%d %H:%M:%S')] $message${NC}" >&3
-    log_to_file "INFO" "$message"
-}
-
-log_warn() {
-    local message="[WARNING] $1"
-    echo -e "${YELLOW}$message${NC}" >&3
-    log_to_file "WARN" "$1"
-}
-
-log_error() {
-    local message="[ERROR] $1"
-    local should_exit=${2:-true}
-
-    echo -e "${RED}$message${NC}" >&3
-    log_to_file "ERROR" "$1"
-
-    if [[ "$should_exit" == "true" ]] && [[ "$ERROR_CLEANUP_RUNNING" == "false" ]]; then
-        ERROR_CLEANUP_RUNNING=true
-        cleanup_on_failure "$1"
-        exit 1
-    fi
-}
-
-log_success() {
-    local message="[SUCCESS] $1"
-    echo -e "${GREEN}$message${NC}" >&3
-    log_to_file "SUCCESS" "$1"
+print_header() {
+    echo ""
+    echo "======================================================="
+    echo "         M3 Enhanced - COMPLETELY REBUILT Setup Script"
+    echo "              Production-Ready Deployment v4.0"
+    echo "======================================================="
+    echo ""
 }
 
 log_step() {
     local step="$1"
     local message="$2"
-    echo -e "${CYAN}[STEP $step] $message${NC}" >&3
-    log_to_file "STEP" "$step: $message"
+    echo -e "${CYAN}[STEP $step] $message${NC}"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [STEP $step] $message" >> "$SETUP_LOG"
 }
 
-log_header() {
+log_info() {
     local message="$1"
-    echo -e "\n${BOLD}${BLUE}=== $message ===${NC}" >&3
-    log_to_file "HEADER" "$message"
+    echo -e "${GREEN}[INFO] $message${NC}"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [INFO] $message" >> "$SETUP_LOG"
 }
 
-# === System Information Collection ===
-collect_system_info() {
-    log_header "System Information Collection"
-
-    {
-        echo "=== SYSTEM INFORMATION ==="
-        echo "Date: $(date)"
-        echo "Hostname: $(hostname)"
-        echo "User: $(whoami)"
-        echo "Working Directory: $WORK_DIR"
-        echo "Script Version: $SCRIPT_VERSION"
-        echo ""
-        echo "=== HARDWARE INFORMATION ==="
-        echo "CPU: $(lscpu 2>/dev/null | grep "Model name" | cut -d: -f2 | xargs || echo "Unknown")"
-        echo "CPU Cores: $(nproc)"
-        echo "Total RAM: $(free -h | awk '/^Mem:/ {print $2}' || echo "Unknown")"
-        echo "Available RAM: $(free -h | awk '/^Mem:/ {print $7}' || echo "Unknown")"
-        echo "Disk Space (root): $(df -h / | awk 'NR==2 {print $4}' || echo "Unknown")"
-        echo ""
-        echo "=== SOFTWARE ENVIRONMENT ==="
-        echo "OS: $(lsb_release -d 2>/dev/null | cut -d: -f2 | xargs || echo "Unknown")"
-        echo "Kernel: $(uname -r)"
-        echo "Architecture: $(uname -m)"
-        echo "Shell: $SHELL"
-        echo "Python3: $(python3 --version 2>/dev/null || echo "Not found")"
-        echo "pip3: $(pip3 --version 2>/dev/null || echo "Not found")"
-
-        if command -v nvidia-smi >/dev/null 2>&1; then
-            echo ""
-            echo "=== GPU INFORMATION ==="
-            nvidia-smi --query-gpu=name,memory.total --format=csv,noheader 2>/dev/null || echo "GPU detection failed"
-        fi
-    } >> "$LOG_FILE"
-
-    log_success "System information collected"
+log_warn() {
+    local message="$1"
+    echo -e "${YELLOW}[WARNING] $message${NC}"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARNING] $message" >> "$SETUP_LOG"
 }
 
-# === Prerequisites Verification ===
-verify_prerequisites() {
-    log_header "Prerequisites Verification"
-    local failed=0
+log_error() {
+    local message="$1"
+    echo -e "${RED}[ERROR] $message${NC}"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [ERROR] $message" >> "$ERROR_LOG"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [ERROR] $message" >> "$SETUP_LOG"
+}
 
-    # Check privileges
+fatal_error() {
+    local message="$1"
+    log_error "$message"
+    echo -e "${RED}[FATAL] Setup failed: $message${NC}"
+    echo -e "${RED}[FATAL] Check logs: $SETUP_LOG and $ERROR_LOG${NC}"
+    exit 1
+}
+
+check_command() {
+    local cmd="$1"
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        return 1
+    fi
+    return 0
+}
+
+run_with_check() {
+    local description="$1"
+    shift
+    echo -e "${BLUE}Running: $description${NC}"
+    if ! "$@"; then
+        fatal_error "Failed: $description"
+    fi
+}
+
+#=======================================================
+#                  SYSTEM VERIFICATION
+#=======================================================
+
+verify_system_requirements() {
+    log_step "1" "Verifying System Requirements"
+
+    # Check if running as root
     if [[ $EUID -eq 0 ]]; then
-        log_info "Running with root privileges"
-    elif groups "$USER" | grep -q '\bsudo\b' 2>/dev/null; then
-        log_info "User has sudo privileges"
+        log_warn "Running as root - this may cause permission issues"
+    fi
+
+    # Check operating system
+    if [[ ! -f /etc/os-release ]]; then
+        fatal_error "Cannot determine operating system"
+    fi
+
+    local os_info=$(cat /etc/os-release)
+    log_info "Operating System: $(echo "$os_info" | grep PRETTY_NAME | cut -d'"' -f2)"
+
+    # Check available disk space
+    local available_gb=$(df "$WORK_DIR" | awk 'NR==2 {print int($4/1024/1024)}')
+    if [[ $available_gb -lt $MIN_DISK_GB ]]; then
+        fatal_error "Insufficient disk space: ${available_gb}GB available, ${MIN_DISK_GB}GB required"
+    fi
+    log_info "Disk space: ${available_gb}GB available (${MIN_DISK_GB}GB required)"
+
+    # Check available RAM
+    local available_ram_gb=$(free -g | awk 'NR==2{print $2}')
+    if [[ $available_ram_gb -lt $MIN_RAM_GB ]]; then
+        log_warn "Low RAM: ${available_ram_gb}GB available, ${MIN_RAM_GB}GB recommended"
     else
-        log_error "This script requires sudo privileges for system package installation" false
-        failed=1
+        log_info "RAM: ${available_ram_gb}GB available"
     fi
 
-    # Check OS compatibility
-    if [[ -f /etc/os-release ]]; then
-        source /etc/os-release
-        log_info "Detected OS: $NAME $VERSION"
-        case "$VERSION_ID" in
-            "20.04"|"22.04"|"24.04")
-                log_success "Ubuntu version is supported"
-                ;;
-            *)
-                log_warn "Ubuntu version may not be fully tested: $VERSION_ID"
-                ;;
-        esac
-    else
-        log_warn "Cannot determine OS version"
+    # Check Python version
+    if ! check_command python3; then
+        fatal_error "Python 3 is not installed"
     fi
 
-    # Check disk space
-    local available_space=$(df / | awk 'NR==2 {print int($4/1024/1024)}' 2>/dev/null || echo "0")
-    if [[ $available_space -lt $MIN_DISK_SPACE_GB ]]; then
-        log_error "Insufficient disk space. Required: ${MIN_DISK_SPACE_GB}GB, Available: ${available_space}GB" false
-        failed=1
-    else
-        log_success "Disk space check passed: ${available_space}GB available"
-    fi
+    local python_version=$(python3 --version | cut -d' ' -f2)
+    local python_major=$(echo "$python_version" | cut -d'.' -f1)
+    local python_minor=$(echo "$python_version" | cut -d'.' -f2)
 
-    # Check RAM
-    local total_ram=$(free -g | awk '/^Mem:/ {print $2}' 2>/dev/null || echo "0")
-    if [[ $total_ram -lt $MIN_RAM_GB ]]; then
-        log_error "Insufficient RAM. Required: ${MIN_RAM_GB}GB, Available: ${total_ram}GB" false
-        failed=1
-    elif [[ $total_ram -lt $RECOMMENDED_RAM_GB ]]; then
-        log_warn "RAM below recommended: ${total_ram}GB (recommended: ${RECOMMENDED_RAM_GB}GB)"
-    else
-        log_success "RAM check passed: ${total_ram}GB available"
+    if [[ $python_major -ne 3 ]] || [[ $python_minor -lt 8 ]] || [[ $python_minor -gt 12 ]]; then
+        fatal_error "Python version $python_version not supported. Requires 3.8-3.12"
     fi
-
-    # Check Python
-    if command -v python3 >/dev/null 2>&1; then
-        local python_ver=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')" 2>/dev/null || echo "unknown")
-        case "$python_ver" in
-            "3.8"|"3.9"|"3.10"|"3.11"|"3.12")
-                log_success "Python version is compatible: $python_ver"
-                ;;
-            *)
-                log_warn "Python version may have compatibility issues: $python_ver"
-                ;;
-        esac
-    else
-        log_error "Python 3 is not installed" false
-        failed=1
-    fi
-
-    # Check internet connectivity with multiple methods
-    if check_internet_connectivity; then
-        log_success "Internet connectivity verified"
-    else
-        log_warn "Internet connectivity check failed - will attempt to continue"
-        log_warn "Some packages may fail to download if internet is not available"
-    fi
-
-    if [[ $failed -eq 1 ]]; then
-        log_error "Critical prerequisites verification failed. Cannot continue."
-    fi
-
-    log_success "Prerequisites verification completed"
+    log_info "Python version: $python_version (supported)"
 }
 
-check_internet_connectivity() {
-    local hosts=("8.8.8.8" "1.1.1.1" "google.com" "github.com")
+#=======================================================
+#              SYSTEM DEPENDENCIES INSTALLATION
+#=======================================================
 
-    for host in "${hosts[@]}"; do
-        if ping -c 1 -W 3 "$host" >/dev/null 2>&1; then
-            return 0
+install_system_dependencies() {
+    log_step "2" "Installing System Dependencies"
+
+    # Update package lists
+    run_with_check "Updating package lists" apt-get update
+
+    # Essential system packages
+    local system_packages=(
+        "build-essential"
+        "software-properties-common"
+        "apt-transport-https"
+        "ca-certificates"
+        "curl"
+        "wget"
+        "git"
+        "unzip"
+        "pkg-config"
+    )
+
+    log_info "Installing essential system packages..."
+    run_with_check "Installing system packages" apt-get install -y "${system_packages[@]}"
+
+    # Audio and multimedia libraries
+    local audio_packages=(
+        "ffmpeg"
+        "libsndfile1"
+        "libsndfile1-dev"
+        "libasound2-dev"
+        "libportaudio2"
+        "libportaudio-dev"
+        "libfftw3-dev"
+        "libsamplerate0-dev"
+        "libjack-jackd2-dev"
+        "libmp3lame-dev"
+        "libopus-dev"
+        "libvorbis-dev"
+        "libflac-dev"
+    )
+
+    log_info "Installing audio processing libraries..."
+    run_with_check "Installing audio packages" apt-get install -y "${audio_packages[@]}"
+
+    # Development libraries
+    local dev_packages=(
+        "python3-dev"
+        "python3-pip"
+        "python3-venv"
+        "python3-setuptools"
+        "python3-wheel"
+        "libssl-dev"
+        "libffi-dev"
+        "libbz2-dev"
+        "liblzma-dev"
+        "libreadline-dev"
+        "libsqlite3-dev"
+        "libxml2-dev"
+        "libxslt1-dev"
+        "zlib1g-dev"
+    )
+
+    log_info "Installing development libraries..."
+    run_with_check "Installing development packages" apt-get install -y "${dev_packages[@]}"
+
+    # Redis server
+    log_info "Installing Redis server..."
+    run_with_check "Installing Redis" apt-get install -y redis-server
+
+    # Verify critical commands are available
+    local required_commands=("python3" "pip3" "ffmpeg" "redis-server" "git")
+    for cmd in "${required_commands[@]}"; do
+        if ! check_command "$cmd"; then
+            fatal_error "Required command not found after installation: $cmd"
         fi
     done
 
-    # Try DNS lookup
-    if nslookup google.com >/dev/null 2>&1; then
-        return 0
-    fi
-
-    # Try curl
-    if command -v curl >/dev/null 2>&1 && curl -s --connect-timeout 5 http://google.com >/dev/null 2>&1; then
-        return 0
-    fi
-
-    return 1
+    log_info "System dependencies installed successfully"
 }
 
-# === Runtime Environment Detection ===
-detect_runtime_environment() {
-    log_header "Runtime Environment Detection"
+#=======================================================
+#                 PYTHON ENVIRONMENT SETUP
+#=======================================================
 
-    # CPU Information
-    CPU_CORES=$(nproc)
-    CPU_ARCH=$(uname -m)
-
-    log_info "CPU Architecture: $CPU_ARCH"
-    log_info "CPU Cores: $CPU_CORES"
-
-    # Memory Information
-    TOTAL_RAM_GB=$(free -g | awk '/^Mem:/ {print $2}')
-    AVAILABLE_RAM_GB=$(free -g | awk '/^Mem:/ {print $7}')
-
-    log_info "Memory: ${AVAILABLE_RAM_GB}GB available of ${TOTAL_RAM_GB}GB total"
-
-    # GPU Detection
-    GPU_AVAILABLE=false
-    GPU_COUNT=0
-    GPU_MEMORY_TOTAL=0
-
-    if command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi >/dev/null 2>&1; then
-        GPU_COUNT=$(nvidia-smi --query-gpu=count --format=csv,noheader,nounits 2>/dev/null | head -1 || echo "0")
-        GPU_MEMORY_TOTAL=$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits 2>/dev/null | head -1 || echo "0")
-
-        if [[ $GPU_COUNT -gt 0 ]]; then
-            GPU_AVAILABLE=true
-            RUNTIME_TYPE="GPU"
-            log_info "GPU Environment Detected: $GPU_COUNT GPU(s) with ${GPU_MEMORY_TOTAL}MB memory"
-        else
-            RUNTIME_TYPE="CPU"
-            log_info "CPU-only environment detected"
-        fi
-    else
-        RUNTIME_TYPE="CPU"
-        log_info "CPU-only environment detected"
-    fi
-
-    # Performance Configuration
-    configure_performance_settings
-
-    log_success "Runtime environment detected: $RUNTIME_TYPE"
-}
-
-configure_performance_settings() {
-    if [[ "$GPU_AVAILABLE" = true ]]; then
-        TORCH_DEVICE="cuda"
-        BATCH_SIZE=8
-        NUM_WORKERS=$((CPU_CORES > 8 ? 8 : CPU_CORES))
-
-        # GPU-specific optimizations
-        export CUDA_VISIBLE_DEVICES=0
-        export PYTORCH_CUDA_ALLOC_CONF="max_split_size_mb:512"
-        export TF_FORCE_GPU_ALLOW_GROWTH=true
-    else
-        TORCH_DEVICE="cpu"
-        BATCH_SIZE=2
-        NUM_WORKERS=$((CPU_CORES > 4 ? 4 : CPU_CORES))
-
-        # CPU-specific optimizations
-        export OMP_NUM_THREADS=$NUM_WORKERS
-        export MKL_NUM_THREADS=$NUM_WORKERS
-        export OPENBLAS_NUM_THREADS=$NUM_WORKERS
-    fi
-
-    log_info "Performance configured - Device: $TORCH_DEVICE, Batch: $BATCH_SIZE, Workers: $NUM_WORKERS"
-}
-
-# === System Package Installation ===
-install_system_packages() {
-    log_header "System Package Installation"
-
-    log_step "APT-1" "Updating package repositories"
-    export DEBIAN_FRONTEND=noninteractive
-
-    if ! apt-get update -qq 2>/dev/null; then
-        log_warn "Package repository update failed - attempting to continue"
-    fi
-
-    log_step "APT-2" "Installing critical system packages"
-    install_critical_packages
-
-    log_step "APT-3" "Installing audio processing packages"
-    install_audio_packages
-
-    log_step "APT-4" "Installing development packages"
-    install_development_packages
-
-    log_step "APT-5" "Installing service packages"
-    install_service_packages
-
-    log_success "System package installation completed"
-}
-
-install_critical_packages() {
-    local packages=(
-        "curl" "wget" "git" "unzip" "software-properties-common"
-        "build-essential" "cmake" "pkg-config" "ca-certificates"
-    )
-
-    install_package_array "critical" packages[@]
-}
-
-install_audio_packages() {
-    local packages=(
-        "ffmpeg" "libsndfile1" "libsndfile1-dev" "libasound2-dev"
-        "portaudio19-dev" "libportaudio2" "libportaudiocpp0"
-        "libfftw3-dev" "lame" "flac" "vorbis-tools" "opus-tools"
-        "libmagic1" "libmagic-dev" "sox" "libsox-dev"
-    )
-
-    install_package_array "audio" packages[@]
-}
-
-install_development_packages() {
-    local packages=(
-        "python3-dev" "python3-pip" "python3-venv"
-        "libblas-dev" "liblapack-dev" "gfortran"
-        "libssl-dev" "libffi-dev" "zlib1g-dev"
-    )
-
-    install_package_array "development" packages[@]
-}
-
-install_service_packages() {
-    local packages=(
-        "redis-server" "nginx" "htop" "tree" "vim" "jq"
-    )
-
-    install_package_array "service" packages[@]
-}
-
-install_package_array() {
-    local category="$1"
-    local -n package_array=$2
-    local failed_packages=()
-
-    for package in "${package_array[@]}"; do
-        if apt-get install -y -qq "$package" 2>/dev/null; then
-            log_info "Installed: $package"
-        else
-            failed_packages+=("$package")
-            log_warn "Failed to install: $package"
-        fi
-    done
-
-    # Retry failed packages once
-    if [[ ${#failed_packages[@]} -gt 0 ]]; then
-        log_warn "Retrying ${#failed_packages[@]} failed $category packages"
-        for package in "${failed_packages[@]}"; do
-            if apt-get install -y "$package" 2>/dev/null; then
-                log_info "Retry successful: $package"
-            else
-                log_warn "Final failure: $package"
-            fi
-        done
-    fi
-}
-
-# === Library Verification ===
-verify_system_libraries() {
-    log_header "System Library Verification"
-
-    local libraries=(
-        "fftw3:FFTW3"
-        "sndfile:libsndfile"
-        "portaudio-2.0:PortAudio"
-    )
-
-    for lib_spec in "${libraries[@]}"; do
-        IFS=':' read -r lib_name display_name <<< "$lib_spec"
-        if pkg-config --exists "$lib_name" 2>/dev/null; then
-            local version=$(pkg-config --modversion "$lib_name" 2>/dev/null || echo "unknown")
-            log_success "$display_name verified (v$version)"
-        else
-            log_warn "$display_name not found via pkg-config"
-        fi
-    done
-
-    # Force library cache refresh
-    ldconfig 2>/dev/null || log_warn "ldconfig failed"
-    log_success "Library verification completed"
-}
-
-# === Python Environment Setup ===
 setup_python_environment() {
-    log_header "Python Environment Setup"
+    log_step "3" "Setting Up Python Environment"
 
-    # Verify Python installation
-    local python_version=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')" 2>/dev/null || echo "unknown")
-    log_info "Python version: $python_version"
+    # Upgrade pip, setuptools, wheel to latest versions
+    log_info "Upgrading pip, setuptools, wheel..."
+    run_with_check "Upgrading pip" python3 -m pip install --upgrade pip
+    run_with_check "Upgrading setuptools" python3 -m pip install --upgrade setuptools
+    run_with_check "Upgrading wheel" python3 -m pip install --upgrade wheel
 
-    # Upgrade pip and essential tools
-    log_step "PY-1" "Upgrading Python package tools"
-    python3 -m pip install --upgrade pip setuptools wheel || log_warn "Failed to upgrade some Python tools"
+    # Install build dependencies
+    local build_deps=(
+        "build"
+        "cmake"
+        "ninja"
+        "pybind11[global]"
+        "cython"
+    )
 
-    local pip_version=$(python3 -m pip --version 2>/dev/null | cut -d' ' -f2 || echo "unknown")
-    log_info "pip version: $pip_version"
+    log_info "Installing build dependencies..."
+    for dep in "${build_deps[@]}"; do
+        run_with_check "Installing $dep" python3 -m pip install "$dep"
+    done
 
-    log_success "Python environment setup completed"
+    log_info "Python environment setup complete"
 }
 
-# === Machine Learning Frameworks ===
-install_ml_frameworks() {
-    log_header "ML Frameworks Installation"
+#=======================================================
+#           DEPENDENCY CONFLICT RESOLUTION
+#=======================================================
 
-    # Install compatible numpy first
-    log_step "ML-1" "Installing compatible numpy"
-    python3 -m pip install "numpy>=1.22.0,<2.0.0" || log_warn "Failed to install numpy - continuing"
+resolve_dependency_conflicts() {
+    log_step "4" "Resolving Dependency Conflicts"
 
-    # Install PyTorch
-    log_step "ML-2" "Installing PyTorch"
-    if [[ "$GPU_AVAILABLE" = true ]]; then
-        python3 -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 || {
-            log_warn "CUDA PyTorch installation failed, trying CPU version"
-            python3 -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu || log_warn "PyTorch installation failed"
-        }
+    log_info "Removing conflicting packages..."
+
+    # Remove problematic packages that cause conflicts
+    local conflicting_packages=(
+        "intel-openmp"
+        "mkl"
+        "numpy"
+        "scipy"
+        "scikit-learn"
+        "opencv-python"
+        "opencv-contrib-python"
+        "opencv-python-headless"
+        "tensorflow"
+        "torch"
+        "torchvision"
+        "torchaudio"
+        "librosa"
+        "soundfile"
+        "basic-pitch"
+        "music21"
+    )
+
+    for package in "${conflicting_packages[@]}"; do
+        if python3 -m pip show "$package" >/dev/null 2>&1; then
+            log_info "Removing conflicting package: $package"
+            python3 -m pip uninstall -y "$package" || true
+        fi
+    done
+
+    # Clean pip cache
+    log_info "Cleaning pip cache..."
+    python3 -m pip cache purge || true
+
+    log_info "Dependency conflicts resolved"
+}
+
+#=======================================================
+#              CORE ML FRAMEWORKS INSTALLATION
+#=======================================================
+
+install_core_ml_frameworks() {
+    log_step "5" "Installing Core ML Frameworks"
+
+    # Install NumPy first with compatible version
+    log_info "Installing NumPy (compatible version)..."
+    run_with_check "Installing NumPy" python3 -m pip install "numpy>=1.21.0,<2.0.0"
+
+    # Install SciPy
+    log_info "Installing SciPy..."
+    run_with_check "Installing SciPy" python3 -m pip install "scipy>=1.7.0"
+
+    # Install scikit-learn
+    log_info "Installing scikit-learn..."
+    run_with_check "Installing scikit-learn" python3 -m pip install "scikit-learn>=1.0.0"
+
+    # Install PyTorch (CPU version to avoid CUDA conflicts)
+    log_info "Installing PyTorch (CPU version)..."
+    run_with_check "Installing PyTorch" python3 -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+    # Install TensorFlow (latest compatible version)
+    log_info "Installing TensorFlow..."
+    run_with_check "Installing TensorFlow" python3 -m pip install "tensorflow>=2.13.0"
+
+    log_info "Core ML frameworks installed successfully"
+}
+
+#=======================================================
+#              AUDIO PROCESSING LIBRARIES
+#=======================================================
+
+install_audio_libraries() {
+    log_step "6" "Installing Audio Processing Libraries"
+
+    # Install soundfile first (required by many audio libraries)
+    log_info "Installing soundfile..."
+    run_with_check "Installing soundfile" python3 -m pip install "soundfile>=0.12.1"
+
+    # Install audio processing libraries
+    log_info "Installing audioread..."
+    run_with_check "Installing audioread" python3 -m pip install "audioread>=3.0.0"
+
+    log_info "Installing librosa..."
+    run_with_check "Installing librosa" python3 -m pip install "librosa>=0.10.0"
+
+    log_info "Installing pydub..."
+    run_with_check "Installing pydub" python3 -m pip install "pydub>=0.25.1"
+
+    log_info "Installing resampy..."
+    run_with_check "Installing resampy" python3 -m pip install "resampy>=0.4.0"
+
+    log_info "Installing audio evaluation libraries..."
+    run_with_check "Installing pesq" python3 -m pip install "pesq"
+    run_with_check "Installing pystoi" python3 -m pip install "pystoi"
+
+    log_info "Audio processing libraries installed successfully"
+}
+
+#=======================================================
+#              MUSIC PROCESSING LIBRARIES
+#=======================================================
+
+install_music_libraries() {
+    log_step "7" "Installing Music Processing Libraries"
+
+    # Install MIDI processing
+    log_info "Installing pretty-midi..."
+    run_with_check "Installing pretty-midi" python3 -m pip install "pretty-midi>=0.2.9"
+
+    log_info "Installing music21 (latest version)..."
+    run_with_check "Installing music21" python3 -m pip install "music21>=9.1.0"
+
+    log_info "Installing mido..."
+    run_with_check "Installing mido" python3 -m pip install "mido>=1.3.0"
+
+    # Install Demucs for audio separation
+    log_info "Installing demucs..."
+    run_with_check "Installing demucs" python3 -m pip install "demucs"
+
+    # Try to install Basic Pitch with compatibility fixes
+    log_info "Installing Basic Pitch (with compatibility handling)..."
+
+    # Install mir_eval first (required by basic-pitch)
+    run_with_check "Installing mir_eval" python3 -m pip install "mir_eval>=0.6"
+
+    # Install specific resampy version compatible with basic-pitch
+    python3 -m pip install "resampy>=0.2.2,<0.4.3" || log_warn "Resampy version conflict - continuing with installed version"
+
+    # Install basic-pitch with error handling
+    if ! python3 -m pip install "basic-pitch"; then
+        log_warn "Basic Pitch installation failed - will try alternative approach"
+
+        # Try installing with no-deps and manual dependency resolution
+        if ! python3 -m pip install --no-deps "basic-pitch"; then
+            log_warn "Basic Pitch installation failed completely - transcription features may be limited"
+        else
+            log_info "Basic Pitch installed with --no-deps"
+        fi
     else
-        python3 -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu || log_warn "PyTorch installation failed"
+        log_info "Basic Pitch installed successfully"
     fi
 
-    # Install TensorFlow
-    log_step "ML-3" "Installing TensorFlow"
-    python3 -m pip install tensorflow || log_warn "TensorFlow installation failed"
-
-    # Install additional ML packages
-    local ml_packages=(
-        "scikit-learn>=1.3.0"
-        "scipy>=1.10.0"
-        "transformers>=4.30.0"
-        "accelerate>=0.20.0"
-    )
-
-    for package in "${ml_packages[@]}"; do
-        python3 -m pip install "$package" || log_warn "Failed to install $package"
-    done
-
-    log_success "ML frameworks installation completed"
+    log_info "Music processing libraries installation complete"
 }
 
-# === Audio Processing Libraries ===
-install_audio_libraries() {
-    log_header "Audio Processing Libraries Installation"
+#=======================================================
+#              WEB FRAMEWORK INSTALLATION
+#=======================================================
 
-    # Core audio libraries
-    local core_audio=(
-        "soundfile>=0.12.1"
-        "audioread>=3.0.0"
-        "librosa>=0.10.0"
-        "pydub>=0.25.1"
-        "resampy>=0.4.0"
-    )
+install_web_frameworks() {
+    log_step "8" "Installing Web Frameworks"
 
-    for package in "${core_audio[@]}"; do
-        python3 -m pip install "$package" || log_warn "Failed to install $package"
-    done
+    # Install FastAPI and dependencies
+    log_info "Installing FastAPI..."
+    run_with_check "Installing FastAPI" python3 -m pip install "fastapi>=0.104.0"
 
-    # Audio separation
-    python3 -m pip install demucs || log_warn "Failed to install demucs"
+    log_info "Installing Uvicorn with standard extras..."
+    run_with_check "Installing Uvicorn" python3 -m pip install "uvicorn[standard]>=0.24.0"
 
-    # MIDI processing
-    local midi_packages=(
-        "pretty-midi>=0.2.9"
-        "music21>=9.1.0"
-        "mido>=1.3.0"
-        "basic-pitch"
-    )
+    log_info "Installing additional web dependencies..."
+    run_with_check "Installing python-multipart" python3 -m pip install "python-multipart>=0.0.6"
+    run_with_check "Installing Jinja2" python3 -m pip install "jinja2>=3.1.0"
+    run_with_check "Installing aiofiles" python3 -m pip install "aiofiles>=23.1.0"
+    run_with_check "Installing python-magic" python3 -m pip install "python-magic>=0.4.27"
 
-    for package in "${midi_packages[@]}"; do
-        python3 -m pip install "$package" || log_warn "Failed to install $package"
-    done
+    # Install Pydantic and settings
+    log_info "Installing Pydantic..."
+    run_with_check "Installing pydantic" python3 -m pip install "pydantic>=2.4.0"
+    run_with_check "Installing pydantic-settings" python3 -m pip install "pydantic-settings>=2.0.0"
 
-    # Quality assessment
-    python3 -m pip install pesq pystoi || log_warn "Quality assessment tools installation failed"
-
-    log_success "Audio libraries installation completed"
+    log_info "Web frameworks installed successfully"
 }
 
-# === Web Framework Installation ===
-install_web_framework() {
-    log_header "Web Framework Installation"
+#=======================================================
+#              TASK QUEUE AND REDIS SETUP
+#=======================================================
 
-    local web_packages=(
-        "fastapi>=0.104.0"
-        "uvicorn[standard]>=0.24.0"
-        "python-multipart>=0.0.6"
-        "jinja2>=3.1.0"
-        "aiofiles>=23.1.0"
-        "python-magic>=0.4.27"
-        "pydantic>=2.4.0"
-        "pydantic-settings>=2.0.0"
-        "celery[redis]>=5.3.0"
-        "redis>=5.0.0"
-    )
+setup_task_queue() {
+    log_step "9" "Setting Up Task Queue and Redis"
 
-    for package in "${web_packages[@]}"; do
-        python3 -m pip install "$package" || log_warn "Failed to install $package"
-    done
+    # Install Celery with Redis support
+    log_info "Installing Celery with Redis..."
+    run_with_check "Installing Celery" python3 -m pip install "celery[redis]>=5.3.0"
 
-    log_success "Web framework installation completed"
+    log_info "Installing Redis Python client..."
+    run_with_check "Installing redis-py" python3 -m pip install "redis>=5.0.0"
+
+    # Configure Redis
+    log_info "Configuring Redis server..."
+
+    # Create Redis configuration
+    cat > "$CONFIG_DIR/redis.conf" << 'EOF'
+# Redis configuration for M3 Enhanced
+bind 127.0.0.1
+port 6379
+protected-mode yes
+daemonize no
+supervised systemd
+pidfile /var/run/redis/redis-server.pid
+loglevel notice
+logfile /var/log/redis/redis-server.log
+databases 16
+
+# Memory management
+maxmemory 512mb
+maxmemory-policy allkeys-lru
+
+# Persistence
+save 900 1
+save 300 10
+save 60 10000
+appendonly yes
+appendfilename "appendonly.aof"
+
+# Security
+requirepass m3enhanced_redis_2024
+
+# Performance
+tcp-keepalive 300
+timeout 0
+EOF
+
+    # Stop existing Redis service
+    systemctl stop redis-server || true
+
+    # Update Redis configuration
+    cp "$CONFIG_DIR/redis.conf" /etc/redis/redis.conf || log_warn "Could not update Redis system config"
+
+    # Start and enable Redis
+    log_info "Starting Redis service..."
+    if systemctl start redis-server && systemctl enable redis-server; then
+        log_info "Redis service started successfully"
+    else
+        log_warn "Could not start Redis as system service, will run manually"
+
+        # Try to start Redis manually
+        if redis-server "$CONFIG_DIR/redis.conf" --daemonize yes; then
+            log_info "Redis started manually"
+        else
+            fatal_error "Cannot start Redis server"
+        fi
+    fi
+
+    # Test Redis connection
+    sleep 2
+    if redis-cli -a "m3enhanced_redis_2024" ping | grep -q "PONG"; then
+        log_info "Redis connection test successful"
+    else
+        fatal_error "Redis connection test failed"
+    fi
+
+    log_info "Task queue setup complete"
 }
 
-# === Utilities Installation ===
-install_utilities() {
-    log_header "Utilities Installation"
+#=======================================================
+#              ADDITIONAL DEPENDENCIES
+#=======================================================
 
-    local utilities=(
+install_additional_dependencies() {
+    log_step "10" "Installing Additional Dependencies"
+
+    # Install utility libraries
+    local utility_packages=(
         "requests>=2.31.0"
         "python-dotenv>=1.0.0"
         "click>=8.1.0"
@@ -562,187 +556,116 @@ install_utilities() {
         "pillow>=10.0.0"
     )
 
-    for package in "${utilities[@]}"; do
-        python3 -m pip install "$package" || log_warn "Failed to install $package"
+    for package in "${utility_packages[@]}"; do
+        log_info "Installing $package..."
+        run_with_check "Installing $package" python3 -m pip install "$package"
     done
 
-    log_success "Utilities installation completed"
+    log_info "Additional dependencies installed successfully"
 }
 
-# === Service Configuration ===
-configure_services() {
-    log_header "Service Configuration"
+#=======================================================
+#              MODEL DOWNLOAD AND SETUP
+#=======================================================
 
-    # Configure Redis
-    log_step "SVC-1" "Configuring Redis"
-    configure_redis_service
+download_models() {
+    log_step "11" "Downloading AI Models"
 
-    log_success "Service configuration completed"
-}
+    log_info "Downloading Demucs model..."
+    python3 -c "
+import torch
+import torchaudio
+from demucs.pretrained import get_model
+try:
+    model = get_model('htdemucs')
+    print('Demucs model downloaded successfully')
+except Exception as e:
+    print(f'Demucs model download failed: {e}')
+    exit(1)
+"
 
-configure_redis_service() {
-    # Start Redis service
-    if systemctl enable redis-server 2>/dev/null; then
-        log_info "Redis service enabled"
+    # Test Basic Pitch if available
+    log_info "Testing Basic Pitch availability..."
+    if python3 -c "import basic_pitch; print('Basic Pitch available')" 2>/dev/null; then
+        log_info "Basic Pitch is available"
     else
-        log_warn "Failed to enable Redis service"
+        log_warn "Basic Pitch not available - transcription features limited"
     fi
 
-    if systemctl start redis-server 2>/dev/null; then
-        log_info "Redis service started"
-    else
-        log_warn "Failed to start Redis service"
-    fi
-
-    # Test Redis connection
-    if command -v redis-cli >/dev/null 2>&1 && redis-cli ping 2>/dev/null | grep -q PONG; then
-        log_success "Redis service is running"
-    else
-        log_warn "Redis service may not be running properly"
-    fi
+    log_info "Model download complete"
 }
 
-# === Project Structure Creation ===
-create_project_structure() {
-    log_header "Project Structure Creation"
+#=======================================================
+#              ENVIRONMENT CONFIGURATION
+#=======================================================
 
-    local base_dir="$WORK_DIR"
-    local directories=(
-        "$base_dir/backend/app/core"
-        "$base_dir/backend/app/models"
-        "$base_dir/backend/app/processors"
-        "$base_dir/backend/app/utils"
-        "$base_dir/backend/app/preprocessing"
-        "$base_dir/backend/app/postprocessing"
-        "$base_dir/frontend/static"
-        "$base_dir/models"
-        "$base_dir/temp"
-        "$base_dir/uploads"
-        "$base_dir/results"
-        "$base_dir/cache"
-    )
+configure_environment() {
+    log_step "12" "Configuring Environment"
 
-    for dir in "${directories[@]}"; do
-        if mkdir -p "$dir" 2>/dev/null; then
-            log_info "Created: ${dir#$base_dir/}"
-        else
-            log_warn "Failed to create: ${dir#$base_dir/}"
-        fi
-    done
+    # Create .env file if it doesn't exist
+    if [[ ! -f "$WORK_DIR/.env" ]]; then
+        log_info "Creating environment configuration..."
 
-    # Create Python package files
-    local init_files=(
-        "$base_dir/backend/__init__.py"
-        "$base_dir/backend/app/__init__.py"
-        "$base_dir/backend/app/core/__init__.py"
-        "$base_dir/backend/app/models/__init__.py"
-        "$base_dir/backend/app/processors/__init__.py"
-        "$base_dir/backend/app/utils/__init__.py"
-        "$base_dir/backend/app/preprocessing/__init__.py"
-        "$base_dir/backend/app/postprocessing/__init__.py"
-    )
+        cat > "$WORK_DIR/.env" << 'EOF'
+# M3 Enhanced Environment Configuration
 
-    for file in "${init_files[@]}"; do
-        if touch "$file" 2>/dev/null; then
-            echo "# M3 Enhanced Package" > "$file"
-        else
-            log_warn "Failed to create: ${file#$base_dir/}"
-        fi
-    done
-
-    log_success "Project structure created"
-}
-
-# === Environment Configuration ===
-setup_environment_configuration() {
-    log_header "Environment Configuration"
-
-    create_env_file
-    create_management_scripts
-
-    log_success "Environment configuration completed"
-}
-
-create_env_file() {
-    local env_file="$WORK_DIR/.env"
-
-    cat > "$env_file" << EOF
-# M3 Enhanced Configuration - Generated $(date)
-
-# System Configuration
-M3_RUNTIME_TYPE=$RUNTIME_TYPE
-M3_DEVICE=$TORCH_DEVICE
-M3_BATCH_SIZE=$BATCH_SIZE
-M3_NUM_WORKERS=$NUM_WORKERS
-
-# Python Configuration
-PYTHONPATH=$WORK_DIR/backend
-PYTHONUNBUFFERED=1
-
-# Performance Tuning
-OMP_NUM_THREADS=$NUM_WORKERS
-MKL_NUM_THREADS=$NUM_WORKERS
-
-# Database Configuration
-REDIS_URL=redis://localhost:6379/0
-
-# Model Storage
-MODELS_DIR=$WORK_DIR/models
-TEMP_DIR=$WORK_DIR/temp
-UPLOADS_DIR=$WORK_DIR/uploads
-RESULTS_DIR=$WORK_DIR/results
-CACHE_DIR=$WORK_DIR/cache
+# Redis Configuration
+REDIS_URL=redis://:m3enhanced_redis_2024@localhost:6379/0
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=m3enhanced_redis_2024
 
 # API Configuration
 API_HOST=0.0.0.0
 API_PORT=8000
 DEBUG=false
-LOG_LEVEL=INFO
+RELOAD=false
 
-# Security
-SECRET_KEY=$(openssl rand -hex 32 2>/dev/null || echo "fallback-secret-key")
-
-# File Processing
-MAX_FILE_SIZE=500MB
-ALLOWED_EXTENSIONS=["mp3","wav","flac","m4a","aac","ogg"]
+# Processing Configuration
+MAX_WORKERS=2
+GPU_ENABLED=false
+BATCH_SIZE=2
+TEMP_CLEANUP=true
 
 # Model Configuration
+MODELS_DIR=./models
+TEMP_DIR=./temp
+UPLOADS_DIR=./uploads
+RESULTS_DIR=./results
+
+# Default Processing Settings
 DEFAULT_SEPARATOR=demucs
-DEFAULT_TRANSCRIBER=basic-pitch
+DEFAULT_TRANSCRIBER=basic_pitch
 ENABLE_CLASSIFICATION=true
+QUALITY_ANALYSIS=true
+GENERATE_TABS=true
+OUTPUT_FORMAT=all
 
-# Audio Processing
-AUDIO_SAMPLE_RATE=44100
-AUDIO_BIT_DEPTH=24
-MAX_AUDIO_DURATION=600
+# File Upload Settings
+MAX_FILE_SIZE=100MB
+ALLOWED_EXTENSIONS=mp3,wav,flac,m4a,ogg
 
-# Job Queue
-CELERY_BROKER_URL=redis://localhost:6379/0
-CELERY_RESULT_BACKEND=redis://localhost:6379/0
-MAX_CONCURRENT_JOBS=2
-JOB_TIMEOUT=3600
+# Logging
+LOG_LEVEL=INFO
+LOG_DIR=./logs
 EOF
-
-    if [[ "$GPU_AVAILABLE" = true ]]; then
-        cat >> "$env_file" << EOF
-
-# GPU Configuration
-CUDA_VISIBLE_DEVICES=0
-PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
-TF_FORCE_GPU_ALLOW_GROWTH=true
-GPU_COUNT=$GPU_COUNT
-GPU_MEMORY_TOTAL=$GPU_MEMORY_TOTAL
-EOF
+        log_info "Environment configuration created"
+    else
+        log_info "Using existing environment configuration"
     fi
-
-    log_success "Environment file created"
 }
 
-create_management_scripts() {
-    # Start script
+#=======================================================
+#              SERVICE SCRIPTS CREATION
+#=======================================================
+
+create_service_scripts() {
+    log_step "13" "Creating Service Scripts"
+
+    # Create start script
+    log_info "Creating start script..."
     cat > "$WORK_DIR/start.sh" << 'EOF'
 #!/bin/bash
-set -e
 
 echo "Starting M3 Enhanced services..."
 
@@ -752,406 +675,266 @@ if [[ -f .env ]]; then
 fi
 
 # Start Redis if not running
-if ! pgrep redis-server > /dev/null; then
+if ! pgrep -x "redis-server" > /dev/null; then
     echo "Starting Redis..."
-    redis-server --daemonize yes 2>/dev/null || echo "Failed to start Redis"
+    if ! redis-server config/redis.conf --daemonize yes; then
+        echo "Failed to start Redis"
+        exit 1
+    fi
+    sleep 2
 fi
 
-# Start API server in background
-echo "Starting API server..."
-cd backend
-nohup python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 > ../logs/api.log 2>&1 &
-echo $! > ../logs/api.pid
+# Test Redis connection
+if ! redis-cli -a "${REDIS_PASSWORD:-m3enhanced_redis_2024}" ping | grep -q "PONG"; then
+    echo "Redis connection failed"
+    exit 1
+fi
 
-echo "M3 Enhanced started!"
-echo "API: http://localhost:8000"
-echo "Logs: tail -f logs/api.log"
+echo "Starting API server..."
+# Start API server
+python3 -m uvicorn backend.main:app --host ${API_HOST:-0.0.0.0} --port ${API_PORT:-8000} --reload=${RELOAD:-false} &
+API_PID=$!
+
+# Wait a moment for server to start
+sleep 3
+
+# Check if API server is running
+if kill -0 $API_PID 2>/dev/null; then
+    echo "M3 Enhanced started!"
+    echo "API: http://localhost:${API_PORT:-8000}"
+    echo "Logs: tail -f logs/api.log"
+else
+    echo "Failed to start API server"
+    exit 1
+fi
 EOF
 
-    # Stop script
+    chmod +x "$WORK_DIR/start.sh"
+
+    # Create stop script
+    log_info "Creating stop script..."
     cat > "$WORK_DIR/stop.sh" << 'EOF'
 #!/bin/bash
+
 echo "Stopping M3 Enhanced services..."
 
 # Stop API server
-if [[ -f logs/api.pid ]]; then
-    kill $(cat logs/api.pid) 2>/dev/null || true
-    rm -f logs/api.pid
+pkill -f "uvicorn.*backend.main:app" || true
+
+# Stop Celery workers
+pkill -f "celery.*worker" || true
+
+# Stop Redis (if we started it)
+if pgrep -f "redis-server.*config/redis.conf" > /dev/null; then
+    pkill -f "redis-server.*config/redis.conf" || true
 fi
 
-# Stop Redis if we started it
-pkill redis-server 2>/dev/null || true
-
-echo "M3 Enhanced services stopped."
+echo "M3 Enhanced stopped"
 EOF
 
-    # Status script
+    chmod +x "$WORK_DIR/stop.sh"
+
+    # Create status script
+    log_info "Creating status script..."
     cat > "$WORK_DIR/status.sh" << 'EOF'
 #!/bin/bash
-echo "=== M3 Enhanced System Status ==="
 
-if [[ -f .env ]]; then
-    source .env
-    echo "Runtime Type: $M3_RUNTIME_TYPE"
-    echo "Device: $M3_DEVICE"
-fi
+echo "M3 Enhanced Service Status:"
+echo "=========================="
 
-echo ""
-echo "Services:"
-
-if pgrep redis-server > /dev/null; then
-    echo "  Redis: RUNNING"
+# Check Redis
+if pgrep -x "redis-server" > /dev/null; then
+    echo "Redis: Running"
+    if redis-cli -a "${REDIS_PASSWORD:-m3enhanced_redis_2024}" ping | grep -q "PONG" 2>/dev/null; then
+        echo "Redis Connection: OK"
+    else
+        echo "Redis Connection: Failed"
+    fi
 else
-    echo "  Redis: STOPPED"
+    echo "Redis: Stopped"
 fi
 
-if [[ -f logs/api.pid ]] && kill -0 $(cat logs/api.pid) 2>/dev/null; then
-    echo "  API Server: RUNNING"
+# Check API server
+if pgrep -f "uvicorn.*backend.main:app" > /dev/null; then
+    echo "API Server: Running"
+
+    # Test API health endpoint
+    if command -v curl >/dev/null 2>&1; then
+        if curl -s http://localhost:${API_PORT:-8000}/health >/dev/null; then
+            echo "API Health: OK"
+        else
+            echo "API Health: Failed"
+        fi
+    fi
 else
-    echo "  API Server: STOPPED"
+    echo "API Server: Stopped"
+fi
+
+# Check Celery workers
+if pgrep -f "celery.*worker" > /dev/null; then
+    echo "Celery Workers: Running"
+else
+    echo "Celery Workers: Stopped"
 fi
 
 echo ""
-echo "System Resources:"
-echo "  CPU Usage: $(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d'%' -f1 || echo "N/A")%"
-echo "  Memory: $(free -h | awk '/^Mem:/ {printf "%s/%s", $3, $2}' || echo "N/A")"
-echo "  Disk: $(df -h . | awk 'NR==2 {printf "%s/%s (%s)", $3, $2, $5}' || echo "N/A")"
-
-echo ""
-echo "Endpoints:"
-echo "  API: http://localhost:8000"
-echo "  Health: curl http://localhost:8000/health"
+echo "Access Points:"
+echo "- API: http://localhost:${API_PORT:-8000}"
+echo "- Health Check: curl http://localhost:${API_PORT:-8000}/health"
+echo "- Documentation: http://localhost:${API_PORT:-8000}/docs"
 EOF
 
-    # Make scripts executable
-    chmod +x "$WORK_DIR"/*.sh 2>/dev/null || log_warn "Failed to make scripts executable"
+    chmod +x "$WORK_DIR/status.sh"
 
-    log_success "Management scripts created"
+    log_info "Service scripts created successfully"
 }
 
-# === System Testing ===
-run_comprehensive_tests() {
-    log_header "System Testing"
+#=======================================================
+#              VERIFICATION AND TESTING
+#=======================================================
 
-    local test_failures=0
+verify_installation() {
+    log_step "14" "Verifying Installation"
 
-    # Test Python imports
-    log_step "TEST-1" "Testing Python imports"
-    if python3 -c "
-import sys, numpy, torch, tensorflow as tf
-print(f'Python: {sys.version_info.major}.{sys.version_info.minor}')
-print(f'NumPy: {numpy.__version__}')
-print(f'PyTorch: {torch.__version__}')
-print(f'TensorFlow: {tf.__version__}')
+    log_info "Testing Python imports..."
+
+    # Test core imports
+    python3 -c "
+import sys
+print(f'Python: {sys.version}')
+
+try:
+    import numpy as np
+    print(f'NumPy: {np.__version__}')
+except ImportError as e:
+    print(f'NumPy import failed: {e}')
+    sys.exit(1)
+
+try:
+    import torch
+    print(f'PyTorch: {torch.__version__}')
+except ImportError as e:
+    print(f'PyTorch import failed: {e}')
+    sys.exit(1)
+
+try:
+    import tensorflow as tf
+    print(f'TensorFlow: {tf.__version__}')
+except ImportError as e:
+    print(f'TensorFlow import failed: {e}')
+    sys.exit(1)
+
 print('Core imports: PASSED')
-" 2>/dev/null; then
-        log_success "Python imports test passed"
-    else
-        log_warn "Python imports test failed"
-        ((test_failures++))
-    fi
+"
 
-    # Test audio processing
-    log_step "TEST-2" "Testing audio processing"
-    if python3 -c "
-import numpy as np
+    # Test audio processing imports
+    python3 -c "
 try:
-    import librosa, soundfile
-    sr = 22050
-    test_audio = 0.5 * np.sin(2 * np.pi * 440 * np.linspace(0, 1, sr))
-    mfccs = librosa.feature.mfcc(y=test_audio, sr=sr)
+    import librosa
+    import soundfile as sf
+    import pydub
     print('Audio processing: PASSED')
-except Exception as e:
-    print(f'Audio processing: FAILED - {e}')
+except ImportError as e:
+    print(f'Audio processing import failed: {e}')
     exit(1)
-" 2>/dev/null; then
-        log_success "Audio processing test passed"
-    else
-        log_warn "Audio processing test failed"
-        ((test_failures++))
+"
+
+    # Test Basic Pitch separately with error handling
+    log_info "Testing Basic Pitch availability..."
+    if ! python3 -c "import basic_pitch; print('Basic Pitch: AVAILABLE')" 2>/dev/null; then
+        log_warn "Basic Pitch verification failed: Module not properly installed"
     fi
 
-    # Test Redis connectivity
-    log_step "TEST-3" "Testing Redis connectivity"
-    if command -v redis-cli >/dev/null 2>&1 && redis-cli ping 2>/dev/null | grep -q PONG; then
-        log_success "Redis connectivity test passed"
-    else
-        log_warn "Redis connectivity test failed"
-        ((test_failures++))
-    fi
-
-    # Test file system permissions
-    log_step "TEST-4" "Testing file system permissions"
-    local test_dirs=("$WORK_DIR/temp" "$WORK_DIR/uploads" "$WORK_DIR/results")
-    local perm_failed=0
-    for dir in "${test_dirs[@]}"; do
-        if [[ -w "$dir" ]]; then
-            log_info "Write access verified: ${dir#$WORK_DIR/}"
-        else
-            log_warn "No write access: ${dir#$WORK_DIR/}"
-            ((perm_failed++))
-        fi
-    done
-
-    if [[ $perm_failed -eq 0 ]]; then
-        log_success "File system permissions test passed"
-    else
-        log_warn "File system permissions test failed"
-        ((test_failures++))
-    fi
-
-    # Test summary
-    if [[ $test_failures -eq 0 ]]; then
-        log_success "All system tests passed!"
-    else
-        log_warn "$test_failures test(s) failed - check logs for details"
-    fi
-
-    return $test_failures
+    log_info "Installation verification complete"
 }
 
-# === Model Downloads ===
-download_models() {
-    log_header "Model Downloads"
+#=======================================================
+#              CLEANUP AND FINALIZATION
+#=======================================================
 
-    mkdir -p "$WORK_DIR/models"
-
-    # Download Demucs model
-    log_step "MODEL-1" "Downloading Demucs model"
-    if python3 -c "
-import demucs.pretrained
-try:
-    model = demucs.pretrained.get_model('htdemucs')
-    print('Demucs model downloaded successfully')
-except Exception as e:
-    print(f'Demucs model download failed: {e}')
-" 2>/dev/null; then
-        log_success "Demucs model verified"
-    else
-        log_warn "Demucs model download failed"
-    fi
-
-    # Verify Basic Pitch
-    log_step "MODEL-2" "Verifying Basic Pitch"
-    if python3 -c "
-try:
-    import basic_pitch
-    print('Basic Pitch model verified')
-except Exception as e:
-    print(f'Basic Pitch verification failed: {e}')
-" 2>/dev/null; then
-        log_success "Basic Pitch model verified"
-    else
-        log_warn "Basic Pitch model verification failed"
-    fi
-
-    log_success "Model downloads completed"
-}
-
-# === Performance Optimization ===
-apply_optimizations() {
-    log_header "System Optimizations"
-
-    # CPU optimization
-    if [[ -d /sys/devices/system/cpu/cpu0/cpufreq ]]; then
-        for cpu in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
-            echo performance > "$cpu" 2>/dev/null || true
-        done
-        log_success "CPU governor set to performance"
-    else
-        log_info "CPU governor optimization not available"
-    fi
-
-    log_success "System optimizations applied"
-}
-
-# === Cleanup Functions ===
 cleanup_installation() {
-    log_header "Installation Cleanup"
-
-    # Clean package cache
-    apt-get clean 2>/dev/null || true
-    apt-get autoremove -y 2>/dev/null || true
+    log_step "15" "Cleaning Up Installation"
 
     # Clean pip cache
-    python3 -m pip cache purge 2>/dev/null || true
+    log_info "Cleaning pip cache..."
+    python3 -m pip cache purge || true
 
-    # Clean temporary files
-    find /tmp -name "pip-*" -type d -mtime +1 -exec rm -rf {} + 2>/dev/null || true
+    # Clean apt cache
+    log_info "Cleaning apt cache..."
+    apt-get autoremove -y || true
+    apt-get autoclean || true
 
-    log_success "Installation cleanup completed"
-}
-
-cleanup_on_failure() {
-    local error_msg="${1:-Unknown error}"
-
-    if [[ "$ERROR_CLEANUP_RUNNING" == "true" ]]; then
-        return 0  # Prevent infinite recursion
+    # Remove temporary files
+    if [[ -d "/tmp/pip-*" ]]; then
+        rm -rf /tmp/pip-* || true
     fi
 
-    ERROR_CLEANUP_RUNNING=true
+    # Set proper permissions
+    chmod -R 755 "$WORK_DIR"/{*.sh,logs,temp,uploads,results} 2>/dev/null || true
 
-    echo -e "${RED}[CLEANUP] Setup failed: $error_msg${NC}" >&3
-    log_to_file "CLEANUP" "Setup failed: $error_msg"
+    log_info "Cleanup complete"
+}
 
-    # Stop any services we might have started
-    systemctl stop redis-server 2>/dev/null || true
-    pkill -f "uvicorn" 2>/dev/null || true
+#=======================================================
+#              MAIN INSTALLATION FUNCTION
+#=======================================================
 
-    # Clean up any partial installations
-    if [[ -f "$WORK_DIR/logs/api.pid" ]]; then
-        kill $(cat "$WORK_DIR/logs/api.pid") 2>/dev/null || true
-        rm -f "$WORK_DIR/logs/api.pid"
+main() {
+    local end_time
+    local duration
+
+    print_header
+
+    # Check if already in M3 Enhanced directory
+    if [[ ! -f "$WORK_DIR/setup.sh" ]]; then
+        fatal_error "Please run this script from the M3 Enhanced project directory"
     fi
 
-    echo -e "${YELLOW}[CLEANUP] Cleanup completed. Check logs: $LOG_FILE${NC}" >&3
-    log_to_file "CLEANUP" "Cleanup completed"
-}
+    log_info "Starting M3 Enhanced setup process..."
+    log_info "Working directory: $WORK_DIR"
+    log_info "Timestamp: $TIMESTAMP"
 
-# === Update Fix Log ===
-update_fixlog() {
-    local fixlog_file="$WORK_DIR/fixlog.txt"
+    # Execute installation steps
+    verify_system_requirements
+    install_system_dependencies
+    setup_python_environment
+    resolve_dependency_conflicts
+    install_core_ml_frameworks
+    install_audio_libraries
+    install_music_libraries
+    install_web_frameworks
+    setup_task_queue
+    install_additional_dependencies
+    download_models
+    configure_environment
+    create_service_scripts
+    verify_installation
+    cleanup_installation
 
-    cat >> "$fixlog_file" << EOF
+    # Calculate duration
+    end_time=$(date +%s)
+    duration=$((end_time - START_TIME))
 
-### Fix #10: Lines 1-1000+ - Complete Error Handling and Stability Fix
-**Date**: $(date '+%Y-%m-%d %H:%M:%S')
-**User**: pieman909
-**Issue**: Infinite recursion in error handling causing segfault, internet connectivity blocking setup
-**Solution**: Complete rewrite of error handling system and robust connectivity checks
+    # Runtime detection
+    local runtime="CPU"
+    local device="cpu"
+    if python3 -c "import torch; print(torch.cuda.is_available())" 2>/dev/null | grep -q "True"; then
+        runtime="GPU"
+        device="cuda"
+    fi
 
-#### CRITICAL FIXES:
-
-### Lines 1-50: Robust Script Foundation
-**Change**: Added proper global constants and error state management
-**Implementation**: readonly variables, ERROR_CLEANUP_RUNNING flag
-**Reason**: Prevent variable modification and infinite recursion
-
-### Lines 51-150: Fixed Logging System
-**Change**: Eliminated recursive error calls
-**Original**: log_error called cleanup_on_failure which called log_error
-**Fixed**: Added ERROR_CLEANUP_RUNNING flag and proper error state management
-**Reason**: Prevent infinite recursion that caused segfault
-
-### Lines 151-200: Improved Connectivity Checking
-**Change**: Multiple fallback methods for internet connectivity
-**Original**: Single ping to google.com that blocked entire setup
-**Fixed**: Multiple hosts, DNS lookup, curl fallback, and non-blocking approach
-**Implementation**:
-- Test multiple hosts (8.8.8.8, 1.1.1.1, google.com, github.com)
-- DNS resolution fallback
-- curl connectivity test
-- Warn but continue on failure
-**Reason**: Internet issues shouldn't block entire setup
-
-### Lines 201-250: Enhanced Prerequisites
-**Change**: Non-fatal error handling for prerequisites
-**Original**: Failed prerequisites caused immediate exit
-**Fixed**: Collect all failures, warn on non-critical issues, only exit on critical failures
-**Reason**: Allow setup to continue with warnings where possible
-
-### Lines 251-400: Robust Package Installation
-**Change**: Graceful handling of package installation failures
-**Implementation**:
-- Individual package success/failure tracking
-- Retry mechanism for failed packages
-- Continue on non-critical package failures
-- Detailed logging of what succeeded/failed
-**Reason**: Some packages may fail due to repository issues but setup should continue
-
-### Lines 401-600: Defensive Programming
-**Change**: Added null checks and fallbacks throughout
-**Implementation**:
-- Command existence checks before execution
-- Output validation before parsing
-- Graceful degradation on command failures
-- Default values for critical variables
-**Reason**: Prevent script crashes from external command failures
-
-### Lines 601-800: Safe Service Configuration
-**Change**: Non-blocking service setup with proper error handling
-**Implementation**:
-- Check service availability before configuration
-- Warn on service failures instead of failing
-- Test service functionality after setup
-- Provide manual recovery instructions
-**Reason**: Service issues shouldn't prevent entire setup completion
-
-### Lines 801-1000: Comprehensive Testing with Graceful Failures
-**Change**: Test suite that reports issues but doesn't block completion
-**Implementation**:
-- Individual test isolation
-- Detailed failure reporting
-- Continue testing even if some tests fail
-- Summary report of all test results
-**Reason**: Identify issues without preventing setup completion
-
-#### SPECIFIC ERROR HANDLING IMPROVEMENTS:
-
-### Infinite Recursion Fix
-**Lines 60-80**: ERROR_CLEANUP_RUNNING flag prevents recursive cleanup calls
-**Lines 120-140**: log_error function checks flag before calling cleanup
-**Lines 950-980**: cleanup_on_failure function sets flag immediately
-
-### Internet Connectivity Robustness
-**Lines 180-220**: check_internet_connectivity function with multiple fallbacks
-**Lines 160-180**: Non-blocking connectivity check in prerequisites
-**Warning instead of error**: Allow setup to continue without internet
-
-### Package Installation Resilience
-**Lines 350-400**: install_package_array function with retry logic
-**Lines 420-480**: Individual package installation with error isolation
-**Continue on failure**: Log warnings but don't stop entire setup
-
-### Service Configuration Safety
-**Lines 650-700**: Service setup with availability checks
-**Lines 720-760**: Redis configuration with fallback options
-**Graceful degradation**: Warn about service issues but continue
-
-#### RELIABILITY IMPROVEMENTS:
-
-1. **Error State Management**: Prevents infinite recursion loops
-2. **Connectivity Resilience**: Multiple internet connectivity test methods
-3. **Package Fault Tolerance**: Continue setup even if some packages fail
-4. **Service Graceful Degradation**: Setup continues even if services fail to start
-5. **Comprehensive Logging**: Detailed logs for debugging without blocking progress
-6. **Safe Cleanup**: Cleanup process that doesn't cause additional errors
-7. **Defensive Programming**: Null checks and command validation throughout
-
-#### EXPECTED RESULTS:
-
-1. ✅ No more infinite recursion or segfaults
-2. ✅ Setup continues even with internet connectivity issues
-3. ✅ Graceful handling of package installation failures
-4. ✅ Service issues reported but don't block setup
-5. ✅ Comprehensive error logging for debugging
-6. ✅ Safe cleanup on any failure type
-7. ✅ Robust error recovery and continuation
-
-This fix transforms the setup script from fragile to production-robust with comprehensive error handling and graceful degradation.
-EOF
-
-    log_success "Fix log updated"
-}
-
-# === Final Status Display ===
-display_final_status() {
-    local end_time=$(date +%s)
-    local duration=$((end_time - START_TIME))
-    local minutes=$((duration / 60))
-    local seconds=$((duration % 60))
-
+    # Final success message
     echo ""
     echo "=============================================="
     echo "    M3 ENHANCED SETUP COMPLETE"
     echo "=============================================="
     echo ""
     echo "INSTALLATION SUMMARY:"
-    echo "  Setup Time: ${minutes}m ${seconds}s"
-    echo "  Runtime: $RUNTIME_TYPE"
-    echo "  Device: $TORCH_DEVICE"
-    echo "  Workers: $NUM_WORKERS"
-    echo "  Batch Size: $BATCH_SIZE"
+    echo "  Setup Time: $((duration / 60))m $((duration % 60))s"
+    echo "  Runtime: $runtime"
+    echo "  Device: $device"
+    echo "  Workers: 2"
+    echo "  Batch Size: 2"
     echo ""
     echo "QUICK START:"
     echo "  ./start.sh     # Start services"
@@ -1164,13 +947,19 @@ display_final_status() {
     echo ""
     echo "IMPORTANT FILES:"
     echo "  Configuration: .env"
-    echo "  Setup Log: $LOG_FILE"
+    echo "  Setup Log: $SETUP_LOG"
     echo "  Error Log: $ERROR_LOG"
     echo "  Results: $RESULT_FILE"
     echo ""
     echo "FEATURES AVAILABLE:"
     echo "  Audio Separation (Demucs)"
-    echo "  Music Transcription (Basic Pitch)"
+
+    if python3 -c "import basic_pitch" 2>/dev/null; then
+        echo "  Music Transcription (Basic Pitch)"
+    else
+        echo "  Music Transcription (Limited - Basic Pitch unavailable)"
+    fi
+
     echo "  MIDI Processing"
     echo "  Web API Interface"
     echo ""
@@ -1182,54 +971,16 @@ display_final_status() {
     echo "=============================================="
     echo "   M3 Enhanced is ready!"
     echo "=============================================="
-
-    log_success "Setup completed successfully in ${minutes}m ${seconds}s"
-}
-
-# === Main Execution Function ===
-main() {
-    echo ""
-    echo "======================================================="
-    echo "         M3 Enhanced - COMPLETELY FIXED Setup Script"
-    echo "              Robust Production Deployment"
-    echo "======================================================="
-    echo ""
-
-    log_info "Starting M3 Enhanced setup with robust error handling..."
-
-    # Execute setup phases with proper error handling
-    collect_system_info || log_warn "System info collection had issues"
-    verify_prerequisites || log_error "Critical prerequisites failed"
-    detect_runtime_environment || log_warn "Runtime detection had issues"
-    install_system_packages || log_warn "Some system packages failed"
-    verify_system_libraries || log_warn "Some libraries not found"
-    setup_python_environment || log_warn "Python setup had issues"
-    install_ml_frameworks || log_warn "Some ML frameworks failed"
-    install_audio_libraries || log_warn "Some audio libraries failed"
-    install_web_framework || log_warn "Some web packages failed"
-    install_utilities || log_warn "Some utilities failed"
-    configure_services || log_warn "Service configuration had issues"
-    create_project_structure || log_warn "Project structure had issues"
-    setup_environment_configuration || log_warn "Environment config had issues"
-    download_models || log_warn "Model downloads had issues"
-    run_comprehensive_tests || log_warn "Some tests failed"
-    apply_optimizations || log_warn "Optimization had issues"
-    cleanup_installation || log_warn "Cleanup had issues"
-    update_fixlog || log_warn "Fix log update failed"
-    display_final_status
-
-    # Final result file summary
     echo ""
     echo "=== SETUP COMPLETE ==="
     echo "Result file: $RESULT_FILE"
-    echo "Setup log: $LOG_FILE"
+    echo "Setup log: $SETUP_LOG"
     echo "Error log: $ERROR_LOG"
     echo "======================="
-
-    log_success "M3 Enhanced setup completed with robust error handling"
 }
 
-# === Script Execution ===
-if [[ "${BASH_SOURCE[0]}" = "${0}" ]]; then
-    main "$@"
-fi
+# Handle script interruption
+trap 'log_error "Setup interrupted"; exit 1' INT TERM
+
+# Run main function
+main "$@"
