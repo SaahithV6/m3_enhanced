@@ -1,0 +1,82 @@
+m3_enhanced/
+├── backend/
+│ ├── app/
+│ │ ├── init.py
+│ │ ├── main.py # FastAPI app with job endpoints
+│ │ ├── core/
+│ │ │ ├── init.py
+│ │ │ ├── config.py # Environment configuration
+│ │ │ ├── job_scheduler.py # Celery/Redis job management
+│ │ │ └── quality_metrics.py # SDR/SIR/SAR calculations
+│ │ ├── models/
+│ │ │ ├── init.py
+│ │ │ ├── model_manager.py # Centralized AI model loading
+│ │ │ └── model_configs.py # Model-specific configurations
+│ │ ├── processors/
+│ │ │ ├── init.py
+│ │ │ ├── multipass_separator.py # Multi-pass separation logic
+│ │ │ ├── instrument_classifier.py # YAMNet/OpenL3 classification
+│ │ │ ├── transcription_engine.py # YourMT3+/MT3/BasicPitch
+│ │ │ └── lead_rhythm_analyzer.py # Guitar part separation
+│ │ ├── preprocessing/
+│ │ │ ├── init.py
+│ │ │ ├── audio_enhancer.py # Studio-grade preprocessing
+│ │ │ ├── format_converter.py # FFmpeg integration
+│ │ │ └── noise_reducer.py # Audio repair algorithms
+│ │ ├── postprocessing/
+│ │ │ ├── init.py
+│ │ │ ├── tablature_generator.py # Guitar tab optimization
+│ │ │ ├── sheet_renderer.py # Music notation rendering
+│ │ │ └── output_formatter.py # ZIP packaging
+│ │ └── utils/
+│ │ ├── init.py
+│ │ ├── audio_utils.py # Common audio operations
+│ │ ├── midi_utils.py # MIDI handling
+│ │ └── file_manager.py # File system operations
+│ ├── requirements.txt # Updated dependencies
+│ ├── docker/
+│ │ ├── Dockerfile # Production container
+│ │ ├── docker-compose.yml # Multi-service setup
+│ │ └── gpu.Dockerfile # GPU-optimized container
+│ └── scripts/
+│ ├── download_models.py # Model downloading script
+│ ├── colab_setup.py # Google Colab initialization
+│ └── benchmark_models.py # Performance testing
+├── frontend/
+│ ├── static/
+│ │ ├── index.html # Web interface
+│ │ ├── style.css # UI styling
+│ │ └── app.js # Client-side logic
+│ └── templates/ # Additional UI templates
+├── models/ # AI model storage
+│ ├── yourmt3_plus/ # Enhanced transcription models
+│ ├── mt3/ # Google MT3 models
+│ ├── demucs/ # Demucs separation models
+│ ├── mvsep/ # MVSEP-MDX23 models
+│ ├── yamnet/ # Audio classification
+│ ├── basic_pitch/ # Spotify transcription
+│ └── soundfonts/ # Audio synthesis
+├── temp/ # Temporary processing files
+├── uploads/ # User uploaded files
+├── results/ # Processing outputs
+├── tests/
+│ ├── init.py
+│ ├── test_separation.py # Separation quality tests
+│ ├── test_transcription.py # Transcription accuracy tests
+│ └── integration/
+│ └── test_full_pipeline.py # End-to-end testing
+├── config/
+│ ├── redis.conf # Redis configuration
+│ ├── celery.conf # Celery worker settings
+│ └── nginx.conf # Reverse proxy config
+├── docs/
+│ ├── API.md # API documentation
+│ ├── SETUP.md # Installation guide
+│ └── PIPELINE.md # Architecture overview
+├── .env.example # Environment variables template
+├── docker-compose.yml # Development environment
+├── requirements-dev.txt # Development dependencies
+└── README.md # Project overview
+
+This is the filestructure of a project I am working on. What I want you to do is traverse through this entire file, it has all the content all the files pasted onto it. From traversing this entire document, I want you to draft up all of the python imports for this in requirements.txt. A .sh script outside in the main directory (one level down from backend will be called to )
+
