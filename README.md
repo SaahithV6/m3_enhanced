@@ -334,12 +334,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **LAION** - Audio classification models
 - **Community Contributors** - Open source improvements
 
-## 🌟 Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=pieman909/m3_enhanced&type=Date)](https://star-history.com/#pieman909/m3_enhanced&Date)
-
----
 
 **Built with ❤️ for the music community**
-
-Transform your audio with AI-powered precision. From bedroom recordings to professional productions, M3 Enhanced delivers studio-grade results for musicians, producers, and audio enthusiasts worldwide.
