@@ -4,7 +4,6 @@
 [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 [![GPU Accelerated](https://img.shields.io/badge/GPU-Accelerated-green.svg)](https://developer.nvidia.com/cuda-zone)
 
-An advanced AI-powered music processing pipeline that combines state-of-the-art models for audio separation, multi-track transcription, and comprehensive music analysis. Transform any audio file into separated tracks, MIDI transcriptions, guitar tablature, and sheet music with studio-grade quality.
 
 ## ✨ Features
 
