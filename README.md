@@ -294,44 +294,7 @@ python -m pytest
 - [Model Guide](docs/MODELS.md) - AI model documentation
 - [Deployment Guide](docs/DEPLOYMENT.md) - Production deployment
 
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**GPU not detected**
-```bash
-# Check CUDA installation
-nvidia-smi
-python -c "import torch; print(torch.cuda.is_available())"
-```
-
-**Out of memory errors**
-- Reduce batch size in configuration
-- Use CPU-only processing for large files
-- Enable model quantization
-
-**Audio processing fails**
-- Ensure FFmpeg is installed and in PATH
-- Check file format compatibility
-- Verify file integrity
-
-### Getting Help
-
-1. Check [Issues](https://github.com/pieman909/m3_enhanced/issues) for existing solutions
-2. Review [Troubleshooting Guide](docs/TROUBLESHOOTING.md)
-3. Submit detailed bug reports with logs and system info
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Facebook Research** - Demucs audio separation
-- **Google Research** - MT3 music transcription
-- **Spotify** - BasicPitch transcription model
-- **LAION** - Audio classification models
-- **Community Contributors** - Open source improvements
-
-
-**Built with ❤️ for the music community**
