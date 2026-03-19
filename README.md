@@ -150,6 +150,6 @@ python backend/scripts/benchmark_models.py
 - [Deployment Guide](docs/DEPLOYMENT.md) - Production deployment
 
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
