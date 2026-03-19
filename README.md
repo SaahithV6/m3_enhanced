@@ -1,42 +1,4 @@
-# M3 Enhanced 🎵
-
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
-[![GPU Accelerated](https://img.shields.io/badge/GPU-Accelerated-green.svg)](https://developer.nvidia.com/cuda-zone)
-
-
-## ✨ Features
-
-### 🎛️ Audio Separation
-- **Multiple AI Models**: Demucs v4, MVSEP-MDX23 for ultra-high quality separation
-- **Instrument Isolation**: Vocals, drums, bass, guitar, and other instruments
-- **Guitar Analysis**: Automatic lead/rhythm guitar separation
-- **Quality Metrics**: SDR, SIR, SAR evaluation for transparency
-
-### 🎼 Multi-Track Transcription
-- **Advanced Models**: YourMT3+, Google MT3, Spotify BasicPitch
-- **Polyphonic Support**: Multiple instruments and notes simultaneously
-- **High Accuracy**: Up to 85% F1 score on complex musical content
-- **MIDI Output**: Standard MIDI files with velocity and timing
-
-### 🎸 Tablature Generation
-- **Guitar Tabs**: Optimized fingering and notation
-- **Bass Tabs**: Complete bass line transcription
-- **Multiple Formats**: GuitarPro, TuxGuitar, ASCII tabs
-
-### 📊 Music Analysis
-- **Key Detection**: Automatic key and scale identification
-- **Tempo Analysis**: BPM and time signature detection
-- **Chord Progression**: Harmonic analysis and chord sequences
-- **Instrument Classification**: YAMNet and OpenL3 powered identification
-
-### 🎨 Output Formats
-- **Sheet Music**: MusicXML and PDF notation
-- **MIDI Files**: Multi-track MIDI with complete arrangements
-- **Audio Tracks**: High-quality separated stems
-- **Comprehensive Reports**: Analysis summaries and quality metrics
-
-## 🚀 Quick Start
+# M3 Enhanced 
 
 ### Docker Setup (Recommended)
 
@@ -102,7 +64,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 celery -A app.core.job_scheduler worker --loglevel=info
 ```
 
-## 📖 Usage
+## Usage
 
 ### Web Interface
 
@@ -115,32 +77,6 @@ celery -A app.core.job_scheduler worker --loglevel=info
 4. Monitor progress in real-time
 5. Download your results as a ZIP package
 
-### API Usage
-
-```python
-import requests
-
-# Upload and start processing
-files = {'file': open('song.mp3', 'rb')}
-data = {
-    'separation_model': 'demucs',
-    'transcription_model': 'yourmt3_plus',
-    'generate_tabs': True
-}
-
-response = requests.post('http://localhost:8000/process', files=files, data=data)
-job = response.json()
-print(f"Job started: {job['job_id']}")
-
-# Check status
-status = requests.get(f"http://localhost:8000/jobs/{job['job_id']}")
-print(status.json())
-
-# Download results when complete
-results = requests.get(f"http://localhost:8000/jobs/{job['job_id']}/download")
-with open('results.zip', 'wb') as f:
-    f.write(results.content)
-```
 
 ### Command Line Interface
 
@@ -155,36 +91,6 @@ python -m app.cli batch /path/to/songs/ --output /path/to/results/
 python scripts/benchmark_models.py --audio test_song.wav
 ```
 
-## 🏗️ Architecture
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Web UI        │    │   FastAPI       │    │   AI Models     │
-│                 │◄──►│                 │◄──►│                 │
-│ • Upload        │    │ • REST API      │    │ • Demucs        │
-│ • Progress      │    │ • WebSockets    │    │ • YourMT3+      │
-│ • Downloads     │    │ • Job Queue     │    │ • YAMNet        │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                │
-                       ┌─────────────────┐    ┌─────────────────┐
-                       │   Redis Queue   │    │   File Storage  │
-                       │                 │    │                 │
-                       │ • Celery        │    │ • Models        │
-                       │ • Monitoring    │    │ • Results       │
-                       │ • Caching       │    │ • Temporary     │
-                       └─────────────────┘    └─────────────────┘
-```
-
-### Processing Pipeline
-
-1. **Input Processing**: Format validation, enhancement, normalization
-2. **Audio Separation**: AI-powered source separation using Demucs/MVSEP
-3. **Classification**: Instrument identification with YAMNet/OpenL3
-4. **Transcription**: Multi-track MIDI generation with YourMT3+/MT3
-5. **Analysis**: Key detection, tempo, chord progression analysis
-6. **Output Generation**: Tablature, sheet music, and packaged results
-
-## 🛠️ Configuration
 
 ### Environment Variables
 
@@ -216,17 +122,8 @@ RESULTS_DIR=./results
 TEMP_DIR=./temp
 ```
 
-### Model Selection
 
-| Model | Purpose | Quality | Speed | Memory |
-|-------|---------|---------|-------|--------|
-| Demucs v4 | Audio Separation | High | Fast | 2.3GB |
-| MVSEP-MDX23 | Audio Separation | Ultra | Medium | 4.1GB |
-| YourMT3+ | Transcription | Highest | Medium | 800MB |
-| MT3 | Transcription | High | Fast | 600MB |
-| BasicPitch | Transcription | Good | Fastest | 200MB |
-
-## 🧪 Testing
+##  Testing
 
 ```bash
 # Run all tests
@@ -241,52 +138,10 @@ python -m pytest tests/integration/test_full_pipeline.py -v
 python backend/scripts/benchmark_models.py
 ```
 
-## 📊 Performance
 
-### Benchmarks (3-minute song)
 
-| Configuration | Separation | Transcription | Total Time |
-|---------------|------------|---------------|------------|
-| GPU (RTX 3080) | 45s | 30s | ~2 min |
-| GPU (GTX 1060) | 90s | 60s | ~3 min |
-| CPU (8-core) | 300s | 180s | ~8 min |
 
-### Quality Metrics
-
-- **Audio Separation**: 12-15 dB SDR average
-- **Transcription Accuracy**: 80-85% F1 score
-- **Processing Success Rate**: >95%
-- **GPU Memory Usage**: 4-6GB peak
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-### Development Setup
-
-```bash
-# Clone and setup
-git clone https://github.com/pieman909/m3_enhanced.git
-cd m3_enhanced
-
-# Install development dependencies
-pip install -r requirements-dev.txt
-
-# Setup pre-commit hooks
-pre-commit install
-
-# Run tests
-python -m pytest
-```
-
-### Adding New Models
-
-1. Implement model wrapper in `backend/app/models/`
-2. Add configuration to `backend/app/models/model_configs.py`
-3. Update model manager in `backend/app/models/model_manager.py`
-4. Add tests in `tests/test_models/`
-
-## 📚 Documentation
+##  Documentation
 
 - [Setup Guide](docs/SETUP.md) - Detailed installation instructions
 - [API Documentation](docs/API.md) - Complete API reference
